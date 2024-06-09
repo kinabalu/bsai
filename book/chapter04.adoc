@@ -1,0 +1,6 @@
+= Interacting in a chat
+:chapter: 4
+
+== Next Steps
+
+In our next chapter, ...

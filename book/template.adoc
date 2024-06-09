@@ -1,0 +1,6 @@
+= Chapter Title Here
+:chapter: 12
+
+Introduction to the chapter goes here.
+
+== Section Header

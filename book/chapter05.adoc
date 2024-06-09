@@ -1,0 +1,6 @@
+= Generating images
+:chapter: 5
+
+== Next Steps
+
+In our next chapter, ...

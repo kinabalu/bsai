@@ -1,0 +1,16 @@
+= Chapter Title Here
+:chapter: 12
+
+Introduction to the chapter goes here.
+
+== Section Header
+
+Whoa, look out, it's text!
+
+NOTE: This is an admonition.
+
+Here's some more text.
+
+WARNING: Watch out for other admonitions!
+
+Whew, just normal text.
