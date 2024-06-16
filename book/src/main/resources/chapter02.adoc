@@ -1,5 +1,77 @@
-= Asking questions
+= Getting Started
 :chapter: 2
+
+== The Project Structure
+
+This book is organized as a single Mavenfootnote:[Maven can be found at https://maven.apache.org/ . It's one of the two most popular build tools for the JVM ecosystem.] project, using Java 21footnote:[As this book is being written, Java 21 is the current release of Java with long-term support. There are lots of ways to download Java, but which one is best depends on your skill level and operating system. In a pinch, you can find it at https://jdk.java.net/21, but readers of this book are likely to already have a JVM installed. We only included this footnote because _every other book_ has stuff on installing tools and we didn't want to feel left out.].
+Installing these tools is beyond the scope of this book; consider asking tools like ChatGPT for advice for your operating system!
+
+Maven uses a fairly verbose object model, written with XML, to describe projects. This was chosen here because it involves _fewer_ files (a pom.xml can describe a project completely) and Maven has demonstrated excellent compatibility across versions, whereas Gradle - the other popular build tool for the JVM - has much shorter build scripts, but uses _multiple_ build scripts for each project, and it's focused more on feature sets than compatibility.
+
+We don't have a preference between Maven or Gradle in reality, but in a book, tool stability is _critical_.
+
+This book's project is called `bsai-code`. It contains _modules_, named after each chapter, so the top-level project contains modules named `chapter02`, `chapter03`, and so forth. The top-level project serves to centralize the dependencies that *every* module needs, which means that in our case it makes sure the Spring dependencies are consistent.
+
+Each chapter has a directory structure, an effective standard across Java projects, that looks like this:
+
+.Listing {chapter}-{counter:listing}: The standard Maven directory structure
+```shell
+.
+./src
+./src/main/java
+./src/main/resources
+./src/test/java
+./src/test/resources
+```
+
+This can be created in the "project directory" with the following command, if you're running a POSIX shell like `bash` or `zsh`:
+
+.Listing {chapter}-{counter:listing}: Creating the project directory structure in POSIX
+```shell
+mkdir src/{main,test}/{java,resources}
+```
+
+This is all fairly standard for Java programmers; it's being included here for completeness more than anything else. Project listings are offsets from the "book's project directory", so the following listing is in the "top level" directory:
+
+.Listing {chapter}-{counter:listing}: `pom.xml`
+```xml
+include::../../../../code/pom.xml[]
+```
+
+This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter02`, and the file is named `pom.xml`.
+
+.Listing {chapter}-{counter:listing}: `chapter02/pom.xml`
+```xml
+include::../../../../code/chapter02/pom.xml[]
+```
+
+We'll want one more file to save ourselves a lot of unnecessary duplication: an `.env` file. This file is going to hold our OpenAI access key. This is a simple name/value pair, and this file goes into the root of our project structure.
+
+Listing {chapter}-{counter:listing}: `.env`
+```shell
+OPENAI_API_KEY=[your-api-key-value-here]
+```
+
+Thus, we should have a project structure that looks like this, so far:
+
+.Listing {chapter}-{counter:listing}: The project structure early in Chapter Two
+```shell
+> tree
+.
+├── .env
+├── chapter02
+│   ├── pom.xml
+│   └── src
+│       ├── main
+│       │   ├── java
+│       │   └── resources
+│       └── test
+│           ├── java
+│           └── resources
+└── pom.xml
+```
+
+All that's very exciting and good, but it's time to actually write some code and show some basic functionality.
 
 == Next Steps
 
