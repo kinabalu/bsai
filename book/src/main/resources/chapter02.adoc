@@ -73,6 +73,37 @@ Thus, we should have a project structure that looks like this, so far:
 
 All that's very exciting and good, but it's time to actually write some code and show some basic functionality.
 
+== Spring AI
+
+Spring AI builds around the idea of a _Model_. A model accepts a request and feeds back a response in some format; chat models use text, there are also image models, and audio models. There's even a model _abstraction_ to provide for mechanisms that haven't necessarily been anticipated yetfootnote:[Imagine an AI that response with peanut butter and jelly sandwiches! ... or don't, we don't mind.].
+
+There are variants for even the coarse abstractions: a chat model, for example, has a blocking version and a streaming version, where the blocking version returns a 'complete answer' and the streaming version returns the answer in intermediate steps, much as a human would as they type out a response.
+
+In simplest form, to use Spring AI, you acquire a model, with appropriate configuration to inform the model of what sources to use, and issue a call to get the response. That sounds so simple that we should build something and test it out.
+
+NOTE: We've chosen to use OpenAI for the base service for this book. As Chapter One mentioned, this is a commercial service; you'll need to set up an API key for use, and in the process of running the examples in this book, you _will_ consume resources on OpenAI that may incur a cost. This was done because OpenAI is commercial and _predictable_. We know the resources it has available. Ollama is free, but has very high demands in terms of hardware; it is *certainly* possible to use Ollama instead of OpenAI, but we chose to focus on reproducible results for the reader; OpenAI tends to be faster and doesn't rely on the reader having a relatively high end CPU/GPU combination with plenty of disk space.
+
+We need to build a configuration first. This is done in two places: the `.env` file mentioned in the prior section (see Listing {chapter}-5) and in a Spring configuration class.
+
+=== Getting the OpenAI key
+
+To get your OpenAI key, you'll need to go to `https://platform.openai.com/` and create an account. From there, you'll go to "Settings" - the gear on the page - and see this screen:
+
+.The OpenAI Settings Screen
+image::images/ch01-openai-settings.png[]
+
+We need to use a _project key_, so select "Create project" in the menu on the left hand side of the page.
+
+.Creating a project on OpenAI.com
+image::images/ch01-openai-create-project.png[]
+
+Enter a project name that makes sense for you (we chose "Beginning Spring AI") and you'll see a page with a _project key_ on it, like this:
+
+.The Project settings on OpenAI.com
+image::images/ch01-openai-project-key.png[]
+
+The value in the "Project ID" field is what we'll put in the `.env` file.
+
 == Next Steps
 
 In our next chapter, ...
