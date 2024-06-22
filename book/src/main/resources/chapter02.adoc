@@ -190,6 +190,56 @@ Note the use of `spring.config.import`, which allows us to load our `.env` file'
 include::../../../../code/chapter02/src/test/resources/application.properties[]
 ```
 
+Let's take a look at a simple chat "client" - a test that demonstrates how we might wish to interact with class that uses Spring AI.
+(We're going to look at the client next, we promise.)
+
+This test is fundamentally simple: it loads the Spring configuration for testing, and issues a simple request to OpenAI.
+We're going to ask a question about the speed of a particular kind of boat carrying tea in a specific body of water; we don't care about the *actual response*, but given that we're setting `spring.ai.openai.chat.options.temperature` to `0.0`, we expect the answers to be pretty consistent across requests, and we can example the output for expected values to determine if the query response is "right."
+
+.Listing {chapter}-{counter:listing}: `chapter02/src/test/java/ch02/Ch02FirstTests.java`
+```java
+include::../../../../code/chapter02/src/test/java/ch02/Ch02FirstTests.java[]
+```
+
+****
+For the record, the response OpenAI gave for this prompt as this chapter was being written was: "The speed of a typical junk carrying tea in November in the South China Sea can vary depending on various factors such as the size of the junk, the wind conditions, and the currents.
+However, on average, junks can travel at speeds ranging from 5 to 10 knots (5.75 to 11.5 mph) in calm weather conditions."
+
+This is mildly fascinating in and of itself, but note how we're having to phrase the query.
+This book isn't about writing efficient or effective queries, but we're going to modify how this prompt is constructed to make it a little more targeted for our purposes over time.
+****
+
+Of course, we can't _run_ this yet, because we don't have `FirstChatService` implemented.
+
+Our `FirstChatService` has one public method in it, `query(String)`, which returns a `String`. This method represents the _essential_ mechanism that _every call in Spring AI will follow_, although there are a lot of variations we can apply.
+
+First we have to have a `Client` available (in this case, a `ChatClient`). We'll use Spring's dependency injection to get a `ChatClient.Builder` provided, as one is automatically provided by Spring AI.
+
+Next, to issue a call, we build a `Prompt`; there are a number of variations here, but we're going to use the simplest first, and rely on the default options from `application.properties` to determine temperature and model.
+
+Once we have a prompt, we issue a call to the API, whether blocking or streaming; in this case, we don't care about streaming, so we use `call()` to get the response specification.
+
+Once we have the response specification, we can get the simple content by using the `content()` method; this is a short form of `getResult().getOutput().getContent()`. If we wanted to, we could get metadata about the call like the number of tokens consumed on our API key and a few other interesting elements.
+
+This sounds pretty straightforward, so let's see what the actual Java class looks like.
+
+.Listing {chapter}-{counter:listing}: `chapter02/src/main/java/ch02/service/FirstChatService.java`
+```java
+include::../../../../code/chapter02/src/main/java/ch02/service/FirstChatService.java[]
+```
+
+Now we actually have something we can test. We can run this chapter's test suite by using Maven:
+
+```shell
+mvn -am -pl chapter02 clean test
+```
+
+If everything works properly, we should see output that looks something like this screenshot, in part:
+
+.The Output from `Ch02FirstTests`
+image::images/ch01-first-test-execution.png[]
+
+
 == Next Steps
 
 In our next chapter, ...
