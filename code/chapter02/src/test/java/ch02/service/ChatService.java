@@ -1,6 +1,8 @@
 package ch02.service;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,10 @@ public class ChatService {
     }
 
     public String query(String query) {
-        return client.prompt(new Prompt(query)).call().content();
+        var response=client
+                .prompt(new Prompt(query))
+                .call()
+                .chatResponse();
+        return response.getResult().getOutput().getContent();
     }
 }
