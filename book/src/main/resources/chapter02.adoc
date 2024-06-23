@@ -18,51 +18,56 @@ The top-level project serves to centralize the dependencies that *every* module 
 Each chapter has a directory structure, an effective standard across Java projects, that looks like this:
 
 .Listing {chapter}-{counter:listing}: The standard Maven directory structure
-```shell
+[source,shell]
+----
 .
 ./src
 ./src/main/java
 ./src/main/resources
 ./src/test/java
 ./src/test/resources
-```
+----
 
 This can be created in the "project directory" with the following command, if you're running a POSIX shell like `bash` or `zsh`:
 
 .Listing {chapter}-{counter:listing}: Creating the project directory structure in POSIX
-```shell
+[source,shell]
+----
 mkdir src/{main,test}/{java,resources}
-```
+----
 
 This is all fairly standard for Java programmers; it's being included here for completeness more than anything else.
 Project listings are offsets from the "book's project directory", so the following listing is in the "top level" directory:
 
 .Listing {chapter}-{counter:listing}: `pom.xml`
-```xml
+[source,xml]
+----
 include::../../../../code/pom.xml[]
-```
+----
 
 This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter02`, and the file is named `pom.xml`.
 
 .Listing {chapter}-{counter:listing}: `chapter02/pom.xml`
-```xml
+[source,xml]
+----
 include::../../../../code/chapter02/pom.xml[]
-```
+----
 
 We'll want one more file to save ourselves a lot of unnecessary duplication: an `.env` file.
 This file is going to hold our OpenAI access key.
 This is a simple name/value pair, and this file goes into the root of our project structure.
 
 Listing {chapter}-{counter:listing}: `.env`
-
-```shell
+[source,shell]
+----
 OPENAI_API_KEY=[your-api-key-value-here]
-```
+----
 
 Thus, we should have a project structure that looks like this, so far:
 
 .Listing {chapter}-{counter:listing}: The project structure early in Chapter Two
-```shell
+[source,shell]
+----
 > tree
 .
 ├── .env
@@ -76,7 +81,7 @@ Thus, we should have a project structure that looks like this, so far:
 │           ├── java
 │           └── resources
 └── pom.xml
-```
+----
 
 All that's very exciting and good, but it's time to actually write some code and show some basic functionality.
 
@@ -84,7 +89,7 @@ All that's very exciting and good, but it's time to actually write some code and
 
 Spring AI builds around the idea of a _Model_.
 A model accepts a request and feeds back a response in some format; chat models use text, there are also image models, and audio models.
-There's even a model _abstraction_ to provide for mechanisms that haven't necessarily been anticipated yetfootnote:[Imagine an AI that response with peanut butter and jelly sandwiches! ... or don't, we don't mind.].
+There's even a model _abstraction_ to provide for mechanisms that haven't necessarily been anticipated yetfootnote:[Imagine an AI that responds with peanut butter and jelly sandwiches! ... or don't, we don't mind.].
 
 There are variants for even the coarse abstractions: a chat model, for example, has a blocking version and a streaming version, where the blocking version returns a 'complete answer' and the streaming version returns the answer in intermediate steps, much as a human would as they type out a response.
 
@@ -146,9 +151,10 @@ Spring has a lot of very flexible approaches to configuration, and those approac
 We're going to use a simple approach to Spring configuration, so our application will look as simple as possible.
 
 .Listing {chapter}-{counter:listing}: `chapter02/src/main/java/ch02/Ch02Configuration.java`
-```java
+[source,java]
+----
 include::../../../../code/chapter02/src/main/java/ch02/Ch02Configuration.java[]
-```
+----
 
 That's it.
 We're going to use `@Service` to mark resources that Spring will scan and configure for us.
@@ -186,9 +192,10 @@ This is all very test-centric, so we're going to place it in `chapter02/src/test
 Note the use of `spring.config.import`, which allows us to load our `.env` file's values for internal use.
 
 .Listing {chapter}-{counter:listing}: `chapter02/src/test/resources/application.properties`
-```properties
+[source,properties]
+----
 include::../../../../code/chapter02/src/test/resources/application.properties[]
-```
+----
 
 Let's take a look at a simple chat "client" - a test that demonstrates how we might wish to interact with class that uses Spring AI.
 (We're going to look at the client next, we promise.)
@@ -197,9 +204,10 @@ This test is fundamentally simple: it loads the Spring configuration for testing
 We're going to ask a question about the speed of a particular kind of boat carrying tea in a specific body of water; we don't care about the *actual response*, but given that we're setting `spring.ai.openai.chat.options.temperature` to `0.0`, we expect the answers to be pretty consistent across requests, and we can example the output for expected values to determine if the query response is "right."
 
 .Listing {chapter}-{counter:listing}: `chapter02/src/test/java/ch02/Ch02FirstTests.java`
-```java
+[source,java]
+----
 include::../../../../code/chapter02/src/test/java/ch02/Ch02FirstTests.java[]
-```
+----
 
 ****
 For the record, the response OpenAI gave for this prompt as this chapter was being written was: "The speed of a typical junk carrying tea in November in the South China Sea can vary depending on various factors such as the size of the junk, the wind conditions, and the currents.
@@ -211,34 +219,85 @@ This book isn't about writing efficient or effective queries, but we're going to
 
 Of course, we can't _run_ this yet, because we don't have `FirstChatService` implemented.
 
-Our `FirstChatService` has one public method in it, `query(String)`, which returns a `String`. This method represents the _essential_ mechanism that _every call in Spring AI will follow_, although there are a lot of variations we can apply.
+Our `FirstChatService` has one public method in it, `query(String)`, which returns a `String`.
+This method represents the _essential_ mechanism that _every call in Spring AI will follow_, although there are a lot of variations we can apply.
 
-First we have to have a `Client` available (in this case, a `ChatClient`). We'll use Spring's dependency injection to get a `ChatClient.Builder` provided, as one is automatically provided by Spring AI.
+First we have to have a `Client` available (in this case, a `ChatClient`).
+We'll use Spring's dependency injection to get a `ChatClient.Builder` provided, as one is automatically provided by Spring AI.
 
 Next, to issue a call, we build a `Prompt`; there are a number of variations here, but we're going to use the simplest first, and rely on the default options from `application.properties` to determine temperature and model.
 
 Once we have a prompt, we issue a call to the API, whether blocking or streaming; in this case, we don't care about streaming, so we use `call()` to get the response specification.
 
-Once we have the response specification, we can get the simple content by using the `content()` method; this is a short form of `getResult().getOutput().getContent()`. If we wanted to, we could get metadata about the call like the number of tokens consumed on our API key and a few other interesting elements.
+Once we have the response specification, we can get the simple content by using the `content()` method; this is a short form of `getResult().getOutput().getContent()`.
+If we wanted to, we could get metadata about the call like the number of tokens consumed on our API key and a few other interesting elements.
 
 This sounds pretty straightforward, so let's see what the actual Java class looks like.
 
 .Listing {chapter}-{counter:listing}: `chapter02/src/main/java/ch02/service/FirstChatService.java`
-```java
+[source,java]
+----
 include::../../../../code/chapter02/src/main/java/ch02/service/FirstChatService.java[]
-```
+----
 
-Now we actually have something we can test. We can run this chapter's test suite by using Maven:
+Now we actually have something we can test.
+We can run this chapter's test suite by using Maven:
 
-```shell
+[source,shell]
+----
 mvn -am -pl chapter02 clean test
-```
+----
 
 If everything works properly, we should see output that looks something like this screenshot, in part:
 
 .The Output from `Ch02FirstTests`
 image::images/ch01-first-test-execution.png[]
 
+== Choosing a Different Model
+
+The model being specified here is, as mentioned, `gpt-3.5-turbo`, which is an inexpensive, somewhat dated model.
+There are _many_ different models to choose from, with the "most current" on OpenAI being the `gpt-4o` model.
+We could set it as the default in `application.properties`, but we can also provide options to the `Prompt` and set it there.
+Let's see that in action, with a `OptionChatService` that allows us to provide `ChatOptions`, and then we'll show a test that uses it.
+
+.Listing {chapter}-{counter:listing}: `chapter02/src/main/java/ch02/service/OptionChatService.java`
+[source,java]
+----
+include::../../../../code/chapter02/src/main/java/ch02/service/OptionChatService.java[]
+----
+
+This overloads the `query` method from `FirstChatService` to also accept an `OpenAiChatOptions` instance.
+To use it, all we have to do is pass it to the creation of the `Prompt`.
+After that, the call follows the same pattern as we saw in `FirstChatService` to the letter.
+
+****
+As with the `openai` properties in our configuration file, different Spring AI libraries have different capabilities.
+We're targeting OpenAI here, but there are variants for the other LLM implementations that reflect the options those services provide.
+There is a `ChatOptions` object that exposes generalized parameters - like `temperature` - but not every LLM allows us to select a model on the fly like OpenAI does, so we're going to limit ourselves to the `OpenAiChatOptions` type here.
+****
+
+Astute readers might wish to invert the service' calls, such that `query(String)` constructs a default `ChatOptions` and passes it to the more flexible `query(String, OpenAiChatOptions)` method.
+This makes a lot of sense, and in a "real project" that would certainly be advisable - but in a "real project" you wouldn't have multiple instances like this.
+This code is being constructed for the purpose of education, not an example to followfootnote:[It's not an example to follow _unless you're writing your own book_, we suppose, and if you follow our example _there_, consider us flattered.].
+
+Let's show this in action, and let's set the model to `gpt-4o`.
+There are other options we can set - `temperature`, for example - and we'll see that next.
+Let's keep ourselves looking at the model for now.
+
+.Listing {chapter}-{counter:listing}: `chapter02/src/test/java/ch02/Ch02OptionTests.java`
+[source,java]
+----
+include::../../../../code/chapter02/src/test/java/ch02/Ch02OptionTests.java[]
+----
+
+The output for this execution is relatively variable (thanks to the default temperature of queries) but one run locally generated this outputfootnote:[We're going to stick on the subject of junks, which are, according to Wikipedia, "a type of Chinese sailing ship characterized by a central rudder, an overhanging flat transom, watertight bulkheads, and a flat-bottomed design." The subject was chosen mostly to avoid referring to African laden swallows, which - let's be real - nobody cares about.]:
+
+[source, text]
+----
+The speed of a typical junk (a traditional Chinese sailing ship) carrying tea in the South China Sea can vary based on several factors, including the design of the junk, the skill of the crew, and the specific weather and sea conditions. However, under clear weather and standard currents, a traditional junk might typically travel at speeds ranging from 4 to 8 knots (approximately 4.6 to 9.2 miles per hour or 7.4 to 14.8 kilometers per hour).
+
+It's important to note that these speeds are general estimates and can vary. Modern adaptations or motorized junks could achieve different speeds.
+----
 
 == Next Steps
 

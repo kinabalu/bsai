@@ -2,22 +2,23 @@ package ch02.service;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 @Service
-public class FirstChatService {
-    protected final ChatClient client;
+public class OptionChatService extends FirstChatService {
 
-    FirstChatService(ChatClient.Builder builder) {
-        this.client = builder.build();
+    OptionChatService(ChatClient.Builder builder) {
+        super(builder);
     }
 
-    public final String query(String query) {
+    public final String query(String query, OpenAiChatOptions options) {
+        Objects.requireNonNull(options);
         Objects.requireNonNull(query);
 
-        var prompt = new Prompt(query);
+        var prompt = new Prompt(query, options);
 
         var request = client
                 .prompt(prompt);
