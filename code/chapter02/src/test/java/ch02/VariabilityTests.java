@@ -27,7 +27,7 @@ public class VariabilityTests {
     @Autowired
     OptionChatService optionChatService;
 
-    String query = "Tell me a one-sentence story of a flying salamander. Include a color.";
+    String query = "Write a short story about a salamander learning to fly.";
 
     public static Stream<Arguments> controlParameters() {
         return Stream.of(
@@ -52,6 +52,7 @@ public class VariabilityTests {
         }
         for(int i=0;i<results.size();i++) {
             log.info("result: {}", results.get(i));
+            log.info("----------");
             var c = calculator.calculateJaccardSimilarity(results.getFirst(), results.get(i));
             regression.addData(i,c);
         }
