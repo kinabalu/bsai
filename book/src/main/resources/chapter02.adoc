@@ -354,7 +354,7 @@ The similarity of `1.0` means those texts are likely to be identical (as, in fac
 
 The similarity score of `0.04` means that the texts are very different, as we expect, since the number of common words is very low.
 
-_Now_ we have a pattern that we can use to throw at an LLM, with different temperatures and `top_k` values, and measure those paramaters' effect on the resultsfootnote:[And you readers probably thought we just wanted to type "Jaccard" out a lot, to show off, didn't you?].
+_Now_ we have a pattern that we can use to throw at an LLM, with different `temperature` and `top_p` values, and measure those parameters' effect on the resultsfootnote:[And you readers probably thought we just wanted to type "Jaccard" out a lot, to show off, didn't you?].
 
 == Next Steps
 
