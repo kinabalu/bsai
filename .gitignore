@@ -1,3 +1,4 @@
+.vscode
 .DS_Store
 *~
 target
@@ -6,3 +7,5 @@ target
 
 code/.env
 *.log
+archive
+output
