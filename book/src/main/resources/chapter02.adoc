@@ -496,6 +496,10 @@ Another is `assistant`, and the third is `system`.
 We actually have seen `assistant` messages already; that's the role assigned to messages _from the LLM_.
 Therefore, when we ask an LLM "What is the definition of a Chinese junk?", that query is sent as conversation with that element being from the `user` role, and the answer comes back as a message from the `assistant` role.
 
+We can actually build a series of messages as our prompt, assigning the appropriate roles as we like. We could, for example, simulate a conversation about a Chinese Junk like so:
+
+
+
 == Next Steps
 
 In our next chapter, ...
