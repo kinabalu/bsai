@@ -3,14 +3,13 @@ package ch02.service;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class JaccardSimilarityCalculator {
-    public double calculateJaccardSimilarity(String text1, String text2) {
+    public double calculateJaccardSimilarity(String text1, String text2, int ngramSize) {
         // Preprocess texts
-        Set<String> set1 = new HashSet<>(preprocessText(text1));
-        Set<String> set2 = new HashSet<>(preprocessText(text2));
+        Set<String> set1 = new HashSet<>(preprocessText(text1, ngramSize));
+        Set<String> set2 = new HashSet<>(preprocessText(text2, ngramSize));
 
         // Calculate intersection
         Set<String> intersection = new HashSet<>(set1);
@@ -24,9 +23,16 @@ public class JaccardSimilarityCalculator {
         return (double) intersection.size() / union.size();
     }
 
-    private List<String> preprocessText(String text) {
-        return Arrays.stream(text.toLowerCase().split("\\W+"))
-                .filter(token -> !token.isEmpty())
-                .collect(Collectors.toList());
+    private Set<String> preprocessText(String text, int ngramSize) {
+        String[] tokens=text.toLowerCase().split("\\W+");
+        Set<String> ngrams = new HashSet<>();
+        for (int i = 0; i <= tokens.length - ngramSize; i++) {
+            StringBuilder ngram = new StringBuilder();
+            for (int j = 0; j < ngramSize; j++) {
+                ngram.append(tokens[i + j]).append(" ");
+            }
+            ngrams.add(ngram.toString().trim());
+        }
+        return ngrams;
     }
 }

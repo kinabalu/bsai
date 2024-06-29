@@ -25,14 +25,18 @@ public class JaccardTests {
                 Arguments.of(
                         "Now is the time for all good men to come to the aid of their country.",
                         "The quick brown fox jumped over the lazy dog's tail.",
-                        0.04)
+                        0.0),
+                Arguments.of(
+                        "This is some cool text. More is better but this will do.",
+                        "This is some cool text. More is better but this might do.",
+                        0.7)
                 );
     }
 
     @ParameterizedTest
     @MethodSource("texts")
     public void testTexts(String text1, String text2, double expected) {
-        var similarity = calculator.calculateJaccardSimilarity(text1, text2);
+        var similarity = calculator.calculateJaccardSimilarity(text1, text2,2);
         assertEquals(expected, similarity, 0.1);
     }
 }

@@ -46,6 +46,7 @@ include::../../../../code/pom.xml[]
 ----
 
 This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter02`, and the file is named `pom.xml`.
+It's fairly straightforward in and of itself, including the dependencies we need to access Spring AI: the OpenAI starter (`spring-ai-openai-spring-boot-starter`), `spring-boot-starter-web` because we need some classes from it to provide services for OpenAI, a test starter (`spring-boot-starter-test`, excluding an android JSON library because we don't need it and Spring will warn us about duplication otherwise), and `commons-math3`, because we'll want to use some simple mathematics operations later in this chapter and we don't want to have to write the code ourselves.
 
 .Listing {chapter}-{counter:listing}: `chapter02/pom.xml`
 [source,xml]
@@ -207,7 +208,7 @@ We're going to ask a question about the speed of a particular kind of boat carry
 .Listing {chapter}-{counter:listing}: `chapter02/src/test/java/ch02/Ch02FirstTests.java`
 [source,java]
 ----
-include::../../../../code/chapter02/src/test/java/ch02/Ch02FirstTests.java[]
+include::../../../../code/chapter02/src/test/java/ch02/FirstTests.java[]
 ----
 
 ****
@@ -288,7 +289,7 @@ Let's keep ourselves looking at the model for now.
 .Listing {chapter}-{counter:listing}: `chapter02/src/test/java/ch02/Ch02OptionTests.java`
 [source,java]
 ----
-include::../../../../code/chapter02/src/test/java/ch02/Ch02OptionTests.java[]
+include::../../../../code/chapter02/src/test/java/ch02/OptionTests.java[]
 ----
 
 The output for this execution is relatively variable (thanks to the default temperature of queries) but one run locally generated this outputfootnote:[We're going to stick on the subject of junks, which are, according to Wikipedia, "a type of Chinese sailing ship characterized by a central rudder, an overhanging flat transom, watertight bulkheads, and a flat-bottomed design." The subject was chosen mostly to avoid referring to African laden swallows, which - let's be real - nobody cares about.]:
@@ -311,7 +312,7 @@ The ranges for the values are slightly different: `top_p` refers to a percentage
 One would use _either_ `top_p` or `temperature` - you don't use them both.
 (However, it's not going to be an programmatic error to _set_ them both - the documentation isn't clear on what happens in the service itself when both are used.)
 
-_Specifying_ either one is trivial: in the code where we build the `OpenAiChatOptions`, simply include a `temperature` value:
+_Specifying_ either one is trivial: in the code where we build the `OpenAiChatOptions`, simply include a `temperature` value, for example:
 
 [source,java]
 ----
@@ -324,12 +325,44 @@ var options=OpenAiChatOptions.builder()
 We use the archaic `1.0f` form for the float because Java is strongly typed, and the actual parameter is a `Float` - which the compiler won't normally translate `1.0`, a `double`, to a `Float` for us.
 Normally, Java's strong typing works in our favor, but the use of `Float` in the API makes this slightly problematic, if by "problematic" we mean that we have to use the narrower type.
 
-What does this mean for our code?
-Well, let's follow the process we've used so far, and show it with some tests.
+There are two questions to ask here: one is "What does this mean for our code?," and the other is "What actual impact does it have?" - with the latter question being more important.
+
+It's not easy to answer, in a concrete sense. Both `temperature` and `top_p` serve as inputs for the language model, basically "churning the water" for output. The `top_p` parameter, for example, controls what elements are selected for generating output: if you imagined a list of colors ordered by popularity, `top_p` might provide a way to suggest selecting the _more popular_ colors rather than the colors at random (by limiting the selection to the "top colors," so to speak.) Temperature also refers to how things are selected in the model.
+
+As a result, a higher `temperature` or `top_p` value provides a wider range of inputs for the generation of a response, which makes it "more variable."
+
+So how do we *measure* this, such that we can demonstrate it?
 
 What we need to do is have a way to describe similarity between blocks of text.
 This is, luckily for us, a known thing.
 There are _lots_ of ways to measure similarity, but we're going to use a simple one, called a Jaccard similarity, which is basically a measure of the number of common elements between two sets against the measure of elements that they _don't_ have in commonfootnote:[To learn more about Jaccard similarity, see `https://www.learndatasci.com/glossary/jaccard-similarity/` - and there are *definitely* other ways to measure similarities between texts, but a Jaccard similarity is effective enough for our purposes *and* it's relatively little code, so you're not having to pore through seven pages of Lucene example code.].
+
+To build the corpus, the body text, for similarity, we're going to extract n-grams from text; n-grams are sequences of tokens in a specific order. An example of a set of n-grams of length two from the, well, definition of n-grams might look like this:
+
+```
+n-grams are
+are sequences
+sequences of
+of tokens
+tokens in
+in a
+a specific
+specific order
+```
+
+If you built n-grams of length three, you'd get this set:
+
+```
+n-grams are sequences
+are sequences of
+sequences of tokens
+of tokens in
+tokens in a
+in a specific
+a specific order
+```
+
+We can compare the set of n-grams generated from "constant" queries - queries with very low `temperature` or `top_p` values - and compare them to queries with higher variability. If our supposition is correct - that the higher values have higher variability - we should see *increasing* variations in those sets of n-grams over time.
 
 Let's create a Spring bean to give us a Jaccard similarity score:
 
@@ -348,13 +381,89 @@ include::../../../../code/chapter02/src/test/java/ch02/JaccardTests.java[]
 ----
 
 Here, we have a _parameterized test_, a JUnit feature that allows us to specify a list of arguments that we can throw at a single method.
-We have two sets of data: one set is a comparison of identical texts, that should have a _very high similarity_, and another set of texts (that we typed very quickly, thank you very much) that have relatively little similarity.
+We have three sets of data: one set is a comparison of identical texts, that should have a _very high similarity_, and another set of texts (that we typed very quickly, thank you very much) that have relatively little similarity. Their n-grams are just too different, which is what we expect.
 
-The similarity of `1.0` means those texts are likely to be identical (as, in fact, they are, but similarity scores _usually_ trim out incidental words and punctuation, which we're not doing here).
 
-The similarity score of `0.04` means that the texts are very different, as we expect, since the number of common words is very low.
+The similarity of `1.0` for the first input means those texts are likely to be identical (as, in fact, they are, but similarity scores _usually_ trim out things like incidental words and punctuation, which we're not quite doing here).
 
-_Now_ we have a pattern that we can use to throw at an LLM, with different `temperature` and `top_p` values, and measure those parameters' effect on the resultsfootnote:[And you readers probably thought we just wanted to type "Jaccard" out a lot, to show off, didn't you?].
+The similarity score of `0.00` means that the second set of inputs are very different, as we expect, since the number of common n-grams is very low.
+
+Our last test has *one word* of difference - `this will do` and `this might do` - which means we have two n-grams that differ. Here are the n-grams (with a size of `3`) for those last two inputs:
+
+[cols="1,1,1"]
+|===
+| First input
+| Second input
+| Same?
+
+| this is some
+| this is some
+| yes
+
+| is some cool
+| is some cool
+| yes
+
+| some cool text
+| some cool text
+| yes
+
+| cool text more
+| cool text more
+| yes
+
+| text more is
+| text more is
+| yes
+
+| more is better
+| more is better
+| yes
+
+| is better but
+| is better but
+| yes
+
+| better but this
+| better but this
+| yes
+
+| but this will
+| but this might
+| no
+
+| this will do
+| this might do
+| no
+|===
+
+Anyway, _now_ we have a pattern that we can use to throw at an LLM, with different `temperature` and `top_p` values, and and we can measure those parameters' effect on the resultsfootnote:[And you readers probably thought we just wanted to type "Jaccard" out a lot, to show off, didn't you?].
+
+Our methodology here is relatively simple. We're going to test both `top_p` and `temperature`, increasing the value for multiple queries, and measure the similarity to our initial response.
+
+What we _expect_ is that the first test (the initial response, compared to the initial response) is _very similar_ (as it should be, being the same content), and as we increase the `temperature`, our similarity score should decrease. We don't _know_ that it will decrease, because that's how sampling mechanisms work - we might just _happen_ to get an identical response by random chance - but we expect that overall the similarity should decrease.
+
+With `top_p` it's a lot harder to measure, because of the nature of our query, but we're going to try anyway - we expect the slope to be _close to 0 or negative_ but not necessarily negative, because `top_p` really changes the selection set for the data and not the _variability_ of the data the way `temperature` does - but we're going to take a look at it anyway.
+
+We use a `SimpleRegression` to calculate the slope of the similarity to measure this. The way this works is that we basically plot the similarity score along an X/Y axis; the "sample number" is the X axis and the "similarity" is the Y axis. We expect the numbers to go down along the X axis, thus we expect a negative slope, *even if* a given point along the X axis is higher than its precedent.
+
+Let's take a look at our actual test:
+
+.Listing {chapter}-{counter:listing}: `chapter02/src/test/java/ch02/VariabilityTests.java`
+[source,java]
+----
+include::../../../../code/chapter02/src/test/java/ch02/VariabilityTests.java[]
+----
+
+When we run this, we get a happy little graph of stars that demonstrate the similarity. The numbers will vary quite a bit based on each individual run; it's _quite possible_ that you might get a test failure because the LLM just happens to generate some outputs with higher similarities. With that said, though, we haven't gotten many actual test failures based on the similarities going up.
+
+NOTE: With that said, we _have_ gotten test failures, particularly with `top_p`. It's because of the way these values work: they change the sampling data for the language models, so sometimes you get variable results. if you run these tests and get failures, it's not entirely unexpected, just like a test of a random number generator _should_ give you an equal distribution of results but occasionally the universe just says, "no, you're getting similar numbers back for a while." Getting that kind of result *consistently* is bad, but it _does_ happen.
+
+== Conversations and Roles
+
+What we've seen so far is a fairly simple query mechanism, a rough analogy to a single query to a given LLM, although we've given ourselves a way to control how variable a given response might be. That's useful, but not very; it means that every query exists in a sort of standalone universefootnote:[Our "variability tests" with `temperature` relied on each query being standalone.].
+
+Given that LLMs are presented as conversational, it's time for us to see how that works and how we can manage a conversation with Spring AI.
 
 == Next Steps
 
