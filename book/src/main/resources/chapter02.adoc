@@ -309,7 +309,7 @@ It turns out that there are two parameters that have similar effects on how an L
 Lower `top_p` and `temperature` values indicate less variability in the responses.
 The ranges for the values are slightly different: `top_p` refers to a percentage of things to consider (so `0.10` means "consider the most relevant tokens" and `1.0` would mean "don't filter tokens at all"), and `temperature` refers to how tokens are selected, with a range from `0.0` to `2.0`, where `2.0` indicates very high variability.
 
-One would use _either_ `top_p` or `temperature` - you don't use them both.
+One would use _either_ `top_p` or `temperature` - you don't normally use them both.
 (However, it's not going to be an programmatic error to _set_ them both - the documentation isn't clear on what happens in the service itself when both are used.)
 
 _Specifying_ either one is trivial: in the code where we build the `OpenAiChatOptions`, simply include a `temperature` value, for example:
@@ -327,7 +327,9 @@ Normally, Java's strong typing works in our favor, but the use of `Float` in the
 
 There are two questions to ask here: one is "What does this mean for our code?," and the other is "What actual impact does it have?" - with the latter question being more important.
 
-It's not easy to answer, in a concrete sense. Both `temperature` and `top_p` serve as inputs for the language model, basically "churning the water" for output. The `top_p` parameter, for example, controls what elements are selected for generating output: if you imagined a list of colors ordered by popularity, `top_p` might provide a way to suggest selecting the _more popular_ colors rather than the colors at random (by limiting the selection to the "top colors," so to speak.) Temperature also refers to how things are selected in the model.
+It's not easy to answer, in a concrete sense.
+Both `temperature` and `top_p` serve as inputs for the language model, basically "churning the water" for output.
+The `top_p` parameter, for example, controls what elements are selected for generating output: if you imagined a list of colors ordered by popularity, `top_p` might provide a way to suggest selecting the _more popular_ colors rather than the colors at random (by limiting the selection to the "top colors," so to speak.) Temperature also refers to how things are selected in the model.
 
 As a result, a higher `temperature` or `top_p` value provides a wider range of inputs for the generation of a response, which makes it "more variable."
 
@@ -337,9 +339,11 @@ What we need to do is have a way to describe similarity between blocks of text.
 This is, luckily for us, a known thing.
 There are _lots_ of ways to measure similarity, but we're going to use a simple one, called a Jaccard similarity, which is basically a measure of the number of common elements between two sets against the measure of elements that they _don't_ have in commonfootnote:[To learn more about Jaccard similarity, see `https://www.learndatasci.com/glossary/jaccard-similarity/` - and there are *definitely* other ways to measure similarities between texts, but a Jaccard similarity is effective enough for our purposes *and* it's relatively little code, so you're not having to pore through seven pages of Lucene example code.].
 
-To build the corpus, the body text, for similarity, we're going to extract n-grams from text; n-grams are sequences of tokens in a specific order. An example of a set of n-grams of length two from the, well, definition of n-grams might look like this:
+To build the corpus, the body text, for similarity, we're going to extract n-grams from text; n-grams are sequences of tokens in a specific order.
+An example of a set of n-grams of length two from the, well, definition of n-grams might look like this:
 
-```
+[source]
+----
 n-grams are
 are sequences
 sequences of
@@ -348,11 +352,12 @@ tokens in
 in a
 a specific
 specific order
-```
+----
 
 If you built n-grams of length three, you'd get this set:
 
-```
+[source,text]
+----
 n-grams are sequences
 are sequences of
 sequences of tokens
@@ -360,9 +365,10 @@ of tokens in
 tokens in a
 in a specific
 a specific order
-```
+----
 
-We can compare the set of n-grams generated from "constant" queries - queries with very low `temperature` or `top_p` values - and compare them to queries with higher variability. If our supposition is correct - that the higher values have higher variability - we should see *increasing* variations in those sets of n-grams over time.
+We can compare the set of n-grams generated from "constant" queries - queries with very low `temperature` or `top_p` values - and compare them to queries with higher variability.
+If our supposition is correct - that the higher values have higher variability - we should see *increasing* variations in those sets of n-grams over time.
 
 Let's create a Spring bean to give us a Jaccard similarity score:
 
@@ -381,14 +387,15 @@ include::../../../../code/chapter02/src/test/java/ch02/JaccardTests.java[]
 ----
 
 Here, we have a _parameterized test_, a JUnit feature that allows us to specify a list of arguments that we can throw at a single method.
-We have three sets of data: one set is a comparison of identical texts, that should have a _very high similarity_, and another set of texts (that we typed very quickly, thank you very much) that have relatively little similarity. Their n-grams are just too different, which is what we expect.
-
+We have three sets of data: one set is a comparison of identical texts, that should have a _very high similarity_, and another set of texts (that we typed very quickly, thank you very much) that have relatively little similarity.
+Their n-grams are just too different, which is what we expect.
 
 The similarity of `1.0` for the first input means those texts are likely to be identical (as, in fact, they are, but similarity scores _usually_ trim out things like incidental words and punctuation, which we're not quite doing here).
 
 The similarity score of `0.00` means that the second set of inputs are very different, as we expect, since the number of common n-grams is very low.
 
-Our last test has *one word* of difference - `this will do` and `this might do` - which means we have two n-grams that differ. Here are the n-grams (with a size of `3`) for those last two inputs:
+Our last test has *one word* of difference - `this will do` and `this might do` - which means we have two n-grams that differ.
+Here are the n-grams (with a size of `3`) for those last two inputs:
 
 [cols="1,1,1"]
 |===
@@ -439,13 +446,17 @@ Our last test has *one word* of difference - `this will do` and `this might do` 
 
 Anyway, _now_ we have a pattern that we can use to throw at an LLM, with different `temperature` and `top_p` values, and and we can measure those parameters' effect on the resultsfootnote:[And you readers probably thought we just wanted to type "Jaccard" out a lot, to show off, didn't you?].
 
-Our methodology here is relatively simple. We're going to test both `top_p` and `temperature`, increasing the value for multiple queries, and measure the similarity to our initial response.
+Our methodology here is relatively simple.
+We're going to test both `top_p` and `temperature`, increasing the value for multiple queries, and measure the similarity to our initial response.
 
-What we _expect_ is that the first test (the initial response, compared to the initial response) is _very similar_ (as it should be, being the same content), and as we increase the `temperature`, our similarity score should decrease. We don't _know_ that it will decrease, because that's how sampling mechanisms work - we might just _happen_ to get an identical response by random chance - but we expect that overall the similarity should decrease.
+What we _expect_ is that the first test (the initial response, compared to the initial response) is _very similar_ (as it should be, being the same content), and as we increase the `temperature`, our similarity score should decrease.
+We don't _know_ that it will decrease, because that's how sampling mechanisms work - we might just _happen_ to get an identical response by random chance - but we expect that overall the similarity should decrease.
 
 With `top_p` it's a lot harder to measure, because of the nature of our query, but we're going to try anyway - we expect the slope to be _close to 0 or negative_ but not necessarily negative, because `top_p` really changes the selection set for the data and not the _variability_ of the data the way `temperature` does - but we're going to take a look at it anyway.
 
-We use a `SimpleRegression` to calculate the slope of the similarity to measure this. The way this works is that we basically plot the similarity score along an X/Y axis; the "sample number" is the X axis and the "similarity" is the Y axis. We expect the numbers to go down along the X axis, thus we expect a negative slope, *even if* a given point along the X axis is higher than its precedent.
+We use a `SimpleRegression` to calculate the slope of the similarity to measure this.
+The way this works is that we basically plot the similarity score along an X/Y axis; the "sample number" is the X axis and the "similarity" is the Y axis.
+We expect the numbers to go down along the X axis, thus we expect a negative slope, *even if* a given point along the X axis is higher than its precedent.
 
 Let's take a look at our actual test:
 
@@ -455,15 +466,35 @@ Let's take a look at our actual test:
 include::../../../../code/chapter02/src/test/java/ch02/VariabilityTests.java[]
 ----
 
-When we run this, we get a happy little graph of stars that demonstrate the similarity. The numbers will vary quite a bit based on each individual run; it's _quite possible_ that you might get a test failure because the LLM just happens to generate some outputs with higher similarities. With that said, though, we haven't gotten many actual test failures based on the similarities going up.
+When we run this, we get a happy little graph of stars that demonstrate the similarity.
+The numbers will vary quite a bit based on each individual run; it's _quite possible_ that you might get a test failure because the LLM just happens to generate some outputs with higher similarities.
+With that said, though, we haven't gotten many actual test failures based on the similarities going up.
 
-NOTE: With that said, we _have_ gotten test failures, particularly with `top_p`. It's because of the way these values work: they change the sampling data for the language models, so sometimes you get variable results. if you run these tests and get failures, it's not entirely unexpected, just like a test of a random number generator _should_ give you an equal distribution of results but occasionally the universe just says, "no, you're getting similar numbers back for a while." Getting that kind of result *consistently* is bad, but it _does_ happen.
+NOTE: With that said, we _have_ gotten test failures, particularly with `top_p`.
+It's because of the way these values work: they change the sampling data for the language models, so sometimes you get variable results. if you run these tests and get failures, it's not entirely unexpected, just like a test of a random number generator _should_ give you an equal distribution of results but occasionally the universe just says, "no, you're getting similar numbers back for a while." Getting that kind of result *consistently* is bad, but it _does_ happen.
 
 == Conversations and Roles
 
-What we've seen so far is a fairly simple query mechanism, a rough analogy to a single query to a given LLM, although we've given ourselves a way to control how variable a given response might be. That's useful, but not very; it means that every query exists in a sort of standalone universefootnote:[Our "variability tests" with `temperature` relied on each query being standalone.].
+What we've seen so far is a fairly simple query mechanism, a rough analogy to a single query to a given LLM, although we've given ourselves a way to control how variable a given response might be.
+That's useful, but not very; it means that every query exists in a sort of standalone universefootnote:[Our "variability tests" with `temperature` relied on each query being standalone.].
 
 Given that LLMs are presented as conversational, it's time for us to see how that works and how we can manage a conversation with Spring AI.
+
+We've used a _very_ simple `Prompt` object, one accepting a `String` (and, perhaps, a `ChatOptions` object).
+This is _useful_ but very _simple_ - too simple, really, except for simple uses as we've shown so far.
+
+What `new Prompt("When was Churchill in office")` does is relatively simple, but very instructive: that particular constructor delegates to a _different_ constructor, that accepts a `UserMessage` with the contents of that string.
+
+So what, then, is a `UserMessage`?
+It's a message from, of all things, a user.
+This implies that there are other types of messages, and there certainly are.
+They're actually rather important, in various ways, for building a conversation with an LLM.
+
+There are three main types of messages in the LLM space right now: one is `user`.
+Another is `assistant`, and the third is `system`.
+
+We actually have seen `assistant` messages already; that's the role assigned to messages _from the LLM_.
+Therefore, when we ask an LLM "What is the definition of a Chinese junk?", that query is sent as conversation with that element being from the `user` role, and the answer comes back as a message from the `assistant` role.
 
 == Next Steps
 
