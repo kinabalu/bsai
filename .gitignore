@@ -9,3 +9,6 @@ code/.env
 *.log
 archive
 output
+
+.env
+*.mp3

@@ -1,5 +1,43 @@
-= Interacting in a chat
+= Audio Transcription and Text-To-Speech
 :chapter: 4
+
+
+
+As we saw in Chapter 2 we'll use a standard Maven directory structure. We'll create a new project
+
+This can be created in the "project directory" with the following command, if you're running a POSIX shell like `bash` or `zsh`:
+
+.Listing {chapter}-{counter:listing}: Creating the project directory structure in POSIX
+[source,shell]
+----
+mkdir src/{main,test}/{java,resources}
+----
+
+We'll want one more file to save ourselves a lot of unnecessary duplication: an `.env` file.
+This file is going to hold our OpenAI access key.
+This is a simple name/value pair, and this file goes into the root of our project structure.
+
+Listing {chapter}-{counter:listing}: `.env`
+
+[source,shell]
+----
+OPENAI_API_KEY=[your-api-key-value-here]
+----
+
+== Creating a chatbot
+
+=== Blocking chatbot
+two models who will survive
+
+=== Streaming chatbot with Flux
+well, there's a streaming API and you can provide context and prior conversation to the LLM
+
+I'm going to cover roles in the next section of chapter 2, conversation builds on that: "I said this, you said that, then I said this, now what?"
+
+I’ll tackle that one in the next few days
+
+the streaming bit is also part of that, but I really despise that API, I think spring ai is going to regret using flux
+
 
 == Next Steps
 
