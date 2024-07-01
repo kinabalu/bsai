@@ -20,7 +20,7 @@ public class TextToSpeechService {
 
     private OpenAiAudioSpeechModel speechModel;
 
-    public byte[] processText(String text) {
+    public TextToSpeechService() {
         var openAiAudioApi = new OpenAiAudioApi(apiKey);
 
         speechModel = new OpenAiAudioSpeechModel(openAiAudioApi);
@@ -30,7 +30,12 @@ public class TextToSpeechService {
                 .withSpeed(1.0f)
                 .withModel(OpenAiAudioApi.TtsModel.TTS_1.value)
                 .build();
+    }
 
+    public byte[] processText(String text) {
+        if (speechModel == null || speechOptions == null) {
+            return null;
+        }
         var speechPrompt = new SpeechPrompt(text, speechOptions);
         SpeechResponse response = speechModel.call(speechPrompt);
         return response.getResult().getOutput();
