@@ -1,6 +1,13 @@
 = Audio Transcription and Text-To-Speech
 :chapter: 4
 
+curl -X POST http://localhost:8080/api/tts \
+-H "Content-Type: application/json" \
+-d '{"text": "Hello, Spring Boot!"}' \
+--output test.mp3
+
+curl -X POST http://localhost:8080/api/transcribe \
+-F "file=@./test.mp3"
 
 
 As we saw in Chapter 2 we'll use a standard Maven directory structure. We'll create a new project

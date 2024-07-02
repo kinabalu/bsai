@@ -1,5 +1,6 @@
 package ch04.service;
 
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
@@ -14,13 +15,13 @@ import org.springframework.stereotype.Service;
 public class TextToSpeechService {
 
     @Value("${spring.ai.openai.api-key}") private String apiKey;
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private OpenAiAudioSpeechOptions speechOptions;
 
     private OpenAiAudioSpeechModel speechModel;
 
-    public TextToSpeechService() {
+    @PostConstruct
+    public void init() {
         var openAiAudioApi = new OpenAiAudioApi(apiKey);
 
         speechModel = new OpenAiAudioSpeechModel(openAiAudioApi);
