@@ -19,7 +19,10 @@ public class ConversationChatService extends OptionChatService {
         return converse(messages, new OpenAiChatOptions.Builder().build());
     }
 
-    List<Generation> converse(List<Message> messages, OpenAiChatOptions options) {
+    public List<Generation> converse(
+            List<Message> messages,
+            OpenAiChatOptions options
+    ) {
         var prompt = new Prompt(messages, options);
         return client.prompt(prompt).call().chatResponse().getResults();
     }
