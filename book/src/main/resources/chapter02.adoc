@@ -549,12 +549,11 @@ The answer is simple: "Because it's much harder to test." Our series of question
 To actually make all this work, we simply add another `UserMessage` (with the text `And if z=3?`) to the list of messages, and create another interaction with the LLM.
 This gives the LLM a chance to examine the context of the question (including our first query and its original answer) and give us the revised response.
 
-You can develop this even further if you like.
-Imagine adding `What's the difference in the slope?` as part of the conversation as well, and you'll see the LLM use even more of its prior answer for context.
-
 We can also use `SystemMessage` as part of the conversation.
 A _system message_ is an edict for the LLM to factor in; it can be similar to a `UserMessage` in impact, but _in general_ a system message is more likely to have a persistent impact over the entire conversation; a `UserMessage` might, for example, change the conversational mode to Diogenes instead, but a `SystemMessage` is harder for the user to override.
 
+This is an interesting example - but we can take it further, and we will, in the next chapter. Our `ConversationTests` example shows context as part of the conversation, but our test looks for a very simple answer - "does the result contain this bit of text that represents what we expect?" and we can do better. It's one of the more compelling features of Spring AI, and we're going to look at it in our next chapter, where we discuss concrete data extraction.
+
 == Next Steps
 
-In our next chapter, ...
+In our next chapter, we're going to look at Spring AI's output converters, where we can get the LLM to give us structured data for our program to consume directly.
