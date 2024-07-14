@@ -33,7 +33,7 @@ This can be created in the "project directory" with the following command, if yo
 .Listing {chapter}-{counter:listing}: Creating the project directory structure in POSIX
 [source,shell]
 ----
-mkdir src/{main,test}/{java,resources}
+mkdir -p src/{main,test}/{java,resources}
 ----
 
 This is all fairly standard for Java programmers; it's being included here for completeness more than anything else.
@@ -498,7 +498,8 @@ Therefore, when we ask an LLM "What is the definition of a Chinese junk?", that 
 
 We can actually build a series of messages as our prompt, assigning the appropriate roles as we like, using `UserMessage` and establishing context with `AssistantMessage` instances from the system.
 
-The first thing we need to do is to create a service that accepts a `List` of messages, because our other services are geared around simple queries with one input only. Thankfully, this is entirely supported by `Prompt`, which has a constructor that accepts `List<Message>`; our new `ConversationChatService` will do little more than handle the plumbing of constructing the actual `Prompt` and returning the response.
+The first thing we need to do is to create a service that accepts a `List` of messages, because our other services are geared around simple queries with one input only.
+Thankfully, this is entirely supported by `Prompt`, which has a constructor that accepts `List<Message>`; our new `ConversationChatService` will do little more than handle the plumbing of constructing the actual `Prompt` and returning the response.
 
 .Listing {chapter}-{counter:listing}: `chapter02/src/main/java/ch02/service/ConversationChatService.java`
 [source,java]
@@ -506,7 +507,8 @@ The first thing we need to do is to create a service that accepts a `List` of me
 include::../../../../code/chapter02/src/main/java/ch02/service/ConversationChatService.java[]
 ----
 
-The test class for this is a little larger than some of our other classes so far. Let's take a look:
+The test class for this is a little larger than some of our other classes so far.
+Let's take a look:
 
 .Listing {chapter}-{counter:listing}: `chapter02/src/test/java/ch02/ConversationTests.java`
 [source,java]
@@ -514,15 +516,21 @@ The test class for this is a little larger than some of our other classes so far
 include::../../../../code/chapter02/src/test/java/ch02/ConversationTests.java[]
 ----
 
-The first part of the test has some utility methods that we'll want: one is a convenience method to help us extract the `AssistantMessage` returned by the API, and the other is a display method to dump wrapped output to a logger. Neither one is _necessary_, but they're handy to have around.
+The first part of the test has some utility methods that we'll want: one is a convenience method to help us extract the `AssistantMessage` returned by the API, and the other is a display method to dump wrapped output to a logger.
+Neither one is _necessary_, but they're handy to have around.
 
-Next we have `simpleConversation()`, a test method that validates that `ConversationChatService` is able to replicate the functionality we expect our services to have: can we ask an LLM a simple question? We're pretending to be math-challenged for this test, because that gives us a concrete answer we can look for; if our output doesn't have _the actual answer to our question_, we want to fail the test.
+Next we have `simpleConversation()`, a test method that validates that `ConversationChatService` is able to replicate the functionality we expect our services to have: can we ask an LLM a simple question?
+We're pretending to be math-challenged for this test, because that gives us a concrete answer we can look for; if our output doesn't have _the actual answer to our question_, we want to fail the test.
 
-The real test is `interactiveConversation()`. This method has a lot of bits in it, so let's deconstruct it.
+The real test is `interactiveConversation()`.
+This method has a lot of bits in it, so let's deconstruct it.
 
-The first part of `interactiveConversation()` replicates `simpleConversation()`; the main difference is that it constructs a `List<Message>` and uses that with the `ConversationChatService`, instead of constructing an immutable `List` in place. We also preserve the `AssistantMessage`.
+The first part of `interactiveConversation()` replicates `simpleConversation()`; the main difference is that it constructs a `List<Message>` and uses that with the `ConversationChatService`, instead of constructing an immutable `List` in place.
+We also preserve the `AssistantMessage`.
 
-After we validate (and display) the output, we add the `AssistantMessage` to the `messages`. Thus, it's a `List` with two entries: a `UserMessage` (our original query) and an `AssistantMessage` that has the LLM explaining the slope of our equation. We then *refine our query* by changing a parameter, but with a question that has no context in and of itself: we alter the value of `z` with another `UserMessage`.
+After we validate (and display) the output, we add the `AssistantMessage` to the `messages`.
+Thus, it's a `List` with two entries: a `UserMessage` (our original query) and an `AssistantMessage` that has the LLM explaining the slope of our equation.
+We then *refine our query* by changing a parameter, but with a question that has no context in and of itself: we alter the value of `z` with another `UserMessage`.
 
 Consider what is happening here: we're asking `And if z=3?` with nothing else; if you walked up to a mathematician - or asked an LLM - that simple question, out of the blue, they'd rationally ask you for more context.
 
@@ -533,13 +541,19 @@ image::images/ch02-math-question.png[]
 
 So now we have a valid way to test: by appending `And if z=3?` as a `UserMessage` with the prior context of our initial question and the LLM's response, we can see if it factors in the conversation.
 
-NOTE: This is not a perfect test. Ideally, we'd have the LLM infer something _not in our question_ and use that for future context in the conversation. Given that we all understand this, why doesn't our test apply context from the LLM as well? The answer is simple: "Because it's much harder to test." Our series of questions here have objective answers, and having the LLM alter the context makes the answers _subjective_, and we really want to actually _test something_ instead of displaying it and hoping it works out.
+NOTE: This is not a perfect test.
+Ideally, we'd have the LLM infer something _not in our question_ and use that for future context in the conversation.
+Given that we all understand this, why doesn't our test apply context from the LLM as well?
+The answer is simple: "Because it's much harder to test." Our series of questions here have objective answers, and having the LLM alter the context makes the answers _subjective_, and we really want to actually _test something_ instead of displaying it and hoping it works out.
 
-To actually make all this work, we simply add another `UserMessage` (with the text `And if z=3?`) to the list of messages, and create another interaction with the LLM. This gives the LLM a chance to examine the context of the question (including our first query and its original answer) and give us the revised response.
+To actually make all this work, we simply add another `UserMessage` (with the text `And if z=3?`) to the list of messages, and create another interaction with the LLM.
+This gives the LLM a chance to examine the context of the question (including our first query and its original answer) and give us the revised response.
 
-You can develop this even further if you like. Imagine adding `What's the difference in the slope?` as part of the conversation as well, and you'll see the LLM use even more of its prior answer for context.
+You can develop this even further if you like.
+Imagine adding `What's the difference in the slope?` as part of the conversation as well, and you'll see the LLM use even more of its prior answer for context.
 
-We can also use `SystemMessage` as part of the conversation. A _system message_ is an edict for the LLM to factor in; it can be similar to a `UserMessage` in impact, but _in general_ a system message is more likely to have a persistent impact over the entire conversation; a `UserMessage` might, for example, change the conversational mode to Diogenes instead, but a `SystemMessage` is harder for the user to override.
+We can also use `SystemMessage` as part of the conversation.
+A _system message_ is an edict for the LLM to factor in; it can be similar to a `UserMessage` in impact, but _in general_ a system message is more likely to have a persistent impact over the entire conversation; a `UserMessage` might, for example, change the conversational mode to Diogenes instead, but a `SystemMessage` is harder for the user to override.
 
 == Next Steps
 
