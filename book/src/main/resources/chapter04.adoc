@@ -124,12 +124,26 @@ This test you can see it writes to disk. Hopefully with these options it sounds 
 
 ### Transcription
 
-We'll show the parameters we can use to change things, and talk about what it might mean for our test and re-run it even after making these changes
+Continuing because apparently I love that song "Daisy Bell" so much, an intrepid search of Wikipedia gives us a FLAC file of the original recording. If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac.
 
-Here we can talk about how you can either change these values in the application.properties (but we have to check to see since we build that in the PostConstruct init) -- perhaps in earlier chapters it shows that we can just inject as long as that field exists in properties?
+.Listing {chapter}-{counter:listing}: Download the Daisy Bell FLAC file
+[source,bash]
+----
+curl -O 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac'
+----
 
-In any case we should change it so the values of tts-1-hd and time of 0.7 and a different voice model is used, I think what worked best was "Shimmer" or "Nova"
+.Listing {chapter}-{counter:listing}: TranscribeTest class
+[source,java]
+----
+include::../../../../code/chapter04/src/test/java/ch04/TranscribeTest.java[]
+----
 
+
+.Listing {chapter}-{counter:listing}: TranscribeService class
+[source,java]
+----
+include::../../../../code/chapter04/src/main/java/ch04/service/TranscribeService.java[]
+----
 
 [cols="1,2"]
 |===
@@ -139,7 +153,7 @@ In any case we should change it so the values of tts-1-hd and time of 0.7 and a 
 | ID of the model to use. Only whisper-1 (which is powered by our open source Whisper V2 model) is currently available.
 
 | spring.ai.openai.audio.transcription.options.response-format
-| The format of the transcript output, in one of these options: json, text, srt, verbose_json, or vtt.
+| The format of the transcript output, in one of these options: `json`, `text`, `srt`, `verbose_json`, or `vtt`.
 
 | spring.ai.openai.audio.transcription.options.prompt
 | An optional text to guide the model’s style or continue a previous audio segment. The prompt should match the audio language.
@@ -154,14 +168,6 @@ In any case we should change it so the values of tts-1-hd and time of 0.7 and a 
 | The timestamp granularities to populate for this transcription. response_format must be set verbose_json to use timestamp granularities. Either or both of these options are supported: word, or segment. Note: There is no additional latency for segment timestamps, but generating word timestamps incurs additional latency.
 |===
 
-Continuing because apparently I love that song "Daisy Bell" so much, an intrepid search of Wikipedia gives us a FLAC file of the original recording. If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac.
-
-.Listing {chapter}-{counter:listing}: Download the Daisy Bell FLAC file
-[source,bash]
-----
-curl -O 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac'
-----
-
 
 model default is `whisper-1` which is oddly the Whisper V2 model
 
@@ -175,12 +181,6 @@ temperature between 0 and 1, closer to 1 is more random, lower values more focus
 
 timestamp_granularities (default: segment)
 
-
-.Listing {chapter}-{counter:listing}: TranscribeService class
-[source,java]
-----
-include::../../../../code/chapter04/src/main/java/ch04/service/TranscribeService.java[]
-----
 
 .Listing {chapter}-{counter:listing}: Calling the TTS endpoint
 [source,shell]
