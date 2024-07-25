@@ -1,50 +1,202 @@
-= Audio Transcription and Text-To-Speech
+= Working with Audio
 :chapter: 4
 
-curl -X POST http://localhost:8080/api/tts \
--H "Content-Type: application/json" \
--d '{"text": "Hello, Spring Boot!"}' \
---output test.mp3
+== Generating and Processing Audio
+Spring AI has two avenues for working with audio in the form of transcribing text from a supplied audio file and generating an audio file with natural sounding speech via text to speech. In both instances the integration done today with Spring AI uses OpenAI. Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
 
-curl -X POST http://localhost:8080/api/transcribe \
--F "file=@./test.mp3"
+In this chapter we will walk through the two simple APIs for processing audio and text and a real world example of how you might use both. Let's dive in.
 
+=== The AI spoken word
+Creating spoken audio from text using a computer has been around since the early 1960s. A physicist at Bell Labs used an IBM 7094 computer to synthesize speech and recreate the song "Daisy Bell". Arthur C Clarke saw a demonstration of this and incorporated it in his book and the screenplay for "2001: A Space Odyssey" when HAL9000 is shut down.
 
-As we saw in Chapter 2 we'll use a standard Maven directory structure. We'll create a new project
-
-This can be created in the "project directory" with the following command, if you're running a POSIX shell like `bash` or `zsh`:
+First task we'll do is to create our directory structure for this chapter. This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
 
 .Listing {chapter}-{counter:listing}: Creating the project directory structure in POSIX
 [source,shell]
 ----
-mkdir src/{main,test}/{java,resources}
+mkdir -p src/{main,test}/{java,resources}
 ----
 
-We'll want one more file to save ourselves a lot of unnecessary duplication: an `.env` file.
-This file is going to hold our OpenAI access key.
-This is a simple name/value pair, and this file goes into the root of our project structure.
 
-Listing {chapter}-{counter:listing}: `.env`
+This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter04`, and the file is named `pom.xml`.
+
+.Listing {chapter}-{counter:listing}: `chapter04/pom.xml`
+[source,xml]
+----
+include::../../../../code/chapter04/pom.xml[]
+----
+
+The first thing we need to handle as we did in previous chapters is the application configuration. Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to be passed in the constructor so we create one that can later be `@Autowired` into our `@Service` classes.
+
+.Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
+[source,java]
+----
+include::../../../../code/chapter04/src/main/java/ch04/Ch04Configuration.java[]
+----
+
+A `OpenAiAudioApi` has three main request modules that it enables for working with audio. The first we'll work with is the `SpeechRequest` which may just be the text we want to create an audio file but can also accept several other options which we'll go over below. As with other modules in Spring AI they can be controlled at the point of the request, in code, or from the application properties.
+
+[cols="1,2"]
+|===
+| Property name
+| Description
+
+| `spring.ai.openai.api-key`
+| The API key to be used by the application. This isn't utilized by `OpenAiAudioApi` but we'll continue with this convention here.
+
+| `spring.ai.openai.audio.speech.options.model`
+| The name of the model to use. `tts-1` and `tts-1-hd` are both available.
+
+| `spring.ai.openai.audio.speech.options.voice`
+| The voice to use for the TTS output. Available options are: `alloy`, `echo`, `fable`, `onyx`, `nova`, and `shimmer`.
+
+| `spring.ai.openai.audio.speech.options.response-format`
+| The format of the audio output, supported formats are `mp3`, `opus`, `aac`, `flac`, `wav`, and `pcm`.
+
+| `spring.ai.openai.audio.speech.options.speed`
+| The speed of the voice synthesis between `0.0` and `1.0`.
+|===
+
+For this chapter we're going to focus on tests but also we will have an opportunity to explore a real world case where we can use the Spring AI Audio API with Spring MVC.
+
+We need to at least provide the API key to our chapter's code, and we want the model to be as deterministic as possible for now, so here's our `application.properties`.
+This is all very test-centric, so we're going to place it in `chapter02/src/test/resources`.
+Note the use of `spring.config.import`, which allows us to load our `.env` file's values for internal use.
+
+.Listing {chapter}-{counter:listing}: `chapter04/src/test/resources/application.properties`
+[source,properties]
+----
+include::../../../../code/chapter04/src/test/resources/application.properties[]
+----
+
+Our first test case is going to be based on the Daisy Bell song that we referenced at the beginning of the chapter. Our test is simple. We're going to pass the lyrics to the song "Daisy Bell" to service `TextToSpeechService` and call the `processText` method. We'll take the response and assert that it is non-null as the actual response would be tough to verify in a test.
+
+.Listing {chapter}-{counter:listing}: Text To Speech Test
+[source,java]
+----
+include::../../../../code/chapter04/src/test/java/ch04/SpeechTTSTest.java[]
+----
+
+If you are interested in the output as part of the test you could write the mp3 to disk.
+
+.Listing {chapter}-{counter:listing}: Write MP3 to disk
+[source,java]
+----
+Files.write(Paths.get("./daisybell.mp3"), responseAsBytes);
+----
+
+This test is simple enough, but it obviously won't run because we don't have an implementation of the `TextToSpeechService`. The service has two public methods in it, `processText(String)` and `processText(String, OpenAiAudioSpeechOptions.Builder)`, which both return a `byte[]`.
+
+We have a `SpeechModel` available which we'll use Spring's dependency injection to reference in our `TextToSpeechService`.
+
+Issuing a call to OpenAI we build a `SpeechPrompt` and pass the text we'd like to use to generate spoken word output. If we don't pass an `OpenAiAudioSpeechOptions` object into the `processText` method it will by default use the options from `application.properties` if specified.
+
+Once we have a prompt, we issue a call to the API, whether blocking or streaming; in this case, we don't care about streaming, so we use `call()` to get the response specification.
+
+Once we have the response specification, we can get the recording by using the `getResult().getOutput()` method which returns a byte array. If we wanted to, we could get metadata about the call like the number of tokens consumed on our API key and a few other interesting elements.
+
+This sounds pretty straightforward, so let's see what the actual Java class looks like.
+
+.Listing {chapter}-{counter:listing}: Text To Speech Service
+[source,java]
+----
+include::../../../../code/chapter04/src/main/java/ch04/service/TextToSpeechService.java[]
+----
+
+We've got something to test now, so we can run this chapter's test suite by using Maven:
 
 [source,shell]
 ----
-OPENAI_API_KEY=[your-api-key-value-here]
+mvn -am -pl chapter04 clean test
 ----
 
-== Creating a chatbot
+If everything is working properly it should complete with `SUCCESS`. If you chose to add the line for writing the file output to disk you can open up the resulting mp3 file and have a listen. This test will sound more like spoken word than singing as there is no "singing" option within the OpenAI API.
 
-=== Blocking chatbot
-two models who will survive
+Let's say we wanted to pass some extra options to make it more like a song. If we pass a custom `OpenAiAudioSpeechOptions` to a custom test we can do so like this.
 
-=== Streaming chatbot with Flux
-well, there's a streaming API and you can provide context and prior conversation to the LLM
+.Listing {chapter}-{counter:listing}: Text To Speech With Options Test
+[source,java]
+----
+include::../../../../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
+----
 
-I'm going to cover roles in the next section of chapter 2, conversation builds on that: "I said this, you said that, then I said this, now what?"
+This test you can see it writes to disk. Hopefully with these options it sounds a little bit more like a song.
 
-I’ll tackle that one in the next few days
+### Transcription
 
-the streaming bit is also part of that, but I really despise that API, I think spring ai is going to regret using flux
+We'll show the parameters we can use to change things, and talk about what it might mean for our test and re-run it even after making these changes
 
+Here we can talk about how you can either change these values in the application.properties (but we have to check to see since we build that in the PostConstruct init) -- perhaps in earlier chapters it shows that we can just inject as long as that field exists in properties?
+
+In any case we should change it so the values of tts-1-hd and time of 0.7 and a different voice model is used, I think what worked best was "Shimmer" or "Nova"
+
+
+[cols="1,2"]
+|===
+| Property | Description
+
+| spring.ai.openai.audio.transcription.options.model
+| ID of the model to use. Only whisper-1 (which is powered by our open source Whisper V2 model) is currently available.
+
+| spring.ai.openai.audio.transcription.options.response-format
+| The format of the transcript output, in one of these options: json, text, srt, verbose_json, or vtt.
+
+| spring.ai.openai.audio.transcription.options.prompt
+| An optional text to guide the model’s style or continue a previous audio segment. The prompt should match the audio language.
+
+| spring.ai.openai.audio.transcription.options.language
+| The language of the input audio. Supplying the input language in ISO-639-1 format will improve accuracy and latency.
+
+| spring.ai.openai.audio.transcription.options.temperature
+| The sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. If set to 0, the model will use log probability to automatically increase the temperature until certain thresholds are hit.
+
+| spring.ai.openai.audio.transcription.options.timestamp_granularities
+| The timestamp granularities to populate for this transcription. response_format must be set verbose_json to use timestamp granularities. Either or both of these options are supported: word, or segment. Note: There is no additional latency for segment timestamps, but generating word timestamps incurs additional latency.
+|===
+
+Continuing because apparently I love that song "Daisy Bell" so much, an intrepid search of Wikipedia gives us a FLAC file of the original recording. If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac.
+
+.Listing {chapter}-{counter:listing}: Download the Daisy Bell FLAC file
+[source,bash]
+----
+curl -O 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac'
+----
+
+
+model default is `whisper-1` which is oddly the Whisper V2 model
+
+response format can be one of json, text, srt, verbose_json, vtt
+
+prompt for guiding models style or continue previous audio segment (should match audio language)
+
+langauge of input audio (ISO-639-1 format)
+
+temperature between 0 and 1, closer to 1 is more random, lower values more focused and deterministic. 0 uses log probability to automatically increase the temperature until certain thresholds are hit
+
+timestamp_granularities (default: segment)
+
+
+.Listing {chapter}-{counter:listing}: TranscribeService class
+[source,java]
+----
+include::../../../../code/chapter04/src/main/java/ch04/service/TranscribeService.java[]
+----
+
+.Listing {chapter}-{counter:listing}: Calling the TTS endpoint
+[source,shell]
+----
+curl -X POST http://localhost:8080/api/tts \
+-H "Content-Type: application/json" \
+-d '{"text": "Hello, Spring Boot!"}' \
+--output test.mp3
+----
+
+.Listing {chapter}-{counter:listing}: Sending an audio file with spoken words to transcribe service
+[source,shell]
+----
+curl -X POST http://localhost:8080/api/transcribe \
+-F "file=@./test.mp3"
+----
 
 == Next Steps
 

@@ -26,7 +26,7 @@ public class AudioTextController {
 
     @PostMapping("/tts")
     public ResponseEntity<byte[]> handleTextToSpeech(@RequestBody TextToSpeechRequest textToSpeechRequest) {
-        byte[] speechResult = textToSpeechService.processText(textToSpeechRequest.getText());
+        byte[] speechResult = textToSpeechService.processText(textToSpeechRequest.text(), null);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=output.mp3");
@@ -44,7 +44,7 @@ public class AudioTextController {
         try {
             byte[] audioBytes = file.getBytes();
 
-            AudioTranscriptionResponse response = transcribeService.transcribeAudio(new ByteArrayResource(audioBytes));
+            AudioTranscriptionResponse response = transcribeService.transcribeAudio(new ByteArrayResource(audioBytes), null);
 
             return new ResponseEntity<>(response.getResult().getOutput(), HttpStatus.OK);
         } catch (IOException e) {

@@ -1,14 +1,3 @@
 package ch04.model;
 
-public class TextToSpeechRequest {
-
-    private String text;
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-}
+public record TextToSpeechRequest (String text) { }

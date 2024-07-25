@@ -1,43 +1,20 @@
 package ch04.service;
 
-import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
 import org.springframework.ai.openai.OpenAiAudioSpeechOptions;
-import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TextToSpeechService {
 
-    @Value("${spring.ai.openai.api-key}") private String apiKey;
-
-    private OpenAiAudioSpeechOptions speechOptions;
-
+    @Autowired
     private OpenAiAudioSpeechModel speechModel;
 
-    @PostConstruct
-    public void init() {
-        var openAiAudioApi = new OpenAiAudioApi(apiKey);
-
-        speechModel = new OpenAiAudioSpeechModel(openAiAudioApi);
-
-        speechOptions = OpenAiAudioSpeechOptions.builder()
-                .withResponseFormat(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3)
-                .withSpeed(1.0f)
-                .withModel(OpenAiAudioApi.TtsModel.TTS_1.value)
-                .build();
-    }
-
-    public byte[] processText(String text) {
-        if (speechModel == null || speechOptions == null) {
-            return null;
-        }
-        var speechPrompt = new SpeechPrompt(text, speechOptions);
+    public byte[] processText(String text, OpenAiAudioSpeechOptions.Builder speechOptions) {
+        var speechPrompt = speechOptions != null ? new SpeechPrompt(text, speechOptions.build()) : new SpeechPrompt(text);
         SpeechResponse response = speechModel.call(speechPrompt);
         return response.getResult().getOutput();
     }
