@@ -42,9 +42,7 @@ public class AudioTextController {
         }
 
         try {
-            byte[] audioBytes = file.getBytes();
-
-            AudioTranscriptionResponse response = transcribeService.transcribeAudio(new ByteArrayResource(audioBytes), null);
+            AudioTranscriptionResponse response = transcribeService.transcribeAudio(new ByteArrayResource(file.getBytes()), null);
 
             return new ResponseEntity<>(response.getResult().getOutput(), HttpStatus.OK);
         } catch (IOException e) {
