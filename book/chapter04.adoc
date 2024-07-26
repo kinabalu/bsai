@@ -24,7 +24,7 @@ This is _this chapter's_ project file, and thus it's in a directory _under_ the 
 .Listing {chapter}-{counter:listing}: `chapter04/pom.xml`
 [source,xml]
 ----
-include::../../../../code/chapter04/pom.xml[]
+include::../code/chapter04/pom.xml[]
 ----
 
 The first thing we need to handle as we did in previous chapters is the application configuration. Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to be passed in the constructor, so we create one for each of the models that we can later `@Autowired` into our `@Service` classes.
@@ -32,7 +32,7 @@ The first thing we need to handle as we did in previous chapters is the applicat
 .Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
 [source,java]
 ----
-include::../../../../code/chapter04/src/main/java/ch04/Ch04Configuration.java[]
+include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[]
 ----
 
 A `OpenAiAudioApi` has three main request modules that it enables for working with audio. The first we'll work with is the `SpeechRequest` which may just be the text we want to create an audio file but can also accept several other options which we'll go over below. As with other modules in Spring AI they can be controlled at the point of the request, in code, or from the application properties.
@@ -67,7 +67,7 @@ Note the use of `spring.config.import`, which allows us to load our `.env` file'
 .Listing {chapter}-{counter:listing}: `chapter04/src/test/resources/application.properties`
 [source,properties]
 ----
-include::../../../../code/chapter04/src/test/resources/application.properties[]
+include::../code/chapter04/src/test/resources/application.properties[]
 ----
 
 Our first test case is going to be based on the Daisy Bell song footnote:[A wonderful article about the IBM 7094 is the first computer to sing https://www.historyofinformation.com/detail.php?entryid=4445] that we referenced at the beginning of the chapter. Our test is simple. We're going to pass the lyrics to the song "Daisy Bell" to service `TextToSpeechService` and call the `processText` method. We'll take the response and assert that it is non-null as the actual response would be tough to verify in a test.
@@ -75,7 +75,7 @@ Our first test case is going to be based on the Daisy Bell song footnote:[A wond
 .Listing {chapter}-{counter:listing}: Text To Speech Test
 [source,java]
 ----
-include::../../../../code/chapter04/src/test/java/ch04/SpeechTTSTest.java[]
+include::../code/chapter04/src/test/java/ch04/SpeechTTSTest.java[]
 ----
 
 If you are interested in the output as part of the test you could write the mp3 to disk.
@@ -101,7 +101,7 @@ This sounds pretty straightforward, so let's see what the actual Java class look
 .Listing {chapter}-{counter:listing}: Text To Speech Service
 [source,java]
 ----
-include::../../../../code/chapter04/src/main/java/ch04/service/TextToSpeechService.java[]
+include::../code/chapter04/src/main/java/ch04/service/TextToSpeechService.java[]
 ----
 
 We've got something to test now, so we can run this chapter's test suite by using Maven:
@@ -118,7 +118,7 @@ Let's say we wanted to pass some extra options to make it more like a song. If w
 .Listing {chapter}-{counter:listing}: Text To Speech With Options Test
 [source,java]
 ----
-include::../../../../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
+include::../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
 ----
 
 This test you can see it writes to disk. Hopefully with these options it sounds a little bit more like a song.
@@ -137,7 +137,7 @@ Our transcription test will be based on this song, after downloading you can pla
 .Listing {chapter}-{counter:listing}: TranscribeTest class
 [source,java]
 ----
-include::../../../../code/chapter04/src/test/java/ch04/TranscribeTest.java[]
+include::../code/chapter04/src/test/java/ch04/TranscribeTest.java[]
 ----
 
 We can't quite run this yet since the `TranscribeService` doesn't exist. If a reader looks at the assertion we might also notice that what we're verifying is not exactly the original lyrics. Listening to the recording we could definitely see how OpenAI would mistake "do" with "too". Now let's take a look at the `TranscribeService` and see how we make the transcription magic happen.
@@ -145,7 +145,7 @@ We can't quite run this yet since the `TranscribeService` doesn't exist. If a re
 .Listing {chapter}-{counter:listing}: TranscribeService class
 [source,java]
 ----
-include::../../../../code/chapter04/src/main/java/ch04/service/TranscribeService.java[]
+include::../code/chapter04/src/main/java/ch04/service/TranscribeService.java[]
 ----
 
 We have a `OpenAiAudioTranscriptionModel` available which we'll use Spring's dependency injection to reference in our `TranscribeService`.
@@ -220,7 +220,7 @@ We'll start our implementation by creating a simple data class called `TextToSpe
 .Listing {chapter}-{counter:listing}: TextToSpeechRequest class
 [source,java]
 ----
-include::../../../../code/chapter04/src/main/java/ch04/model/TextToSpeechRequest.java[]
+include::../code/chapter04/src/main/java/ch04/model/TextToSpeechRequest.java[]
 ----
 
 After this our implementation will be fairly straightforward using Spring MVC. We will use dependency injection to insert our two services: `TextToSpeechService` and `TranscribeService`. Our two handlers will accept `POST` requests with either a `@RequestBody` of `TextToSpeechRequest` as we saw above for processing the text to speech, or a `MultipartFile` for transcription.
@@ -228,7 +228,7 @@ After this our implementation will be fairly straightforward using Spring MVC. W
 .Listing {chapter}-{counter:listing}: AudioTextController class
 [source,java]
 ----
-include::../../../../code/chapter04/src/main/java/ch04/handler/AudioTextController.java[]
+include::../code/chapter04/src/main/java/ch04/handler/AudioTextController.java[]
 ----
 
 We can run this from the chapter root using Maven.

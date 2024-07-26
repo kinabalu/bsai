@@ -18,7 +18,6 @@
 
     <modules>
         <module>code</module>
-        <module>book</module>
     </modules>
 
     <properties>
