@@ -1,3 +1,3 @@
 package ch03;
 
-public record DoublePair(double x,double z) {}
+public record DoublePair(double y,double z, double w) {}

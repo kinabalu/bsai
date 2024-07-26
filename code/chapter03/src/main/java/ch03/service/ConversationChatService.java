@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 public class ConversationChatService {
-    protected final ChatClient client;
+    public final ChatClient client;
 
     ConversationChatService(ChatClient.Builder builder) {
         client = builder.build();
