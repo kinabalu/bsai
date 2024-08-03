@@ -2,16 +2,32 @@
 :chapter: 4
 
 == Generating and Processing Audio
+
+////
+TODO I think I'd like to see a preface talking about how AI can be used here."One can imagine
+using AI to transcribe a recording to text" and "... or it could be used in an assistive
+capacity to read text aloud for the vision-impaired," for example. That sets the stage for what the chapter
+describes.
+////
+
 In this chapter we will walk through the two simple APIs for processing audio and text and a real world example of how you might use both.
 
-Spring AI has two avenues for working with audio. The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech. In both instances the integration done today with Spring AI uses OpenAI. Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
+Spring AI has two avenues for working with audio.
+The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech.
+In both instances the integration done today with Spring AI uses OpenAI.
+Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
 
 Let's dive in.
 
 === The AI spoken word
-Creating spoken audio from text using a computer has been around since the early 1960s. A physicist at Bell Labs used an IBM 7094 computer to synthesize speech and recreate the song "Daisy Bell". Arthur C Clarke saw a demonstration of this and incorporated it in his book and the screenplay for "2001: A Space Odyssey" when HAL9000 is shut down.
 
-First task we'll do is to create our directory structure for this chapter. This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
+Creating spoken audio from text using a computer has been around since the early 1960s.
+a physicist at Bell Labs used an IBM 7094 computer to synthesize speech and recreate the song "Daisy Bell;" author Arthur C. Clarke saw a demonstration of this, and incorporated it in his book and the screenplay for "2001: A Space Odyssey" for when HAL9000 is shut down.
+It's an interesting technical challenge that involves understanding of how words are formed from phonemes and how phonemes link together, much as how font ligatures work to create handwriting fonts.
+There are plenty of text-to-speech libraries out there, but AI has a much larger repository of information to draw from, and requires less work to install and run, since the heavy lifting's been done by the AI service providers.
+
+The first task we'll take on is to create our directory structure for this chapter.
+This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
 
 .Listing {chapter}-{counter:listing}: Creating the project directory structure in POSIX
 [source,shell]
@@ -27,7 +43,8 @@ This is _this chapter's_ project file, and thus it's in a directory _under_ the 
 include::../code/chapter04/pom.xml[]
 ----
 
-The first thing we need to handle as we did in previous chapters is the application configuration. Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to be passed in the constructor, so we create one for each of the models that we can later `@Autowired` into our `@Service` classes.
+The first thing we need to handle as we did in previous chapters is the application configuration.
+Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to be passed in the constructorfootnote:[As this is being written, the Spring AI module has not had its first production release, so there are some rough edges in place. Production releases may (or may not!) change some of these details.], so we create one for each of the models that we can later `@Autowired` into our `@Service` classes.
 
 .Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
 [source,java]
@@ -35,7 +52,9 @@ The first thing we need to handle as we did in previous chapters is the applicat
 include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[]
 ----
 
-A `OpenAiAudioApi` has three main request modules that it enables for working with audio. The first we'll work with is the `SpeechRequest` which may just be the text we want to create an audio file but can also accept several other options which we'll go over below. As with other modules in Spring AI they can be controlled at the point of the request, in code, or from the application properties.
+A `OpenAiAudioApi` has three main request modules that it enables for working with audio.
+The first we'll work with is the `SpeechRequest` which may just be the text we want to create an audio file but can also accept several other options which we'll go over below.
+As with other modules in Spring AI they can be controlled at the point of the request, in code, or from the application properties.
 
 [cols="1,2"]
 |===
@@ -70,7 +89,10 @@ Note the use of `spring.config.import`, which allows us to load our `.env` file'
 include::../code/chapter04/src/test/resources/application.properties[]
 ----
 
-Our first test case is going to be based on the Daisy Bell song footnote:[A wonderful article about the IBM 7094 is the first computer to sing https://www.historyofinformation.com/detail.php?entryid=4445] that we referenced at the beginning of the chapter. Our test is simple. We're going to pass the lyrics to the song "Daisy Bell" to service `TextToSpeechService` and call the `processText` method. We'll take the response and assert that it is non-null as the actual response would be tough to verify in a test.
+Our first test case is going to be based on the Daisy Bell song footnote:[As mentioned in the rather informative article, "The IBM 7094 is the First Computer to Sing,` at `https://www.historyofinformation.com/detail.php?entryid=4445` - well worth reading.] that we referenced at the beginning of the chapter.
+Our test is simple; We're going to pass the lyrics to the song "Daisy Bell" to service `TextToSpeechService` and call the `processText` method.
+We'll take the response and assert that it is non-null as the actual response would be tough to verify in a test.
+(However, as we'll demonstrate, we can save it to local storage, where you can play it yourself and hear whether the AI actually fulfilled our request.)
 
 .Listing {chapter}-{counter:listing}: Text To Speech Test
 [source,java]
@@ -86,15 +108,18 @@ If you are interested in the output as part of the test you could write the mp3 
 Files.write(Paths.get("./daisybell.mp3"), responseAsBytes);
 ----
 
-This test is simple enough, but it obviously won't run because we don't have an implementation of the `TextToSpeechService`. The service has two public methods in it, `processText(String)` and `processText(String, OpenAiAudioSpeechOptions.Builder)`, which both return a `byte[]`.
+This test is simple enough, but it obviously won't run because we don't have an implementation of the `TextToSpeechService`.
+The service has two public methods in it, `processText(String)` and `processText(String, OpenAiAudioSpeechOptions.Builder)`, which both return a `byte[]`.
 
 We have a `SpeechModel` available which we'll use Spring's dependency injection to reference in our `TextToSpeechService`.
 
-Issuing a call to OpenAI we build a `SpeechPrompt` and pass the text we'd like to use to generate spoken word output. If we don't pass an `OpenAiAudioSpeechOptions` object into the `processText` method it will by default use the options from `application.properties` if specified.
+Issuing a call to OpenAI, we build a `SpeechPrompt` and pass the text we'd like to use to generate spoken word output.
+If we don't pass an `OpenAiAudioSpeechOptions` object into the `processText` method it will by default use the options from `application.properties` if they're specified.
 
 Once we have a prompt, we issue a call to the API, whether blocking or streaming; in this case, we don't care about streaming, so we use `call()` to get the response specification.
 
-Once we have the response specification, we can get the recording by using the `getResult().getOutput()` method which returns a byte array. If we wanted to, we could get metadata about the call like the number of tokens consumed on our API key and a few other interesting elements.
+Once we have the response specification, we can get the recording by using the `getResult().getOutput()` method which returns a byte array.
+If we wanted to, we could get metadata about the call like the number of tokens consumed on our API key and a few other interesting elements.
 
 This sounds pretty straightforward, so let's see what the actual Java class looks like.
 
@@ -111,9 +136,12 @@ We've got something to test now, so we can run this chapter's test suite by usin
 mvn -am -pl chapter04 clean test
 ----
 
-If everything is working properly it should complete with `SUCCESS`. If you chose to add the line for writing the file output to disk you can open up the resulting mp3 file and have a listen. This test will sound more like spoken word than singing as there is no "singing" option within the OpenAI API.
+If everything is working properly it should complete with `SUCCESS`.
+If you chose to add the line for writing the file output to disk you can open up the resulting mp3 file and have a listen.
+This test will sound more like spoken word than singing as there is no "singing" option within the OpenAI API; the result is a particularly passionless rendering of a silly love song, and might be worth listening to only for humor's sake.
 
-Let's say we wanted to pass some extra options to make it more like a song. If we pass a custom `OpenAiAudioSpeechOptions` to a custom test we can do so like this.
+Let's say we wanted to pass some extra options to make it more like a song.
+If we pass a custom `OpenAiAudioSpeechOptions` to a custom test we can do so like this.
 
 .Listing {chapter}-{counter:listing}: Text To Speech With Options Test
 [source,java]
@@ -121,10 +149,20 @@ Let's say we wanted to pass some extra options to make it more like a song. If w
 include::../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
 ----
 
-This test you can see it writes to disk. Hopefully with these options it sounds a little bit more like a song.
+This test you can see it writes to disk.
+Hopefully with these options it sounds a little bit more like a song, but it's probably safe to say that Celine Dion, Adele, or Janis Joplin are all safe from challenges from OpenAI just yet.
 
 === Transcription
-The more useful integration being done with Spring's integration is the transcription of audio to text. Our tests previously have been using the lyrics to "Daisy Bell", and we will continue that here. A search on Wikipedia gives us a FLAC file of the original recording. If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac.
+
+The more useful integration being done with Spring's integration is the transcription of audio to text.
+Our tests previously have been using the lyrics to "Daisy Bell", and we will continue that here.
+A search on Wikipedia gives us a FLAC file of the original recording.
+If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: `https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac`.
+
+////
+TODO: bit.ly? Any other url shortener? These long urls are brutal.
+////
+
 
 .Listing {chapter}-{counter:listing}: Download the Daisy Bell FLAC file
 [source,bash]
@@ -132,7 +170,11 @@ The more useful integration being done with Spring's integration is the transcri
 curl -O 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac'
 ----
 
-Our transcription test will be based on this song, after downloading you can place the file in the chapter's `src/test/resources` directory. The test is fairly simple, we'll read the file from the classpath and pass the audio content to the `TranscribeService` and call the single method `transcribeAudio`. The response we receive back will be verified using an assert of the original lyrics, sort of. Let's take a look at our test.
+Our transcription test will be based on this song, after downloading you can place the file in the chapter's `src/test/resources` directory.
+The test is fairly simple, we'll read the file from the classpath and pass the audio content to the `TranscribeService` and call the single method `transcribeAudio`.
+The response we receive back will be verified using an assertion of a phrase from the original lyrics, because transcription is not an exact art. Even when the words match (as they usually will), the punctuation can be different, so an exact match of the output is unlikely. As a result, we're going to search for a phrase we do indeed fully expect to be in the output (the closing line) and leave it at that.
+
+Let's take a look at our test.
 
 .Listing {chapter}-{counter:listing}: TranscribeTest class
 [source,java]
@@ -140,7 +182,10 @@ Our transcription test will be based on this song, after downloading you can pla
 include::../code/chapter04/src/test/java/ch04/TranscribeTest.java[]
 ----
 
-We can't quite run this yet since the `TranscribeService` doesn't exist. If a reader looks at the assertion we might also notice that what we're verifying is not exactly the original lyrics. Listening to the recording we could definitely see how OpenAI would mistake "do" with "too". Now let's take a look at the `TranscribeService` and see how we make the transcription magic happen.
+We can't quite run this yet since the `TranscribeService` doesn't exist.
+If a reader looks at the assertion we might also notice that what we're verifying is not exactly the original lyrics.
+Listening to the recording we could definitely see how OpenAI would mistake "do" with "too".
+Now let's take a look at the `TranscribeService` and see how we make the transcription magic happen.
 
 .Listing {chapter}-{counter:listing}: TranscribeService class
 [source,java]
@@ -150,11 +195,13 @@ include::../code/chapter04/src/main/java/ch04/service/TranscribeService.java[]
 
 We have a `OpenAiAudioTranscriptionModel` available which we'll use Spring's dependency injection to reference in our `TranscribeService`.
 
-Issuing a call to OpenAI we build an `AudioTranscriptionPrompt` and pass the text we'd like to use to generate the output. If we don't pass an `OpenAiAudioTranscriptionOptions` object into the `transcribeAudio` method it will by default use the options from `application.properties` if specified.
+Issuing a call to OpenAI we build an `AudioTranscriptionPrompt` and pass the text we'd like to use to generate the output.
+If we don't pass an `OpenAiAudioTranscriptionOptions` object into the `transcribeAudio` method it will by default use the options from `application.properties` if specified.
 
 Once we have a prompt, we issue a call to the API, whether blocking or streaming; in this case, we don't care about streaming, so we use `call()` to get the response specification.
 
-Once we have the response specification, we can get the recording by using the `getResult().getOutput()` method which returns a String. As with other calls we could choose to look at the metadata which is available from the call to `getResult()` and for our test and usage we're focused only on the output.
+Once we have the response specification, we can get the recording by using the `getResult().getOutput()` method which returns a String.
+As with other calls we could choose to look at the metadata which is available from the call to `getResult()` and for our test and usage we're focused only on the output.
 
 We've got something to test now, so we can run this chapter's test suite by using Maven.
 
@@ -164,6 +211,8 @@ mvn -am -pl chapter04 clean test
 ----
 
 If the stars align and the AI hasn't done any hallucinating during your test you should see `SUCCESS` in the test.
+
+The neat thing to consider here is that the phrase is actually rendered pretty well; we expect it to render the _number_ two (as in "a bicycle built for two") and not the homonym "too" - the AI model is usually going to infer the proper words based on the phrases in the song, so while the punctuation and capitalization may be slightly variable, _in general_ it's rendering a quite recognizable transcription of the input, _without_ necessarily recognizing the song itself.
 
 [cols="1,2"]
 |===
@@ -189,7 +238,9 @@ If the stars align and the AI hasn't done any hallucinating during your test you
 |===
 
 === REST Example
-A real world example might be an endpoint using Spring MVC which processes text or audio files. Our next step will to be setting up two simple POST endpoints one which accepts a String of text and the other which accepts an audio file.
+
+A real world example might be an endpoint using Spring MVC which processes text or audio files.
+Our next step will to be setting up two simple POST endpoints one which accepts a String of text and the other which accepts an audio file.
 
 Calling this endpoint might look something like:
 
@@ -204,7 +255,8 @@ curl -X POST http://localhost:8080/api/tts \
 EOF
 ----
 
-The above is passing a JSON object with a key of `text` and the value as the string we're looking to pass in. For transcribing an audio file containing spoken words we can imagine the curl command to look like this:
+The above is passing a JSON object with a key of `text` and the value as the string we're looking to pass in.
+For transcribing an audio file containing spoken words we can imagine the curl command to look like this:
 
 .Listing {chapter}-{counter:listing}: Sending the Daisy Bell audio file to transcribe endpoint
 [source,shell]
@@ -223,7 +275,9 @@ We'll start our implementation by creating a simple data class called `TextToSpe
 include::../code/chapter04/src/main/java/ch04/model/TextToSpeechRequest.java[]
 ----
 
-After this our implementation will be fairly straightforward using Spring MVC. We will use dependency injection to insert our two services: `TextToSpeechService` and `TranscribeService`. Our two handlers will accept `POST` requests with either a `@RequestBody` of `TextToSpeechRequest` as we saw above for processing the text to speech, or a `MultipartFile` for transcription.
+After this our implementation will be fairly straightforward using Spring MVC.
+We will use dependency injection to insert our two services: `TextToSpeechService` and `TranscribeService`.
+Our two handlers will accept `POST` requests with either a `@RequestBody` of `TextToSpeechRequest` as we saw above for processing the text to speech, or a `MultipartFile` for transcription.
 
 .Listing {chapter}-{counter:listing}: AudioTextController class
 [source,java]
