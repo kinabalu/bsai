@@ -2,19 +2,11 @@
 :chapter: 4
 
 == Generating and Processing Audio
+Let's turn our attention toward what we can achieve using AI with the spoken word. One can imagine transcribing video or audio to written text as part of a service offering. Written text can be spoken aloud using this module for the vision-impaired or for those engaged in activities where reading isn't an option.
 
-////
-TODO I think I'd like to see a preface talking about how AI can be used here."One can imagine
-using AI to transcribe a recording to text" and "... or it could be used in an assistive
-capacity to read text aloud for the vision-impaired," for example. That sets the stage for what the chapter
-describes.
-////
+In this chapter we will walk through the two simple APIs for processing audio and text and real world examples of how you can use both.
 
-In this chapter we will walk through the two simple APIs for processing audio and text and a real world example of how you might use both.
-
-Spring AI has two avenues for working with audio.
-The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech.
-In both instances the integration done today with Spring AI uses OpenAI.
+Spring AI has two avenues for working with audio. The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech. In both instances the integration done today with Spring AI uses OpenAI.
 Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
 
 Let's dive in.
@@ -157,17 +149,12 @@ Hopefully with these options it sounds a little bit more like a song, but it's p
 The more useful integration being done with Spring's integration is the transcription of audio to text.
 Our tests previously have been using the lyrics to "Daisy Bell", and we will continue that here.
 A search on Wikipedia gives us a FLAC file of the original recording.
-If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: `https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac`.
-
-////
-TODO: bit.ly? Any other url shortener? These long urls are brutal.
-////
-
+If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: `https://bit.ly/daisy_bell_dectalk`.
 
 .Listing {chapter}-{counter:listing}: Download the Daisy Bell FLAC file
 [source,bash]
 ----
-curl -O 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Daisy_Bell_sung_by_DECtalk.flac'
+curl -O 'https://bit.ly/daisy_bell_dectalk'
 ----
 
 Our transcription test will be based on this song, after downloading you can place the file in the chapter's `src/test/resources` directory.
@@ -296,4 +283,4 @@ In a separate terminal session we can use the curl commands above and see the AP
 
 == Next Steps
 
-In our next chapter, something else is going to be talked about
+In our next chapter, we're going to look at image generation with Spring AI and object identification in images using the multi-modality API.
