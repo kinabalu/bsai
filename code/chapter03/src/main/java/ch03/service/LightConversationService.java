@@ -10,15 +10,20 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ConversationChatService {
-    public final ChatClient client;
+public class LightConversationService {
+    private final ChatClient client;
 
-    ConversationChatService(ChatClient.Builder builder) {
+    LightConversationService(ChatClient.Builder builder) {
         client = builder.build();
     }
 
     public List<Generation> converse(List<Message> messages) {
-        return converse(messages, new OpenAiChatOptions.Builder().build());
+        return converse(messages,
+                new OpenAiChatOptions
+                        .Builder()
+                        .withFunction("RequestLightStatusService")
+                        .withFunction("ChangeLightService")
+                        .build());
     }
 
     public List<Generation> converse(
@@ -26,6 +31,10 @@ public class ConversationChatService {
             OpenAiChatOptions options
     ) {
         var prompt = new Prompt(messages, options);
-        return client.prompt(prompt).call().chatResponse().getResults();
+        return client
+                .prompt(prompt)
+                .call()
+                .chatResponse()
+                .getResults();
     }
 }

@@ -5,7 +5,6 @@ import ch04.service.TextToSpeechService;
 import ch04.service.TranscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.ai.openai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +41,7 @@ public class AudioTextController {
         }
 
         try {
-            AudioTranscriptionResponse response = transcribeService.transcribeAudio(new ByteArrayResource(file.getBytes()), null);
+            var response = transcribeService.transcribeAudio(new ByteArrayResource(file.getBytes()), null);
 
             return new ResponseEntity<>(response.getResult().getOutput(), HttpStatus.OK);
         } catch (IOException e) {

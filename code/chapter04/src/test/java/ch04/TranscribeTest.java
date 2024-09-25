@@ -2,7 +2,7 @@ package ch04;
 
 import ch04.service.TranscribeService;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.openai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
