@@ -556,4 +556,4 @@ This is an interesting example - but we can take it further, and we will, in the
 
 == Next Steps
 
-In our next chapter, we're going to look at Spring AI's output converters, where we can get the LLM to give us structured data for our program to consume directly.
+In our next chapter, we're going to look at Spring AI's output converters, where we can get the LLM to give us structured data for our program to consume directly, along with some mechanisms for allowing the AI to gather data from our programs.

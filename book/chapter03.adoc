@@ -1,5 +1,24 @@
-= Asking Questions
+= Asking Questions and Using Data
 :chapter: 3
+
+In our last chapter, we explored setting up our project and querying an LLM. In this chapter, we're going to explore two other important aspects of the LLM infrastructure - getting structured data out of them, and feeding data *to* an LLM on demand by way of providing functions.
+
+It may seem odd to think about providing access points to an AI, but this is a crucial lever for applying what the LLMs can do for you.
+
+== Interacting with an AI
+
+For the most part, AIs consist of data and a reasoning process about that data. The model tends to be fairly static, as creating a model is expensive in terms of resources, and models tend to be focused on spheres of knowledge. Most of the popular models, like `gpt4-o` (one of the commercial models from ChatGPT) are huge, and focused on generalized knowledge; they might be good for the questions you ask, or they might not. Other models, like Github's Copilot or the Qwen models, are designed for coding, and some are finely tuned for specific programming languages.
+
+The key feature of all of these, however, is that they *were trained* - note the past tense. Most of them provide information about when they were trained, to give some context to what they know, and many of them will also answer time-sensitive questions about current events by informing you that their training data didn't include recent history.
+
+.Asking an LLM about current events
+image::images/ch03-current-events.png[]
+
+The LLM isn't _wrong_ - checking local calendars or social media isn't a bad strategy! - but it limits the AI to being a useful but fairly passive research toolfootnote:[What's more, given the nature of how LLMs work, even as a research tool it requires verification, about which most responsible LLMs will explicitly remind you.].
+
+The problem, then, lies in how to provide access of, well, _something_, to the LLM. It's not just _data_ or _current events_, it's a matter of providing interactions to the LLM, such that it can find out something that its knowledge model does not have, or provide functionality that it _shouldn't have_.
+
+This is how one might be able to use ChatGPT as it is *today* to query order status, or perhaps even *make* an order.
 
 == Next Steps
 
