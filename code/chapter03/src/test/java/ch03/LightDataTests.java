@@ -10,10 +10,11 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class LightDataTests extends BaseLightTests {
@@ -21,16 +22,25 @@ public class LightDataTests extends BaseLightTests {
     @Autowired
     LightDataService lightDataService;
 
+    private Map<String, Boolean> mapToStatus(LightDataService.Data response) {
+        var map = new HashMap<String, Boolean>();
+        response.lights().forEach(light -> {
+            map.put(light.getColor(), light.isOn());
+        });
+        return map;
+    }
+
     @Test
     void changeLightStatus() {
         var response = lightDataService.converse(List.of(
                 new UserMessage("Turn the yellow light on."),
                 new UserMessage("Then show the state of the red, green, blue, purple, and yellow lights.")
         ));
-        logger.info("response: {}", response);
 
-        assertState("yellow", true);
-        assertState("red", false);
+        var statuses = mapToStatus(response);
+        assertTrue(statuses.get("yellow"));
+        assertFalse(statuses.get("red"));
+        assertFalse(statuses.get("purple"));
     }
 
     @Test
@@ -40,9 +50,11 @@ public class LightDataTests extends BaseLightTests {
                 new UserMessage("Then show the state of the red, green, blue, purple, and yellow lights."),
                 new UserMessage("If the light doesn't exist, remove it from the output.")
         ));
-        logger.info("response: {}", response);
 
-        assertState("yellow", true);
-        assertState("red", false);
+        var statuses = mapToStatus(response);
+        assertTrue(statuses.get("yellow"));
+        assertFalse(statuses.get("red"));
+        // note use of null here, not false
+        assertNull(statuses.get("purple"));
     }
 }
