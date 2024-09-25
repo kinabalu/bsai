@@ -1,5 +1,6 @@
 package ch03;
 
+import ch03.model.Light;
 import ch03.service.LightDataService;
 import ch03.service.LightService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,10 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,5 +38,13 @@ public abstract class BaseLightTests {
         var light = lightService.getLight(color);
         assertTrue(light.isPresent(), color + " light is present");
         assertEquals(on, light.get().isOn(), "light state");
+    }
+
+    final Map<String, Boolean> mapToStatus(List<Light> response) {
+        return response
+                .stream()
+                .collect(
+                        Collectors.toMap(Light::getColor, Light::isOn)
+                );
     }
 }
