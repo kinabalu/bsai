@@ -20,6 +20,35 @@ The problem, then, lies in how to provide access of, well, _something_, to the L
 
 This is how one might be able to use ChatGPT as it is *today* to query order status, or perhaps even *make* an order.
 
+== Working with the "Real World"
+
+We can build a working example of something you might find in the real world by thinking of smart lights. There are many commercial examples of smart lightbulbs on the market today, and one can work with them in multiple ways, whether with Alexa, Nest, the custom apps associated with each brand, or home controller applications like openHABfootnote:[openHAB can be found at `https://www.openhab.org/`.] or Home Assistantfootnote:[Home Assistant's home page is `https://www.home-assistant.io/`.].
+
+We're going to build something like openHAB: we're going to create a Spring service to control software "light bulbs" and then we'll provide ways to query and control them through interactions with OpenAI.
+
+NOTE: It would be fairly trivial to take our planned light bulb manager and migrate to work with *actual* light bulbs. This is something one of your authors did for a living. It's actually rather fun, but we're not going to assume our readers have a specific brand of smart lightsfootnote:[The Matter API (`https://developers.home.google.com/matter`) actually helps synchronize a lot of smart device controls, but Matter's API requires a lot of investment, and that's out of the scope of this book. Apart from Matter, you're writing to a set of specific manufacturers' specifications, and that's difficult to generalize and often inconsistent, to boot. Our software emulations carry the day for simplicity and consistency and, well, cost.], or that they want to annoy their wives by changing the lights by fooling around with software, either.
+
+With that said, let's get started. First, we need our directory structure and our `pom.xml`.
+
+Listing {chapter}-{counter:listing}: Creating the directory structure in a POSIX shell
+[source,shell]
+----
+# in a POSIX shell
+mkdir -p chapter03/src/{main,test}/{java/ch03,resources}
+----
+
+The `pom.xml` is very straightforward. It could have been copied from Chapter 2 with few changes, but we actually have fewer dependencies in Chapter 3 than we did in Chapter 2.
+
+Listing {chapter}-{counter:listing}: `chapter03/pom.xml`
+[source,xml]
+----
+include::../code/chapter03/pom.xml[]
+----
+
+Now for the more interesting stuff: our lights. Our basic light abstraction is very simple (and not very accurate, from a real-world light modeling perspective): we have lights, identified by color, that have a state of being "on" or "off."
+
+NOTE: In the real world, smart bulbs have a number of identifying characteristics: IP Addresses, MAC addresses, names, and perhaps zones. They also have more mutable characteristics, *including* color (most of the time!), brightness, and color temperature, and they also can provide metrics for their use. However, none of these attributes help us model calling functions from Spring AI, so we're ignoring them.
+
 == Next Steps
 
 In our next chapter, ...

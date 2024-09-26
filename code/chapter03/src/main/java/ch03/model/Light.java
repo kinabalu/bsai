@@ -12,7 +12,8 @@ public class Light {
     }
 
     // included for serialization later
-    public Light() {}
+    public Light() {
+    }
 
     public String getColor() {
         return color;
@@ -32,7 +33,8 @@ public class Light {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", Light.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ",
+                Light.class.getSimpleName() + "[", "]")
                 .add("color='" + color + "'")
                 .add("on=" + on)
                 .toString();
