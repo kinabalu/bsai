@@ -2,6 +2,7 @@ package ch03.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.util.function.Function;
 @Description("Change a light's state")
 public class ChangeLightService implements Function<ChangeLightService.Request, ChangeLightService.Response> {
     public final Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Autowired
     LightService lightService;
 
     public ChangeLightService(LightService lightService) {

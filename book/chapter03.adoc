@@ -26,7 +26,7 @@ We can build a working example of something you might find in the real world by 
 
 We're going to build something like openHAB: we're going to create a Spring service to control software "light bulbs" and then we'll provide ways to query and control them through interactions with OpenAI.
 
-NOTE: It would be fairly trivial to take our planned light bulb manager and migrate to work with *actual* light bulbs. This is something one of your authors did for a living. It's actually rather fun, but we're not going to assume our readers have a specific brand of smart lightsfootnote:[The Matter API (`https://developers.home.google.com/matter`) actually helps synchronize a lot of smart device controls, but Matter's API requires a lot of investment, and that's out of the scope of this book. Apart from Matter, you're writing to a set of specific manufacturers' specifications, and that's difficult to generalize and often inconsistent, to boot. Our software emulations carry the day for simplicity and consistency and, well, cost.], or that they want to annoy their wives by changing the lights by fooling around with software, either.
+NOTE: It would be fairly trivial to take our planned light bulb manager and migrate to work with *actual* light bulbs. This is something one of your authors did for a living. It's actually rather fun, but we're not going to assume our readers have a specific brand of smart lightsfootnote:[The Matter API (`https://developers.home.google.com/matter`) actually helps synchronize a lot of smart device controls, but Matter's API requires a lot of investment, and that's out of the scope of this book. Apart from Matter, you're writing to a set of specific manufacturers' specifications, and that's difficult to generalize and often inconsistent, to boot. Our software emulations carry the day for simplicity and consistency and, well, cost.], or that they want to annoy their wives by changing the lights through fooling around with software, either.
 
 With that said, let's get started. First, we need our directory structure and our `pom.xml`.
 
@@ -48,6 +48,70 @@ include::../code/chapter03/pom.xml[]
 Now for the more interesting stuff: our lights. Our basic light abstraction is very simple (and not very accurate, from a real-world light modeling perspective): we have lights, identified by color, that have a state of being "on" or "off."
 
 NOTE: In the real world, smart bulbs have a number of identifying characteristics: IP Addresses, MAC addresses, names, and perhaps zones. They also have more mutable characteristics, *including* color (most of the time!), brightness, and color temperature, and they also can provide metrics for their use. However, none of these attributes help us model calling functions from Spring AI, so we're ignoring them.
+
+The `Light` class is a model - it's a representation of a thing - so we're going to put it in the `ch03.model` package, in `chapter03/src/main/java/ch03/model/Light.java`. The code for it is very straightforward; it's a classic Plain Old Java Object (not a `record`) because we're going to mutate its state. Again, we're aiming for simplicity herefootnote:[We toyed with the idea of making an unimpeachably correct representation, including the use of `record` and other such things. We decided against it, because we're not trying to stun readers - or, well, *attempt* to stun readers - with how most excellent and FP-compliant our _simple example code_ was. We just want it to work and be easy to understand.].
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/model/Light.java`
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/model/Light.java[]
+----
+
+The next thing we'll need to do is create a `LightService` - in `ch03.service` - that works with instances of our `Light` class. This is a Spring component, and the heart of its functionality is in the `getLights()` method, which queries the Spring `ApplicationContext` for any managed instances of `Light`.
+
+In a real application, this class would have network services to track when lights became available or responded to network broadcast events, but the actual mechanics of that are *far* too complex for this example.
+
+After we see the source for `LightService`, we're going to create our Spring configuration, and then we'll test all this stuff out so we know it works.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightService.java`
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/service/LightService.java[]
+----
+
+This service provides three methods: one is `getLights()`, which - as previously stated - gets all of the managed `Light` instances from Spring. The `getBeansOfType()` method returns a `Map<String, Class<T>>` - where the key is the name of the bean in the Spring context, and the `Class` is the type passed in - and we don't care about the name of the beans, so we convert it to a simple `List`.
+
+The next method provided retrieves a `Light` by color. If the color isn't found among the list of `Light` instances, an empty result is returned; this is a pattern largely inspired by the Spring Data `Repository`. We could have used nullable types instead, as `Optional` references are nullable in and of themselvesfootnote:[`Optional` is useful in Java, but not very; however, in streams they can occasionally be quite useful. We're not going to get anywhere near the tipping point where we see value from using `Optional` like that, but it's good to follow a convention, and this is one.].
+
+The last method is provides a mechanism to change a light's state. It assumes the state passed in is absolute; it won't complain if you try to turn on a light that's already on, for example; nor will it complain if you change a light that doesn't exist. In this case, it simply returns an empty `Optional` just like `getLight()` does.
+
+Like our `Light` class, the `LightService` isn't particularly complex or interesting; we just need to have it to make everything else work, much as we need our _next_ class, the `Ch03Configuration` class, which is our Spring configuration.
+
+This class exists mostly to give us a place for the `@SpringBootApplication` annotation as well as instantiate our `Light` instances. Thus, it's just as simple as `Light` and `LightService`:
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03//Ch03Configuration.java`
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/Ch03Configuration.java[]
+----
+
+Note that there's no correlation of light colors to bean names. We could have named the beans "more appropriately," but again, in any kind of real-world analog, we'd not create light references in this manner; they'd be discovered, so this class is entirely used for building out our examples, which we're quite aware haven't even _begun_ to touch Spring AI.
+
+Spring AI integration is coming, we promise. We're almost there: we just need a test to validate that our `LightService` and the configuration is doing what it's supposed to, and that involves two _more_ classes - one of which is a base class for our tests that provides common services.
+
+Let's look at our `BaseLightTests` class first; it's a test class, so it goes in `chapter03/src/test/java/ch03`. It provides a common reference to a `LightService` (so our tests don't have to include one), as well as methods to reset all available lights to being "off" - so we have a pristine test state every time - and assert that a light exists and has a given state, as well as a method to construct a map of lights to their status, which means it's easier for us to test the state of *all* lights.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/BaseLightTests.java`
+[source,java]
+----
+include::../code/chapter03/src/test/java/ch03/BaseLightTests.java[]
+----
+
+Now it's finally time for us to round out our simple example of light services, with a test of the, well, `LightService`. This class extends `BaseLightTests` so it gets a reference to the `LightService`, and every test it has will start with all lights being set to _off_.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/LightServiceTests.java`
+[source,java]
+----
+include::../code/chapter03/src/test/java/ch03/LightServiceTests.java[]
+----
+
+The code here is remarkably simple, as is the rest of our code: we know what our configuration should be (four lights, and "purple" should not be among them), and we simply run through all of our `LightService` methods to make sure they return values we expect.
+
+We're not really being exhaustive here, but we're being exhaustive _enough_ for our example code. If this test passes completely, we have quite a bit of confidence that our `LightService` is functional in the ways we expect it to be.
+
+It's finally time for us to look at _using_ this from Spring AI.
+
+
 
 == Next Steps
 
