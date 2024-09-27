@@ -275,9 +275,12 @@ Here's example output from our machines for this test:
 
 [source,text]
 ----
-INFO  ch03.service.RequestLightStatusService -- Requesting status for light: Request[color=yellow]
-INFO  ch03.service.RequestLightStatusService -- Requesting status for light: Request[color=purple]
-INFO  ch03.RequestLightStatusTest -- Response: The status of the light named 'yellow' is off.
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=yellow]
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=purple]
+INFO  ch03.RequestLightStatusTest --
+Response: The status of the light named 'yellow' is off.
 Unfortunately, I couldn't retrieve the status of the light named 'purple'.
 ----
 
