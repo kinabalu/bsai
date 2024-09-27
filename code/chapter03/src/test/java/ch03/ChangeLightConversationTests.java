@@ -1,7 +1,6 @@
 package ch03;
 
-import ch03.service.LightConversationService;
-import ch03.service.LightService;
+import ch03.service.LightUpdateService;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-public class LightConversationalTests extends BaseLightTests {
+public class ChangeLightConversationTests extends BaseLightTests {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    LightConversationService lightConversationService;
+    LightUpdateService lightConversationService;
 
     @Test
     void changeLightStatus() {

@@ -1,23 +1,25 @@
 package ch03.service;
 
+import ch03.model.Light;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class LightConversationService {
+public class LightStructuredUpdateService {
     private final ChatClient client;
 
-    LightConversationService(ChatClient.Builder builder) {
+    public record Data(List<Light> lights) {
+    }
+
+    LightStructuredUpdateService(ChatClient.Builder builder) {
         client = builder.build();
     }
 
-    public List<Generation> converse(List<Message> messages) {
+    public Data converse(List<Message> messages) {
         return converse(messages,
                 new OpenAiChatOptions
                         .Builder()
@@ -26,15 +28,16 @@ public class LightConversationService {
                         .build());
     }
 
-    public List<Generation> converse(
+    public Data converse(
             List<Message> messages,
             OpenAiChatOptions options
     ) {
-        var prompt = new Prompt(messages, options);
+        //var prompt = new Prompt(messages, options);
         return client
-                .prompt(prompt)
+                .prompt()
+                .messages(messages)
+                .options(options)
                 .call()
-                .chatResponse()
-                .getResults();
+                .entity(Data.class);
     }
 }
