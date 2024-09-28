@@ -2,6 +2,10 @@
 :chapter: 4
 
 == Generating and Processing Audio
+////
+TODO I feel like this is an awesome place to make some geeky Star Trek references, where the crew
+shouted "COMPUTER! PLAY THE TAPE!" and stuff like that, and it spoke back to them.
+////
 Let's turn our attention toward what we can achieve using AI with the spoken word. One can imagine transcribing video or audio to written text as part of a service offering. Written text can be spoken aloud using this module for the vision-impaired or for those engaged in activities where reading isn't an option.
 
 In this chapter we will walk through the two simple APIs for processing audio and text and real world examples of how you can use both.
@@ -13,8 +17,9 @@ Let's dive in.
 
 === The AI spoken word
 
+// TODO The following paragraph doesn't flow as well as it should. It feels like it should be multiple paragraphs.
 Creating spoken audio from text using a computer has been around since the early 1960s.
-a physicist at Bell Labs used an IBM 7094 computer to synthesize speech and recreate the song "Daisy Bell;" author Arthur C. Clarke saw a demonstration of this, and incorporated it in his book and the screenplay for "2001: A Space Odyssey" for when HAL9000 is shut down.
+A physicist at Bell Labs used an IBM 7094 computer to synthesize speech and recreate the song "Daisy Bell;" author Arthur C. Clarke saw a demonstration of this, and incorporated it in his book and the screenplay for "2001: A Space Odyssey" for when HAL9000 is shut down.
 It's an interesting technical challenge that involves understanding of how words are formed from phonemes and how phonemes link together, much as how font ligatures work to create handwriting fonts.
 There are plenty of text-to-speech libraries out there, but AI has a much larger repository of information to draw from, and requires less work to install and run, since the heavy lifting's been done by the AI service providers.
 
@@ -86,7 +91,7 @@ Our test is simple; We're going to pass the lyrics to the song "Daisy Bell" to s
 We'll take the response and assert that it is non-null as the actual response would be tough to verify in a test.
 (However, as we'll demonstrate, we can save it to local storage, where you can play it yourself and hear whether the AI actually fulfilled our request.)
 
-.Listing {chapter}-{counter:listing}: Text To Speech Test
+.Listing {chapter}-{counter:listing}: `chapter04/src/test/java/ch04/SpeechTTSTest.java`
 [source,java]
 ----
 include::../code/chapter04/src/test/java/ch04/SpeechTTSTest.java[]
@@ -115,7 +120,7 @@ If we wanted to, we could get metadata about the call like the number of tokens 
 
 This sounds pretty straightforward, so let's see what the actual Java class looks like.
 
-.Listing {chapter}-{counter:listing}: Text To Speech Service
+.Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/service/TextToSpeechService.java`
 [source,java]
 ----
 include::../code/chapter04/src/main/java/ch04/service/TextToSpeechService.java[]
@@ -135,7 +140,7 @@ This test will sound more like spoken word than singing as there is no "singing"
 Let's say we wanted to pass some extra options to make it more like a song.
 If we pass a custom `OpenAiAudioSpeechOptions` to a custom test we can do so like this.
 
-.Listing {chapter}-{counter:listing}: Text To Speech With Options Test
+.Listing {chapter}-{counter:listing}: `chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java`
 [source,java]
 ----
 include::../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
@@ -144,8 +149,13 @@ include::../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
 This test you can see it writes to disk.
 Hopefully with these options it sounds a little bit more like a song, but it's probably safe to say that Celine Dion, Adele, or Janis Joplin are all safe from challenges from OpenAI just yet.
 
+// TODO what would it take to actually have an AI "sing?" How do people do this?
+
 === Transcription
 
+// TODO "the more useful?" I mean... how do we know it's "more useful?" You might be right, but still...
+
+// TODO very choppy paragraph here
 The more useful integration being done with Spring's integration is the transcription of audio to text.
 Our tests previously have been using the lyrics to "Daisy Bell", and we will continue that here.
 A search on Wikipedia gives us a FLAC file of the original recording.
@@ -163,7 +173,7 @@ The response we receive back will be verified using an assertion of a phrase fro
 
 Let's take a look at our test.
 
-.Listing {chapter}-{counter:listing}: TranscribeTest class
+.Listing {chapter}-{counter:listing}: `chapter04/src/test/java/ch04/TranscribeTest.java`
 [source,java]
 ----
 include::../code/chapter04/src/test/java/ch04/TranscribeTest.java[]
@@ -174,7 +184,7 @@ If a reader looks at the assertion we might also notice that what we're verifyin
 Listening to the recording we could definitely see how OpenAI would mistake "do" with "too".
 Now let's take a look at the `TranscribeService` and see how we make the transcription magic happen.
 
-.Listing {chapter}-{counter:listing}: TranscribeService class
+.Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/service/TranscribeService.java`
 [source,java]
 ----
 include::../code/chapter04/src/main/java/ch04/service/TranscribeService.java[]
@@ -256,7 +266,7 @@ Running this from the chapter root should pick up the file that was downloaded e
 
 We'll start our implementation by creating a simple data class called `TextToSpeechRequest` which we can use for our endpoint `/api/tts`.
 
-.Listing {chapter}-{counter:listing}: TextToSpeechRequest class
+.Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/model/TextToSpeechRequest.java`
 [source,java]
 ----
 include::../code/chapter04/src/main/java/ch04/model/TextToSpeechRequest.java[]
@@ -266,7 +276,7 @@ After this our implementation will be fairly straightforward using Spring MVC.
 We will use dependency injection to insert our two services: `TextToSpeechService` and `TranscribeService`.
 Our two handlers will accept `POST` requests with either a `@RequestBody` of `TextToSpeechRequest` as we saw above for processing the text to speech, or a `MultipartFile` for transcription.
 
-.Listing {chapter}-{counter:listing}: AudioTextController class
+.Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/handler/AudioTextController.java`
 [source,java]
 ----
 include::../code/chapter04/src/main/java/ch04/handler/AudioTextController.java[]
