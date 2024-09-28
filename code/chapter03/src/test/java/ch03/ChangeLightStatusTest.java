@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
-public class ChangeLightConversationTests extends BaseLightTests {
+public class ChangeLightStatusTest extends BaseLightTests {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     LightUpdateService lightConversationService;
@@ -19,8 +19,9 @@ public class ChangeLightConversationTests extends BaseLightTests {
     @Test
     void changeLightStatus() {
         var response = lightConversationService.converse(List.of(
-                new UserMessage("Turn the yellow light on."),
-                new UserMessage("Then show the state of the red, green, blue, purple, and yellow lights.")
+                new UserMessage("Turn the yellow light on. " +
+                        "Then show the state of the red," +
+                        " green, blue, purple, and yellow lights.")
         ));
         logger.info("Response from service: {}",
                 response.getFirst().getOutput().getContent());

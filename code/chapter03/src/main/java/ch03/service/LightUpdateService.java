@@ -15,7 +15,7 @@ public class LightUpdateService extends LightQueryService {
         return new OpenAiChatOptions
                 .Builder()
                 .withFunction("RequestLightStatusService")
-                .withFunction("ChangeLightService")
+                .withFunction("ChangeLightStatusService")
                 .build();
     }
 }

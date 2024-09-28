@@ -1,43 +1,45 @@
 package ch03.service;
 
-import ch03.model.Light;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class LightStructuredUpdateService {
     private final ChatClient client;
 
-    public record Data(List<Light> lights) {
+    public record LightWithXYZ(String color, boolean on, Double x, Double y, Double z) {
     }
 
-    LightStructuredUpdateService(ChatClient.Builder builder) {
+    public record LightWithXYZList(List<LightWithXYZ> lights) {
+    }
+
+    public LightStructuredUpdateService(ChatClient.Builder builder) {
         client = builder.build();
     }
 
-    public Data converse(List<Message> messages) {
-        return converse(messages,
-                new OpenAiChatOptions
-                        .Builder()
-                        .withFunction("RequestLightStatusService")
-                        .withFunction("ChangeLightService")
-                        .build());
+    public OpenAiChatOptions buildOptions() {
+        return new OpenAiChatOptions
+                .Builder()
+                .withFunction("RequestLightStatusService")
+                .withFunction("ChangeLightStatusService")
+                .build();
     }
 
-    public Data converse(
-            List<Message> messages,
-            OpenAiChatOptions options
-    ) {
-        //var prompt = new Prompt(messages, options);
+    public LightWithXYZList converse(List<Message> messages) {
+        var localMessages = new ArrayList<Message>(messages);
+        localMessages.addFirst(new SystemMessage(
+                "Add the CIE 1931 color representation of each light if possible."));
         return client
                 .prompt()
-                .messages(messages)
-                .options(options)
+                .messages(localMessages)
+                .options(buildOptions())
                 .call()
-                .entity(Data.class);
+                .entity(LightWithXYZList.class);
     }
 }

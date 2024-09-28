@@ -10,7 +10,8 @@ import java.util.function.Function;
 
 @Component("RequestLightStatusService")
 @Description("Get light status")
-public class RequestLightStatusService implements Function<RequestLightStatusService.Request, RequestLightStatusService.Response> {
+public class RequestLightStatusService
+        implements Function<RequestLightStatusService.Request, RequestLightStatusService.Response> {
     public final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     LightService lightService;

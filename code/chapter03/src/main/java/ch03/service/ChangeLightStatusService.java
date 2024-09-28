@@ -8,14 +8,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
-@Component("ChangeLightService")
+@Component("ChangeLightStatusService")
 @Description("Change a light's state")
-public class ChangeLightService implements Function<ChangeLightService.Request, ChangeLightService.Response> {
+public class ChangeLightStatusService
+        implements Function<ChangeLightStatusService.Request, ChangeLightStatusService.Response> {
     public final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     LightService lightService;
 
-    public ChangeLightService(LightService lightService) {
+    public ChangeLightStatusService(LightService lightService) {
         this.lightService = lightService;
     }
 
@@ -28,10 +29,8 @@ public class ChangeLightService implements Function<ChangeLightService.Request, 
     public Response apply(Request request) {
         logger.info("Changing status for light: {}", request);
         var light=lightService.setLight(request.color, request.on);
-        if(light.isPresent()) {
-            return new Response(request.color, request.on);
-        } else {
-            return null;
-        }
+        return light
+                .map(value -> new Response(request.color, value.isOn()))
+                .orElse(null);
     }
 }
