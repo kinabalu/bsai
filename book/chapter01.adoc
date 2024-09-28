@@ -178,6 +178,9 @@ LLMs have different capabilities and settings; part of why we chose ChatGPT was 
 Readers who wish to use alternatives should be able to fine-tune the example code for their specific AI implementation without too much effort.
 (And if it takes a lot of effort, feel free to reach out to your authors; we're very interested in helping the industry move forward!)
 
+We're also not covering exhaustive techniques in terms of how the LLMs are being interacted with.
+LLMs are conversational processes, and while we _will_ be covering "conversations," we're not going often into streaming techniques, that have the LLMs feed back information _as it's being generated_ - this is useful for emulating human behavior ("See, it's typing right now!") but complicates the interactions drastically, and complicated code tends to hide the intent behind what the code is doing.
+
 == Next Steps
 
 In our next chapter, we're going to walk through setting up a project that includes calling ChatGPT through Spring AIfootnote:[It would not be difficult to use any other LLM provider, but again, this book uses ChatGPT, because it's very common, well known, and very predictable - and it definitely provides all of the services the book covers.].
