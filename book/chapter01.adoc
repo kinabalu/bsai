@@ -82,7 +82,31 @@ And if it's math, well, do we _need_ AI?
 The answer is, as you might suspect, "it depends." "What math?" is answered by another question: "What are you trying to do?" An LLM does a lot of stemming and tokenization to reduce a prompt to a series of numbers, which generates some amusing outcomes sometimesfootnote:[A few weeks ago as of this writing, it was a meme about AI that the LLMs couldn't tell how many occurrences of the letter "R" were in the word "strawberry." To us, it's obviously three; to the LLM, however, it was counting based on the tokenized version of the word, which had two Rs, not three, and it ended up looking hopelessly confused, even when corrected.].
 A Markov chain gauged towards weather would have _no_ sensible output to an input that asked what `1+1` was - it's simply too sensitive to its problem domain.
 
-== How can it be used?
+It's also important to keep in mind that the reason we have so many models and definitions is because there are so many applications, some appropriate and some not.
+
+It's an aphorism that "when all you have is a hammer, everything looks like a nail." As of this writing, this feels like an accusation; it's rather common to see "can we throw an AI at it?" as a response to problems that, honestly, don't need all that much computation power.
+
+A logistics company might throw artificial intelligence at predicting whether a given package will be late or not - when the answer can be predicted almost as well by simply asking what the weather is like at the destination of the package. This is a poor application of the resources and power of AI.
+
+That's not to say that you shouldn't use artificial intelligence, at all: it's more an observation that AI is a tool, and like most tools, it has appropriate uses and can be overused, and given the current enthusiasm around a term that few seem to understand, is *often* overused.
+
+== The Scope of This Book
+
+This book primarily focuses on Large Language Models and how to access them with the Spring Framework.
+
+Large language models use a number of techniques to reduce textual prompts to mathematical models, and apply *other* mathematical models to generate responses, also generally textual in nature, although chapters 4 and 5 will show you how to feed audio and visual information into an LLM, and get audio and visual information *out*.
+
+== How can LLMs be used?
+
+LLMs are effectively information blenders; you give them a filter (the prompt) and they generate a probabilistic outcome based on the information on which they were trained.
+
+Therefore, selecting a model can be of critical importance. (You wouldn't want to use a model trained primarily on fantasy literature to make medical conclusionsfootnote:[You probably wouldn't want to rely on an LLM's medical conclusion even if it were trained on medical data, actually; you'd want an actual competent doctor to make decisions, possibly factoring in observations by an LLM.])
+
+One way to think about the output of an LLM is as if it were selected at random based on what other people _might_ have said, as if the LLM were to take all of the possible answers to your prompt, stir them together and pick elements at random, and then present the result in a cohesive manner.
+
+This is why stories written by an AI tend to be faintly familiar: they are! They're taking common elements of storytelling and replacing bits as they go, and the result can feel original at times while feeling horribly derivative at other times. That doesn't mean the story isn't worth telling - most stories in human history have a similar set of concepts at their hearts, as Joseph Campbellfootnote:[Joseph Campbell wrote a book in 1949 called "The Hero with a Thousand Faces," that described a common set of concepts in human mythology, often summed up as the "Hero's Journey." See `https://www.amazon.com/Thousand-Faces-Collected-Joseph-Campbell/dp/1577315936` for more.] might have told you - but it also isn't the same as coming up with "original content."
+
+But with this observation - that LLMs are stirring up knowledge we already had in possibly unexpected ways to come up with content - it's worth saying that this is _useful_. Sometimes things we want to know are "hiding in plain sight," obscured by tradition and expectation, and an LLM doesn't have the burden of prior knowledge; it can see common patterns that humans can overlook, and without models being specifically limited in what they can observe, an LLM is able to point out that the emperor's not wearing any clothes fairly easily.
 
 == How do you choose an LLM?
 
