@@ -179,7 +179,7 @@ We'll need to set the API key, in any event, so let's take a look at the some of
 | This determines the variability of the responses. A high temperature means the model generates more diverse answers, and a low temperature means the answers are more deterministic.
 
 | `spring.ai.openai.chat.options.model`
-| This is the name of the model to use. This addresses the _type_ of trainings used as well as the _cost_ of the trainings used. The model names, and their prices, can be found at `https://openai.com/api/pricing/`;
+| This is the name of the model to use. This addresses the _type_ of trainings used as well as the _cost_ of the trainings used. The model names, and their prices, can be found at `https://openai.com/api/pricing/`; see chapter 1 for more discussion of how this is relevant and how it's calculated.
 |===
 
 NOTE: Astute readers will see the use of `openai` in those properties.
