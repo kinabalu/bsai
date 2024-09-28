@@ -38,6 +38,24 @@ recognized as having two distinct "r" characters.
 
 To be fair, a more advanced model pointed out that there were indeed three Rs in the word. And this is an important concept: the choice of the model you use *directly* impacts the quality of the answer you get. The small model that said that there were two Rs in "strawberry" was fast; the model that got the more correct answer was far slower, and more expensive to run if you were to consume your available tokens.
 
+NOTE: It's also important to recognize that the IPA representation of "strawberry" is not likely to be the source of the error; this is supposition. It might be accurate, but it might not be; the IPA illustration is meant to be purely demonstrative of the kinds of problems AI encounters, and how easy it is to get literally wrong answers.
+
+Of course, counting letters is a trivial engineering problem, and not one that should be using an AI.
+
+At the same time, it's easy to say "Hey, AI, write me a function that..." in such a way that you get a _somewhat_ working answer, without it being the _right_ answer.
+
+In general, the LLMs are trained in such a way that they try to prioritize _better_ code over _worse_ code, of course, so while it's possible for an LLM to suggest code that makes you vulnerable to SQL injection attacks, it's unlikely. But with that said, LLMs are trained on the _body of existing knowledge_, so if an attack vector has been discovered _after_ a given LLM was trained, the LLM isn't going to have any awareness of the attack vector.
+
+It's possible that the vector could be _derived_ via the LLM, of course, but this is still an area where human intervention and analysis is *required*.
+
+It's easy to interpret all of this as a "six of one, half a dozen of the other" discussion, in that some things are very positive (potential detection of SQL injection thanks to how the LLM analyzes data apart from human intervention) or very negative (exposure of critical resources due to an _undetected_ attack vector), but... that's *the point*.
+
+The machine might know, and it might not, and this removes _none_ of the human engineer's responsibility.
+
+If we had a suggestion, it would be to use the tools at your disposal, just as engineers have always done - who sneers at using a debugger, after all, except Python developers? If the available tools include AI, there's nothing wrong with that.
+
+But as with the other tools, you _have_ to continue using your brain, you _have_ to continue analyzing what the tools create for you, or else you're accepting someone else's problems through ignorance, and that's _bad_.
+
 * Overview of Common Concerns
 
 == Legal and Ethical Issues
