@@ -1,13 +1,100 @@
 = Introduction
 :chapter: 1
 
+Welcome to Beginning Spring AI!
+
+Spring AI refers to the Spring Framework's suite of libraries meant to help programmers use some of the more common artificial intelligence technologies in the marketplace.
+
+In this book, we're going to take a quick tour through some of the libraries and their features, not so much to provide an in-depth reference on every feature, but to communicate enough information such that readers can see the potential of the technology, and use _most_ of what they'd care about.
+
+== AI is all the rage
+
+It's hard to read anything on the Internet today without being at least tangentially aware of AI.
+It really doesn't matter what industry or topic is involved; AI is used to write prompts on sites like Quora, it's used to design quick and easy visual arts (even music videos), or music - there're songs written fully by AI, some possibly quite respectable.
+
+In programming, most IDEs have integrations available with AIs that help suggest code or revisions to existing code; if you know how to create queries well enough, you can get an AI to generate nearly all of a working application, a capability that's resulted in some managers wondering whether they even _need_ human engineersfootnote:[Spoiler alert: yes, the managers do need human engineers. We'll get to why soon, some in this chapter and some in Chapter 6.].
+
+Authors, too, have felt the impact of AI "writing." AI can not only help correct text - with many writing aids that will suggest grammar, spelling, even evocative text - but AI can even write stories, and if the prompts used are detailed enough, some of the stories might pass for having written by a human author.
+
+NOTE: It's worth noting for the record: this book has indeed been impacted by AI, and we'll point out why and how later.
+We promise.
+At least, that's what the AI said to say.
+Or did it write it?
+Sometimes it's hard to tellfootnote:[This is intended to be humor. If an AI generates any actual content of note in this book, we'll be pointing it out, even if it's not obvious. With that said, when we say AI is used in many writing tools, we mean it; a lot of our grammar was checked and occasionally fixed by AI. It's also worth noting that not even _one_ of the footnotes was suggested by an AI.].
+
+The effect can be chilling: are we replaceable by a machine after all?
+If a machine can take a specification for an application, or a song, or a story, and generate something that's approaching the quality of a human - or better, in some ways - then wh do we need humans?
+
+There are a number of good answers, and some bad ones, too.
+
+== What is AI, really?
+
+First, let's consider what AI really is, and limit the scope of what we're talking about, because "AI" - artificial intelligence - is a term that has _many_ applications, and we're not going to go into all (or even "most") of them.
+
+Here's how an AI summarized artificial intelligence:
+
+[source,text]
+----
+Artificial Intelligence (AI) refers to the development of computer systems that can perform
+tasks that normally require human intelligence, such as learning, problem-solving, and
+understanding language. At its core, AI uses mathematical models to make decisions and
+predictions—ranging from simpler approaches like Markov chains, which predict sequences
+of events, to more complex systems like recommender algorithms that suggest movies or
+products based on user preferences. With advancements in AI, more sophisticated models
+like Large Language Models (LLMs) have emerged, allowing systems to understand and
+generate human-like text. These models can be integrated into applications, such as
+those built with Spring AI, to automate and enhance various tasks across industries.
+----
+
+Not bad, `ChatGPT4o`!
+This is a good example of a "good use" of AI: the prompt used here asked for a single paragraph that covered the general and historical use of AI, leading up to the technology most commonly easily exploited today, the Large Language Model, or LLM.
+(`ChatGPT4o` refers to a specific LLM, hosted by OpenAI.)
+
+In the end, it's all literally math, as the paragraph suggested: an input is reduced to a series of numbers, and the AI ... does something with those numbers (what it does depends on the type of AI and its purpose).
+It then generates _more_ numbers, and those numbers map to an output - and that applies to nearly every AI model, including the one that generated the paragraph.
+
+Some of the earliest uses of AI models - early enough that some might scoff at the reference to them as "artificial intelligence" - were for predicting weather or making simple deductions based on probabilities.
+
+One simple modeling type is the Markov chain, for example, which is a model that generates a likely outcome based on a string of inputs.
+This is actually fairly useful in predicting weather with few variables, and that's actually how it worked.
+
+Consider: if it's raining today, what's the likelihood of it raining _tomorrow?_ If it was raining _yesterday_, does that change the likelihood of rain at all?
+What if it's been raining heavily for a week?
+Consider also the history of the region being predicted; if it rains every day in June, for example, and it's June, _and_ it's been raining every day so far, can rain tomorrow be predicted?
+A Markov chain reduces the history to a series of tokens (which might combine the day of the year, the region, and the weather for that day) and have a set of outcomes that says "95% of the time, when the prior condition looks like _this_, the next day will look like _that_."
+
+Markov chains are also useful for generating text; the ELIZA programfootnote:[An example of ELIZA can be found at `https://web.njit.edu/~ronkowit/eliza.html` . Try it! It's fun! beware: it might make you think of your mother.] emulates a therapist similar to Carl Rogers, by taking significant parts of what you say to it and repeating those parts back to you, in a few different combinations.
+
+Markov chains work on Bayesian probabilities internally; Bayesian algorithms found a lot of use in early attempts to filter email spam, to quite a bit of success, although obviously spammers have found ways to avoid easy detection.
+
+If probabilities don't sound like "artificial intelligence," well, that's fine, but it's generally unfair.
+Probabilities rule much of our lives; when we go for a drive, we look at our fuel and calculate how likely it is that we'll need to purchase more, or when, or whether we'll need to take an umbrella or a coat, after all.
+
+AI also has a sort of "magic appeal" in how difficult it can be to understand what's going on behind an invocation.
+In the end, it's all math, but ... _what_ math?
+And if it's math, well, do we _need_ AI?
+
+The answer is, as you might suspect, "it depends." "What math?" is answered by another question: "What are you trying to do?" An LLM does a lot of stemming and tokenization to reduce a prompt to a series of numbers, which generates some amusing outcomes sometimesfootnote:[A few weeks ago as of this writing, it was a meme about AI that the LLMs couldn't tell how many occurrences of the letter "R" were in the word "strawberry." To us, it's obviously three; to the LLM, however, it was counting based on the tokenized version of the word, which had two Rs, not three, and it ended up looking hopelessly confused, even when corrected.].
+A Markov chain gauged towards weather would have _no_ sensible output to an input that asked what `1+1` was - it's simply too sensitive to its problem domain.
+
+== How can it be used?
+
+== How do you choose an LLM?
+
+== How much does it actually cost?
+
+== Scope of the book
+
 ## Choosing an LLM Implementation
 
 Ollama vs OpenAI (and things like it, like Perplexity)
 
 OpenAI is "better" because it relies on much better hardware, but costs more money, especially when writing a book or running lots of tests that use LLMs.
 
-Ollama gives you access to more models, is free outside of the resource requirements of running it (and you probably have your hardware already) - but those requirements aren't trivial. It's also likely to be, as noted, MUCH less responsive. It's gonna be way slower, in all likelihood. That may not suit your needs.
+Ollama gives you access to more models, is free outside of the resource requirements of running it (and you probably have your hardware already) - but those requirements aren't trivial.
+It's also likely to be, as noted, MUCH less responsive.
+It's gonna be way slower, in all likelihood.
+That may not suit your needs.
 
 Ollama also may not support some functionality that services like OpenAI provide, like function calls.
 
