@@ -1,0 +1,118 @@
+= Navigating AI in Engineering: Challenges and Best Practices
+:chapter: 6
+
+== A Practical Exploration of AI-Aided Development
+
+In Chapter 1, we brought up a simple high-level overview of the AI landscape as it is today. It's a useful chapter, not just because of the content it holds, but because of the way it was written.
+
+It was drafted in Asciidoctor (as was the rest of the book), with the editor suggesting minor grammar changes as it was written. These edits were focused on simple things like matching tenses, or spellingfootnote:[If you're interested, the tool used for grammar and syntax was Grammarly, at `https://app.grammarly.com/`, which is merely one of many such tools, and this is not an endorsement of Grammarly over other similar tools like ProWritingAid (`https://prowritingaid.com/`), and so forth. Most of them do the same sorts of things, although most of them _also_ tend to be more focused on specific types of writing; ProWritingAid, for example, is primarily meant for storytellers.].
+
+After the initial simple draft was done and revised by the author, the content was submitted as a whole to an LLM (ChatGPT, specifically), with a prompt asking for hints toward clarification, ease of use, and appropriate topical coverage. ChatGPT then presented a potential rewrite of the chapter, which wasn't quite what was intended.
+
+That rewritten draft was then considered sentence-by-sentence and compared to the original. In some cases, the rewrite was indeed more clear, or highlighted issues in the original draft, and those changes were integrated into the chapter's content. The changes were *not* copied, nor were they accepted wholesale, nor was original content inserted by ChatGPT into the flow of the chapter accepted without consideration.
+
+There was only one section where ChatGPT suggested content that wasn't present already in some form in the original draft, and that was rewritten for the draft. Apart from the quote from ChatGPT (on the "summary of AI") no content was quoted from ChatGPT as original material.
+
+The other chapters, too, had similar aids applied: grammar checkers were in play throughout writing, with suggestions often accepted, and the text was submitted to the LLM for evaluation, looking for suggestions on clarity and completeness. The code, too, was evaluated by an LLM for suggestions for refactoring and efficiency, with some suggestions accepted and others rejected.
+
+This text was written by humans, aided by AI, and not the other way aroundfootnote:[Of course, "written by humans and aided by AI, and not the other way around" is exactly what an AI author would be instructed to say, wouldn't it? The main proof we have that humans wrote this is in the revision history of the text, which includes some amusing and very human errors, and the silliness of some of the footnotes, which the AIs kept telling us to remove.].
+
+Of course, this is a _book_, and not a _program_, but even in programming, this is becoming a common way of working: AI suggests revisions to code as best it can, deriving intent from the programmer and the code they write, possibly even generating code based on prompts the engineer gives an AI.
+
+This is not without its dangers.
+
+== Dangers in Applying AI in Engineering
+
+The most dangerous aspect of AI in engineering is that it is easy to accept "complete answers" without regard to whether they're *right* or not. In Chapter 1, we mentioned a popular meme in which an LLM was unable to count the number of the letter "R" contained in the word "strawberry," for example. To a human, this is a trivial problem, and it's funny that an AI struggled with it, but it's quite illustrative.
+
+The reason the AIs get it wrong in the first place is because of tokenization. The AI doesn't see the word "strawberry" as a series of letters; it sees it as a token, in a short form: one might imagine a representation being "strɔːbərɪ" (the IPAfootnote:[IPA stands for the "International Phonetic Alphabet," and is a general mechanism for describing how to pronounce words in standard fashion. See `https://en.wikipedia.org/wiki/International_Phonetic_Alphabet` for more.] pronunciation of the word in the United States). The IPA form of "strawberry" does indeed have only two Rs
+
+But when asked, one of ChatGPT's models (a small one), came up with this answer, even after *demonstrating visibly* there are three Rs in the word:
+
+[source, text]
+----
+While it might appear there are three "r"s due to the
+double "r" in the latter part of the word, it's commonly
+recognized as having two distinct "r" characters.
+----
+
+To be fair, a more advanced model pointed out that there were indeed three Rs in the word. And this is an important concept: the choice of the model you use *directly* impacts the quality of the answer you get. The small model that said that there were two Rs in "strawberry" was fast; the model that got the more correct answer was far slower, and more expensive to run if you were to consume your available tokens.
+
+NOTE: It's also important to recognize that the IPA representation of "strawberry" is not likely to be the source of the error; this is supposition. It might be accurate, but it might not be; the IPA illustration is meant to be purely demonstrative of the kinds of problems AI encounters, and how easy it is to get literally wrong answers.
+
+Of course, counting letters is a trivial engineering problem, and not one that should be using an AI.
+
+At the same time, it's easy to say "Hey, AI, write me a function that..." in such a way that you get a _somewhat_ working answer, without it being the _right_ answer.
+
+In general, the LLMs are trained in such a way that they try to prioritize _better_ code over _worse_ code, of course, so while it's possible for an LLM to suggest code that makes you vulnerable to SQL injection attacks, it's unlikely. But with that said, LLMs are trained on the _body of existing knowledge_, so if an attack vector has been discovered _after_ a given LLM was trained, the LLM isn't going to have any awareness of the attack vector.
+
+It's possible that the vector could be _derived_ via the LLM, of course, but this is still an area where human intervention and analysis is *required*.
+
+It's easy to interpret all of this as a "six of one, half a dozen of the other" discussion, in that some things are very positive (potential detection of SQL injection thanks to how the LLM analyzes data apart from human intervention) or very negative (exposure of critical resources due to an _undetected_ attack vector), but... that's *the point*.
+
+The machine might know, and it might not, and this removes _none_ of the human engineer's responsibility.
+
+If we had a suggestion, it would be to use the tools at your disposal, just as engineers have always done - who sneers at using a debugger, after all, except Python developers? If the available tools include AI, there's nothing wrong with that.
+
+But as with the other tools, you _have_ to continue using your brain, you _have_ to continue analyzing what the tools create for you, or else you're accepting someone else's problems through ignorance, and that's _bad_.
+
+* Overview of Common Concerns
+
+== Legal and Ethical Issues
+* Understanding Copyright in AI
+** Intellectual Property Rights
+** Fair Use and Licensing
+* Ethical Considerations
+** Bias and Discrimination
+** Accountability and Responsibility
+
+== Data Visibility and Transparency
+* Importance of Data Transparency
+* Data Privacy and Security
+** Handling Sensitive Information
+** Compliance with Data Protection Laws
+
+== Model Selection and Appropriateness
+* Choosing the Right AI Model
+** Model Types and Use Cases
+** Evaluating Model Performance
+* Ensuring Model Relevance
+** Contextual Suitability
+** Avoiding Overfitting and Underfitting
+
+== Effective Prompt Engineering
+* Risks of Underspecified Prompts
+** Ambiguity in Instructions
+** Misalignment with Objectives
+* Crafting Clear and Precise Prompts
+** Best Practices
+** Examples and Counterexamples
+
+== Managing Model Updates
+* Dangers of Outdated Models
+** Performance Degradation
+** Security Vulnerabilities
+* Strategies for Staying Updated
+** Version Control
+** Continuous Learning Systems
+
+== Case Studies
+* Real-World Scenarios of AI Misapplication
+* Lessons Learned from Industry Examples
+
+== Best Practices for Engineers
+* Guidelines for Ethical AI Deployment
+* Ensuring Transparency and Accountability
+* Ongoing Education and Awareness
+
+== Conclusion
+* Recap of Key Points
+* The Future Landscape of AI in Engineering
+
+== References
+* Further Reading
+* Useful Tools and Resources
+
+== Next Steps
+
+In our next chapter, ...

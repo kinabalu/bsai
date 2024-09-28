@@ -1,0 +1,420 @@
+= Asking Questions and Using Data
+:chapter: 3
+
+In our last chapter, we explored setting up our project and querying an LLM.
+In this chapter, we're going to explore two other important aspects of the LLM infrastructure - getting structured data out of them, and feeding data *to* an LLM on demand by way of providing functions.
+
+It may seem odd to think about providing access points to an AI, but this is a crucial lever for applying what the LLMs can do for you.
+
+== Interacting with an AI
+
+For the most part, AIs consist of data and a reasoning process about that data.
+The model tends to be fairly static, as creating a model is expensive in terms of resources, and models tend to be focused on spheres of knowledge.
+Most of the popular models, like `gpt4-o` (one of the commercial models from ChatGPT) are huge, and focused on generalized knowledge; they might be good for the questions you ask, or they might not.
+Other models, like Github's Copilot or the Qwen models, are designed for coding, and some are finely tuned for specific programming languages.
+
+The key feature of all of these, however, is that they *were trained* - note the past tense.
+Most of them provide information about when they were trained, to give some context to what they know, and many of them will also answer time-sensitive questions about current events by informing you that their training data didn't include recent history.
+
+.Asking an LLM about current events
+image::images/ch03-current-events.png[]
+
+The LLM isn't _wrong_ - checking local calendars or social media isn't a bad strategy! - but it limits the AI to being a useful but fairly passive research toolfootnote:[What's more, given the nature of how LLMs work, even as a research tool it requires verification, about which most responsible LLMs will explicitly remind you.].
+
+The problem, then, lies in how to provide access of, well, _something_, to the LLM.
+It's not just _data_ or _current events_, it's a matter of providing interactions to the LLM, such that it can find out something that its knowledge model does not have, or provide functionality that it _shouldn't have_.
+
+This is how one might be able to use ChatGPT as it is *today* to query order status, or perhaps even *make* an order.
+
+== Working with the "Real World"
+
+We can build a working example of something you might find in the real world by thinking of smart lights.
+There are many commercial examples of smart lightbulbs on the market today, and one can work with them in multiple ways, whether with Alexa, Nest, the custom apps associated with each brand, or home controller applications like openHABfootnote:[openHAB can be found at `https://www.openhab.org/`.] or Home Assistantfootnote:[Home Assistant's home page is `https://www.home-assistant.io/`.].
+
+We're going to build something like openHAB: we're going to create a Spring service to control software "light bulbs" and then we'll provide ways to query and control them through interactions with OpenAI.
+
+NOTE: It would be fairly trivial to take our planned light bulb manager and migrate to work with *actual* light bulbs.
+This is something one of your authors did for a living.
+It's actually rather fun, but we're not going to assume our readers have a specific brand of smart lightsfootnote:[The Matter API (`https://developers.home.google.com/matter`) actually helps synchronize a lot of smart device controls, but Matter's API requires a lot of investment, and that's out of the scope of this book. Apart from Matter, you're writing to a set of specific manufacturers' specifications, and that's difficult to generalize and often inconsistent, to boot. Our software emulations carry the day for simplicity and consistency and, well, cost.], or that they want to annoy their wives by changing the lights through fooling around with software, either.
+
+With that said, let's get started.
+First, we need our directory structure and our `pom.xml`.
+
+Listing {chapter}-{counter:listing}: Creating the directory structure in a POSIX shell
+
+[source,shell]
+----
+# in a POSIX shell
+mkdir -p chapter03/src/{main,test}/{java/ch03,resources}
+----
+
+The `pom.xml` is very straightforward.
+It could have been copied from Chapter 2 with few changes, but we actually have fewer dependencies in Chapter 3 than we did in Chapter 2.
+
+Listing {chapter}-{counter:listing}: `chapter03/pom.xml`
+
+[source,xml]
+----
+include::../code/chapter03/pom.xml[]
+----
+
+Now for the more interesting stuff: our lights.
+Our basic light abstraction is very simple (and not very accurate, from a real-world light modeling perspective): we have lights, identified by color, that have a state of being "on" or "off."
+
+NOTE: In the real world, smart bulbs have a number of identifying characteristics: IP Addresses, MAC addresses, names, and perhaps zones.
+They also have more mutable characteristics, *including* color (most of the time!), brightness, and color temperature, and they also can provide metrics for their use.
+However, none of these attributes help us model calling functions from Spring AI, so we're ignoring them.
+
+The `Light` class is a model - it's a representation of a thing - so we're going to put it in the `ch03.model` package, in `chapter03/src/main/java/ch03/model/Light.java`.
+The code for it is very straightforward; it's a classic Plain Old Java Object (not a `record`) because we're going to mutate its state.
+Again, we're aiming for simplicity herefootnote:[We toyed with the idea of making an unimpeachably correct representation, including the use of `record` and other such things. We decided against it, because we're not trying to stun readers - or, well, *attempt* to stun readers - with how most excellent and FP-compliant our _simple example code_ was. We just want it to work and be easy to understand.].
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/model/Light.java`
+
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/model/Light.java[]
+----
+
+The next thing we'll need to do is create a `LightService` - in `ch03.service` - that works with instances of our `Light` class.
+This is a Spring component, and the heart of its functionality is in the `getLights()` method, which queries the Spring `ApplicationContext` for any managed instances of `Light`.
+
+In a real application, this class would have network services to track when lights became available or responded to network broadcast events, but the actual mechanics of that are *far* too complex for this example.
+
+After we see the source for `LightService`, we're going to create our Spring configuration, and then we'll test all this stuff out so we know it works.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightService.java`
+
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/service/LightService.java[]
+----
+
+This service provides three methods: one is `getLights()`, which - as previously stated - gets all of the managed `Light` instances from Spring.
+The `getBeansOfType()` method returns a `Map<String, Class<T>>` - where the key is the name of the bean in the Spring context, and the `Class` is the type passed in - and we don't care about the name of the beans, so we convert it to a simple `List`.
+
+The next method provided retrieves a `Light` by color.
+If the color isn't found among the list of `Light` instances, an empty result is returned; this is a pattern largely inspired by the Spring Data `Repository`.
+We could have used nullable types instead, as `Optional` references are nullable in and of themselvesfootnote:[`Optional` is useful in Java, but not very; however, in streams they can occasionally be quite useful. We're not going to get anywhere near the tipping point where we see value from using `Optional` like that, but it's good to follow a convention, and this is one.].
+
+The last method is provides a mechanism to change a light's state.
+It assumes the state passed in is absolute; it won't complain if you try to turn on a light that's already on, for example; nor will it complain if you change a light that doesn't exist.
+In this case, it simply returns an empty `Optional` just like `getLight()` does.
+
+Like our `Light` class, the `LightService` isn't particularly complex or interesting; we just need to have it to make everything else work, much as we need our _next_ class, the `Ch03Configuration` class, which is our Spring configuration.
+
+This class exists mostly to give us a place for the `@SpringBootApplication` annotation as well as instantiate our `Light` instances.
+Thus, it's just as simple as `Light` and `LightService`:
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03//Ch03Configuration.java`
+
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/Ch03Configuration.java[]
+----
+
+Note that there's no correlation of light colors to bean names.
+We could have named the beans "more appropriately," but again, in any kind of real-world analog, we'd not create light references in this manner; they'd be discovered, so this class is entirely used for building out our examples, which we're quite aware haven't even _begun_ to touch Spring AI.
+
+Spring AI integration is coming, we promise.
+We're almost there: we just need a test to validate that our `LightService` and the configuration is doing what it's supposed to, and that involves two _more_ classes - one of which is a base class for our tests that provides common services.
+
+Let's look at our `BaseLightTests` class first; it's a test class, so it goes in `chapter03/src/test/java/ch03`.
+It provides a common reference to a `LightService` (so our tests don't have to include one), as well as methods to reset all available lights to being "off" - so we have a pristine test state every time - and assert that a light exists and has a given state, as well as a method to construct a map of lights to their status, which means it's easier for us to test the state of *all* lights.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/BaseLightTests.java`
+
+[source,java]
+----
+include::../code/chapter03/src/test/java/ch03/BaseLightTests.java[]
+----
+
+Now it's finally time for us to round out our simple example of light services, with a test of the, well, `LightService`.
+This class extends `BaseLightTests` so it gets a reference to the `LightService`, and every test it has will start with all lights being set to _off_.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/LightServiceTests.java`
+
+[source,java]
+----
+include::../code/chapter03/src/test/java/ch03/LightServiceTests.java[]
+----
+
+The code here is remarkably simple, as is the rest of our code: we know what our configuration should be (four lights, and "purple" should not be among them), and we simply run through all of our `LightService` methods to make sure they return values we expect.
+
+We're not really being exhaustive here, but we're being exhaustive _enough_ for our example code.
+If this test passes completely, we have quite a bit of confidence that our `LightService` is functional in the ways we expect it to be.
+
+It's finally time for us to look at _using_ this from Spring AI.
+
+== Providing Access to Your Data
+
+The core concept here is that we're providing a way for the AI to do two things: determine __when__ we're referring to something our code controls, and providing access to whatever it is.
+
+If the data is static, we could always provide it to the AI as part of the request.
+For example, if we wanted a summary of a web page, we might fetch the web page's content (with JSoupfootnote:[JSoup (`https://jsoup.org/`) is a Java library that makes extraction of data from HTML or XML very trivial: many HTML and XML documents are poorly formed, and JSoup is quite permissive in how it parses.] or something like it) and provide that as part of the request:
+
+Listing {chapter}-{counter:listing}: An example AI request for content summary
+
+[source,text]
+----
+I have a web page with the following content, for which I'd like a
+summary and any interesting observations about the author:
+
+```
+This is My About Page
+
+My name is Lorem Ipsum. I like hamsters and most other small mammals, like squirrels and rabbits. I'm
+pretty indiscriminate in which mammals I like; rodents, lagomorphs, procyonids, they're all wonderful
+creatures.
+
+I like gnawing on tree stumps, too. I may have had a didelphoid in my family tree at some point.
+```
+----
+
+NOTE: You should feel free to use this as a prompt for any GPT you prefer; it's not likely to tell you much you didn't already know, though.
+To really get anything out of it, you'd want a much larger body of input.
+
+This approach works if you know what information you intend to provide to the language model.
+In this case, you're focusing its attention specifically on the plain-text content of a web page (presumably; we made that content up as we wrote), so there's no need for "live access" to the data.
+
+You could also provide a table of information, corresponding to the lights we've set up in our Spring configuration in Listing 3-5:
+
+Listing {chapter}-{counter:listing}: An example AI request for finding the status of a light
+
+[source,text]
+----
+Here's a CSV representation of a set of light bulbs.
+Can you tell me the status of the lights named 'yellow' and 'purple'?
+
+```
+name,state
+yellow,on
+red,off
+blue,off
+green,off
+```
+----
+
+This should result in the AI telling us that the light named `yellow` is "on," and that the state of the light named `purple` cannot be determined, as we didn't provide its data.
+
+The issues with doing this are twofold: one issue is that the light data isn't "live" - what if someone changes the light after issuing the request?
+
+Another issue is that we're providing far more data than our request actually needs.
+We only need to provide the data for the light named `yellow`, since that's the only _existing_ light we have in our query, and the other lights are simply consuming tokens for the AI to parse.
+Token parsing isn't _expensive_, really, but imagine we were querying the lights for, say, a hospital, which might have _thousands_ of such lights - parsing all of that data adds up to real money and time.
+
+Let's do better.
+
+=== Building the Callable for Spring AI
+
+To provide functionality to Spring AI, we use a _named service_ that has a description to help the AI determine whether the service can provide data or not.
+That service is an implementation of a `java.util.Function`, that accepts a data element as a request, and returns a response.
+When we build our prompt, we will provide the name of our service as part of the prompt, and _in general_ the LLMs do a good job of determining when and how to call the function.
+
+Let's take a look at how this is done, first by replicating our query of the status of lights named `yellow` and `purple`.
+This won't compile until we have a few other classes written, but we're going to get to them in very short order.
+
+Here's `RequestLightStatusTest.java`, which uses a service to talk to the AI.
+Again, _we haven't written that service_ yet, but it's coming up very soon.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/RequestLightStatusTest.java`
+
+[source,java]
+----
+include::../code/chapter03/src/test/java/ch03/RequestLightStatusTest.java[]
+----
+
+This test is, honestly, not very good: it replicates our query well enough, but the output is not tested very wellfootnote[The difficulty of testing textual responses is going to come up later in this chapter and will also be addressed in Chapter 6.].
+
+The test fails if the response doesn't contain the word "off" - which we expect it will, because that's the default state of the `yellow` light - but doesn't have a good way to validate that the `purple` light isn't present.
+Once we have the other classes required for this test built, we'll be able to see what the query responds with, and validate it *that* way - and there are ways to do it programmatically, but we haven't covered those yet.
+We're getting there.
+
+What we need next is a `LightQueryService`.
+It's going to look an awful lot like our `ConversationChatService` from Chapter 2, in Listing 2-16, but it's going to introduce a method to build our `OpenAiChatOptions` object that we'll use explicitly in calling the AI, `buildOptions()`.
+
+This `OpenAiChatOptions` object will include a reference to a named service, `RequestLightStatusService`, that we'll see next - this is the named function that allows a light's status to be queried.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightQueryService.java`
+
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/service/LightQueryService.java[]
+----
+
+Now we have _finally_ gotten to the point where we can write our function.
+
+It's important to note that this is a Component - declared with `@Component` here, so Spring knows to manage it. It could be a `@Bean` in our configuration, or a `@Service` - it's not really a service, despite the name, but as it operates _on_ data, and uses another service, it seemed appropriate enough as a namefootnote:[Readers should definitely feel free to use their own conventions. The power of conventions is not that _you_ use _ours_ - it's that whatever convention you use works for _you_.].
+
+The next important thing about the declaration, before we get to the code itself, is the use of a _description_, done here with the `@Description` annotation. This provides information to the AI about what the function does, and should be written to provide hints; here, `get light status` provides enough information.
+
+NOTE: Writing the descriptions might be the most challenging aspect of writing functions for Spring AI. Directness and clarity seem to be the most consistent approaches; you may have to try a few options in your own functions, testing along the way, to get them tuned well. Oddly enough, this advice applies to generalized queries to an LLM, too. There's no replacement for experience.
+
+We need three pieces here: our input structure, our output structure, and the function that maps our input to the outputfootnote:[Interestingly enough, that's one of the definitions of a function in mathematics: a function literally maps an input to an output, deterministically. This is also the heart of "Functional Programming," and a core aspect of how streams work, and we've now wandered far away from the point of _this_ book.].
+
+We can put all three in the same source file, and scope the inputs and outputs to our component, as `record` types; our class is a Spring bean, so it has access to all of the wiring that the Spring context provides.
+In our case, we're having Spring provide a reference to a `LightService`, from Listing 3-4.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/RequestLightStatusService.java`
+
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/service/RequestLightStatusService.java[]
+----
+
+Our class has an `@Autowired` field, the `LightService`, that provides access to our lights "live."
+
+Next, we have a `RequestLightStatusService.Request` record - which has a single field, a light's name.
+This is what the AI should provide to our function.
+
+After that, we have a `RequestLightStatusService.Response` - which binds the light's color to its status.
+
+Lastly, we have the actual mapping function, the `apply()` method.
+This looks up the light from the `LightService`, and maps the `Optional<Light>` into either a valid `RequestLightStatusService.Response` object (if it exists) or `null` if not.
+
+NOTE: As usual, we have a lot of options for how to map the response, given an input.
+This is one of a few sensible possibilities.
+It's also the one that occurred to your author first, and by gum, it worked well enough. After all, it's just taking an input and generating an output for it.
+
+Now we have enough code that we can run our `RequestLightStatusTest` and see its output.
+Here's example output from our machines for this test:
+
+[source,text]
+----
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=yellow]
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=purple]
+INFO  ch03.RequestLightStatusTest --
+Response: The status of the light named 'yellow' is off.
+Unfortunately, I couldn't retrieve the status of the light named 'purple'.
+----
+
+Because this is generated with an LLM, the output can vary from call to call, but your output should map pretty closely to what this example shows.
+Assuming everything has gone well, you can see that the system reported the yellow light correctly - it's off, by default, after all - and you can see from the logging output that the function was called twice, once for the `yellow` light and once for the `purple` light.
+
+It's time to write another function, one that _changes_ a light's status, and then we can look at perhaps some better ways than plain text to get data out of the AI.
+
+=== Changing a Light
+
+The pattern for writing a mutation operation isn't any different from the pattern for writing an access. We have an input format - a request - and a response of some sort, and a mapping function to go from one to the other. In this case, we have input that should add the desired light's state in addition to the light's name, and the response... well, the response can be anything, but it probably makes sense to return the new light's information.
+
+So in essence, our `ChangeLightStatusService` is going to be _just_ like our `RequestLightStatusService`, with a mutation of the light and a `Request` that includes the desired light's state. Let's see what it looks like:
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/ChangeLightStatusService.java`
+
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/service/ChangeLightStatusService.java[]
+----
+
+It's so similar to `RequestLightStatusService` that one could conceive of writing a class hierarchy to build the functionality - you'd use a generic type for the `Request`, and have localized functionality to apply the request (i.e., a do-nothing operation for `RequestLightStatusService` and a mutation operation for `ChangeLightStatusService`). It'd be trivial to write, really, but wouldn't really accomplish anything for our purposes here, besides creating a few more listings. In the end, it'd probably end up with _more_ lines of code, by a few, thanks to Java being slightly verbosefootnote:[If we put the functions in our Spring Configuration as `@Bean` instances rather than in separate source files, we could probably save a few lines here and there, but then it'd get a lot harder to explain in this chapter.].
+
+However, now we have to build another test - and another service - to show the functionality. It's going to look _very_ similar to our previous example, but that's all right; authors get paid by the wordfootnote:[We actually don't get paid by the word, or by the page. In the days of pulp fiction, in the 1950s, authors _were_ paid by the word, which is why so much pulp fiction used purple prose - authors wrote out everything they could, so they would get paid more by the publisher. Speaking personally, your author here thinks that's a great idea; can we go back to that, Publisher?].
+
+In our previous example, we wrote the test first, then the service the test used, and then the function - here, we've already seen the function, so let's continue inverting the process and take a look at the service that uses the function.
+
+Here, though, we're going to use inheritance, because the only difference between `LightQueryService` and `LightUpdateService` is the provision of the `ChangeLightStatusService` function to the chat options.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightUpdateService.java`
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/service/LightUpdateService.java[]
+----
+
+And now it's time to take a look at a query that actually changes the lights' status. It's going to look much like the `RequestLightStatusTest`, but will actually verify the lights' status after showing the response from the AI. Here, we actually have a better way of validating that our mutation was performed; this is a better test than `RequestLightStatusTest` was.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/ChangeLightStatusTest.java`
+
+[source,java]
+----
+include::../code/chapter03/src/test/java/ch03/ChangeLightStatusTest.java[]
+----
+
+Our tests will pass (which means the function worked), but the test _also_ generates the following output as an example:
+
+[source,text]
+----
+INFO  ch03.service.ChangeLightStatusService --
+Changing status for light: Request[color=yellow, on=true]
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=red]
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=green]
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=blue]
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=purple]
+INFO  ch03.service.RequestLightStatusService --
+Requesting status for light: Request[color=yellow]
+INFO  ch03.ChangeLightStatusTest --
+Response from service: The yellow light is now turned on.
+
+Here are the states of the lights:
+- Red light: Off
+- Green light: Off
+- Blue light: Off
+- Purple light: Not available
+- Yellow light: On
+----
+
+You can see the flow: first, it determined that it needed to mutate the `yellow` light, so called `ChangeLightStatusService` with `yellow` and `true` to turn the light "on" - and then it iterated through the lights we specified ("red", "green", "blue", "purple", and "yellow") to query their state, and it informed us that `purple` wasn't available, as the function to get the light returned `null`.
+
+=== Structured Output
+
+Our last test did a good job of verifying that the lights were actually changed, by using a single service (the `LightService`) to do everything, including apply changes from the AI. It's worth noting, though, that we can get the AI to give us actual data structures, so we can blend information from our data as well as information from the AI.
+
+One way to do this is to instruct the AI to literally return formatted data: you might issue a query such as `provide the status of the lights in JSON format, with no commentary and no explanation.,` as a short example. Then we could take the response and pipe it through a JSON parser like Jacksonfootnote:[Jackson is the library that provides the default JSON parser in Spring Boot.] and access the resulting data structures.
+
+That's... one way to do it. We can actually instruct Spring AI to do the work for us, though. Let's build a test that does the same thing as `ChangeLightStatusTest`, except that it returns a list of lights - and adds the CIE 1931 color coordinate of the light, inferred from its state and name.
+
+---
+
+CIE 1931 is a mathematical model that "define the relationship between the visible spectrum and the visual sensation of specific colors by human color vision.footnote:[CIE 1931: `https://en.wikipedia.org/wiki/CIE_1931_color_space`, captured on September 27, 2024.]" It represents the colors we can see with an "x", "y", and "z" coordinate - where "z" is often shown as "Y", but that's confusing in a book where users might not be familiar with the systems in question - and it's very common in APIs that work with smart lights, although it's not very common for users to work with the coordinate system directly. It was formalized in 1931, if you can imagine that from its name.
+
+---
+
+There are multiple ways to map data from Spring AI into an object model, but the easiest way is to simply construct the `OpenAiChatOptions` such that we use the `entity()` method, with a type reference that Jackson can recognize. We can even embed the data structures in our service, although it makes referencing them a little more verbose in calling code (as we'll see in our test).
+
+Let's take a look, though. The service looks quite similar to our other Spring AI services, but it has some important differences.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightStructuredUpdateService.java`
+[source,java]
+----
+include::../code/chapter03/src/main/java/ch03/service/LightStructuredUpdateService.java[]
+----
+
+The first differences are the use of the `LightWithXYZ` and `LightWithXYZList` records. The `LightWithXYZ` is basically a copy of our `Light` with added CIE 1931 information. The `LightWithXYZList` is simply a way to specify a list of the lights trivially (to avoid building more complex type references and whatnot.)
+
+Our `buildOptions()` is exactly the same as our other options methods, providing mutation and access to our lights to the AI.
+
+Our `converse()` method does some extra things, though.
+
+First, it uses a *system* message to instruct the AI with additional context, outside of whatever prompt the user supplies. In this case, we're telling the system to add the CIE 1931 representation of the lights, if possible (derived from their names and presence, so if the light's not found, we won't get any CIE 1931 information from it.)
+
+Secondly - and here's where the actual work of specifying structured data comes in - it uses `.entity(LightWithXYZList.class)` as the last part of the Spring AI request. This is all we need to do to ask the AI to try to coerce the output into a Java data structure that we can use.
+
+There are other ways to specify mappings, if we have a more complex interaction, but this is the beginning of all of it, and even those other interactions are essentially doing something very similar.
+
+Of course, now that we've talked about it, we should show it working, with a test. Here's `ChangeLightStructuredTest`.
+
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/ChangeLightStructuredTest.java`
+
+[source,java]
+----
+include::../code/chapter03/src/test/java/ch03/ChangeLightStructuredTest.java[]
+----
+
+We have much the same structure as our other tests, and our query is the same. We have a method to get a specific light from our data structure (because it's returned as an `ArrayList`), but our test takes the data structure, finds both `yellow` and `purple`, and validates their state *and* that their CIE colors are roughly correct.
+
+You'll note the use of actual data types in the test method, like `LightStructuredUpdateService.LightWithXYZList`. This is entirely intentional, and is purely to make the data types obvious to the reader. There's absolutely no need to use the data type's names if you don't want to; `var yellow` would have worked just as wellfootnote:[When this chapter was being written, `var yellow` was actually the declaration used, for example. With that said, we felt we wanted to make the types more obvious, since they were being pulled from a service _and_ exposed to client code, where our other embedded types were limited to their use in internal communications.].
+
+== Next Steps
+
+In this chapter, we've seen how to provide two-way interaction between Spring AI and our code, such that the AI isn't limited to what data exists in its training set only, and it can use our functions to change things in our application. We've gone from a simple "fortune-teller" model, where we ask questions and the AI passively responds, to a model in which we can let the AI change the world around us.
+
+It wouldn't be a stretch to imagine how these functions could return order information, or modify orders, or create tickets, or any other system interaction our applications needed; this is how many OpenAI-driven chatbots work, after all.
+
+We've also seen some of how we can get the AI to present data in a fashion that our programs can easily interpret and apply.
+
+In our next chapter, we're going to jump from the realm of working with text, into working with audio, both interpreting audio files and generating them.
