@@ -35,15 +35,20 @@ Here's how an AI summarized artificial intelligence:
 
 [source,text]
 ----
-Artificial Intelligence (AI) refers to the development of computer systems that can perform
-tasks that normally require human intelligence, such as learning, problem-solving, and
-understanding language. At its core, AI uses mathematical models to make decisions and
-predictions—ranging from simpler approaches like Markov chains, which predict sequences
-of events, to more complex systems like recommender algorithms that suggest movies or
-products based on user preferences. With advancements in AI, more sophisticated models
-like Large Language Models (LLMs) have emerged, allowing systems to understand and
-generate human-like text. These models can be integrated into applications, such as
-those built with Spring AI, to automate and enhance various tasks across industries.
+Artificial Intelligence (AI) refers to the development
+of computer systems that can perform tasks that normally
+require human intelligence, such as learning, problem-solving,
+and understanding language. At its core, AI uses mathematical
+models to make decisions and predictions—ranging from
+simpler approaches like Markov chains, which predict
+sequences of events, to more complex systems like recommender
+algorithms that suggest movies or products based on user
+preferences. With advancements in AI, more sophisticated models
+like Large Language Models (LLMs) have emerged, allowing
+systems to understand and generate human-like text. These
+models can be integrated into applications, such as those
+built with Spring AI, to automate and enhance various
+tasks across industries.
 ----
 
 Not bad, `ChatGPT4o`!
