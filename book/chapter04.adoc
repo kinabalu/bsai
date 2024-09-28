@@ -2,16 +2,13 @@
 :chapter: 4
 
 == Generating and Processing Audio
-////
-TODO I feel like this is an awesome place to make some geeky Star Trek references, where the crew
-shouted "COMPUTER! PLAY THE TAPE!" and stuff like that, and it spoke back to them.
-////
-Let's turn our attention toward what we can achieve using AI with the spoken word. One can imagine transcribing video or audio to written text as part of a service offering. Written text can be spoken aloud using this module for the vision-impaired or for those engaged in activities where reading isn't an option.
+Since the early 19th century, humans have expressed the idea of a mechanical device capable of speech in fiction, through authors like Jules Verne and later H.G. Wells. By the mid 20th century in fiction we had moved from "Ulla, Ulla" to machines that were capable of talking back (text to speech) and understanding speech (transcription). Today we are surrounded by mechanical devices that have made the vision of Roddenberry and others come to life whether prefaced with "Computer", "Siri" or "Alexa" the result is a device that understands the basics of what you ask it like requests for weather or a piece of music.
+
+Today, we can reasonably speak something as futuristic as "Computer, write me a chapter on using Spring AI to generate and process audio" and what would be returned might just be a good first startfootnote:[As we mentioned in Chapter 1, unless we mention it the text of this book was written by one of the human authors.]. Since we're still actually writing the text here, let's turn our attention toward what we can achieve using AI with the spoken word. One can imagine transcribing video or audio to written text as part of a service offering. Written text can be spoken aloud using this module for the vision-impaired and for those engaged in activities where reading isn't an option or as a response to commands in a system like Siri.
+
+Spring AI has two avenues for working with audio. The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech. In both instances the integration done today with Spring AI uses OpenAI. Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
 
 In this chapter we will walk through the two simple APIs for processing audio and text and real world examples of how you can use both.
-
-Spring AI has two avenues for working with audio. The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech. In both instances the integration done today with Spring AI uses OpenAI.
-Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
 
 Let's dive in.
 
@@ -20,7 +17,9 @@ Let's dive in.
 // TODO The following paragraph doesn't flow as well as it should. It feels like it should be multiple paragraphs.
 Creating spoken audio from text using a computer has been around since the early 1960s.
 A physicist at Bell Labs used an IBM 7094 computer to synthesize speech and recreate the song "Daisy Bell;" author Arthur C. Clarke saw a demonstration of this, and incorporated it in his book and the screenplay for "2001: A Space Odyssey" for when HAL9000 is shut down.
+
 It's an interesting technical challenge that involves understanding of how words are formed from phonemes and how phonemes link together, much as how font ligatures work to create handwriting fonts.
+
 There are plenty of text-to-speech libraries out there, but AI has a much larger repository of information to draw from, and requires less work to install and run, since the heavy lifting's been done by the AI service providers.
 
 The first task we'll take on is to create our directory structure for this chapter.
@@ -134,7 +133,7 @@ mvn -am -pl chapter04 clean test
 ----
 
 If everything is working properly it should complete with `SUCCESS`.
-If you chose to add the line for writing the file output to disk you can open up the resulting mp3 file and have a listen.
+If you chose to add the line for writing the file output to disk you can open up the resulting MP3 file and have a listen.
 This test will sound more like spoken word than singing as there is no "singing" option within the OpenAI API; the result is a particularly passionless rendering of a silly love song, and might be worth listening to only for humor's sake.
 
 Let's say we wanted to pass some extra options to make it more like a song.
@@ -146,17 +145,12 @@ If we pass a custom `OpenAiAudioSpeechOptions` to a custom test we can do so lik
 include::../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
 ----
 
-This test you can see it writes to disk.
-Hopefully with these options it sounds a little bit more like a song, but it's probably safe to say that Celine Dion, Adele, or Janis Joplin are all safe from challenges from OpenAI just yet.
+This test generates an MP3 file on disk which, with the given options, aims to sound more like a song. However, it’s safe to say that vocalists like Celine Dion, Adele, and Janis Joplin have nothing to worry about from OpenAI just yet. The Whisper model we are using has been trained on the spoken word in the various supported languages. In order to provide a method of "text-to-sing" we'd need to model the aspects of melody, pitch, rhythm and the various other musical elements involved in realistic sounding singing.
 
-// TODO what would it take to actually have an AI "sing?" How do people do this?
+There are general purpose TTS systems on the market today (Tacotron 2, WaveNet, and FastSpeech) that can be adapted by training the model on singing data including the music and patterns involved. It would also be important to provide the actual melody in the form of perhaps a MIDI file to teach the model the song it's singing.
 
 === Transcription
-
-// TODO "the more useful?" I mean... how do we know it's "more useful?" You might be right, but still...
-
-// TODO very choppy paragraph here
-The more useful integration being done with Spring's integration is the transcription of audio to text.
+The other primary method available in these modules is the ability of Spring AI to integrate with a provider like OpenAI to transcribe audio of spoken words to text.
 Our tests previously have been using the lyrics to "Daisy Bell", and we will continue that here.
 A search on Wikipedia gives us a FLAC file of the original recording.
 If you'd like to download the file using the command line tool `curl` you can see how to do that below, or opening a browser and saving the file to disk from the URL: `https://bit.ly/daisy_bell_dectalk`.
