@@ -25,7 +25,7 @@ This is not without its dangers.
 
 The most dangerous aspect of AI in engineering is that it is easy to accept "complete answers" without regard to whether they're *right* or not. In Chapter 1, we mentioned a popular meme in which an LLM was unable to count the number of the letter "R" contained in the word "strawberry," for example. To a human, this is a trivial problem, and it's funny that an AI struggled with it, but it's quite illustrative.
 
-The reason the AIs get it wrong in the first place is because of tokenization. The AI doesn't see the word "strawberry" as a series of letters; it sees it as a token, in a short form: one might imagine a representation being "strɔːbərɪ" (the IPAfootnote:[IPA stands for the "International Phonetic Alphabet," and is a general mechanism for describing how to pronounce words in standard fashion. See `https://en.wikipedia.org/wiki/International_Phonetic_Alphabet` for more.] pronunciation of the word in the United States). The IPA form of "strawberry" does indeed have only two Rs
+The reason the AIs get it wrong in the first place is because of tokenization. The AI doesn't see the word "strawberry" as a series of letters; it sees it as a token, in a short form: one might imagine a representation being "strɔːbərɪ" (the IPAfootnote:[IPA stands for the "International Phonetic Alphabet," and is a general mechanism for describing how to pronounce words in standard fashion. See `https://en.wikipedia.org/wiki/International_Phonetic_Alphabet` for more.] pronunciation of the word in the United States). The IPA form of "strawberry" does indeed have only two Rs.
 
 But when asked, one of ChatGPT's models (a small one), came up with this answer, even after *demonstrating visibly* there are three Rs in the word:
 
