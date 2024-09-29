@@ -23,13 +23,13 @@ This is not without its dangers.
 
 == Dangers in Applying AI in Engineering
 
-If there's a concern around AI, it's not about a possible future in which an AI overthrows humanity: it's in how easy it is to mistake AI-generated content as being accurate. Generating content with AI is easy and becoming easier all the time, and the AIs are getting better and better at generating realistic output, no matter what kind of content it is.
+If there's a concern around AI, it's not about a possible future in which an AI overthrows humanity: it's in how easy it is to mistake AI-generated content as being accurate. Generating content with AI is easy and becoming easier all the time, and the AIs are getting better and better at generating realistic output, no matter what kind of medium is being used.
 
 AI models depend heavily on the quality of their training data and are highly sensitive to data quality issues: "garbage in, garbage out" is very apt, and given the volume of data used to train even the smaller LLMs, it's very difficult to ensure that the data is correct; thus, it's relatively easy for an AI to confidently assert something that is very, very wrong.
 
 AIs can generate working code relatively easily, and there are many AI models designed specifically for this purpose; asking an AI how to write a function to parse a given set of inputs, yielding a specific type of output, is likely to give you working code for whichever language you choose, and you can often even specify the parsing techniques.
 
-For example, you could ask for the use of a packrat-style parser in Kotlin, with examples of seven input lines, and show the data you want to extract. Many of the AI models will generate full working code, including tests.
+For example, you could ask for the use of a packrat-style parserfootnote:[A "packrat-style parser" is a context-free parser. They tend to be quite fast, often very flexible, and their grammars can be a pain to write. See `https://en.wikipedia.org/wiki/Parsing_expression_grammar` for more details.] in Java, with examples of seven input lines, and show the data you want to extract. Many of the AI models will generate full working code, including tests and suggestions of libraries.
 
 The code will probably even work. The danger here is that the AI will work _to your specification_, flaws and all, which means that the prompt needs to be as precise as possible, and even then, the generated code needs to be parsed carefully to make sure it *actually does what it's supposed to*. It might be reliable, but you need to verify that.
 
