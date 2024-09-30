@@ -85,15 +85,20 @@ If there are concerns about the legality of AI-generated content, it is advisabl
 
 While the previous section discussed the legality of data produced by AI, it's also important to consider the legal and privacy implications of the data you provide to an AI hosted by a third partyfootnote:[Local models offered by platforms like Ollama can offer enhanced data security compared to external services since they keep data on-premises. These models still should be checked to make sure they don't send information offsite, or isolated by firewalls to prevent possible breaches of security, but local models are *probably* safer than external services. They also require significant computational resources and can be slower or less efficient than cloud-based services. In any event, it's crucial for users to verify that even local models do not transmit data externally and to implement appropriate security measures to safeguard information.].
 
-When using a third-party service like ChatGPT, as we do throughout this book, you're sending information outside of your direct control. If your data is meant to be secure, submitting it to an external service can *violate* that security, because _you don't know what the service is doing with it_, a concern that goes beyond AI services, because you don't necessarily know what the services are doing with your data.
+When using a third-party service like ChatGPT, as we do throughout this book, you're sending information outside of your direct control.
+If your data is meant to be secure, submitting it to an external service can *violate* that security, because _you don't know what the service is doing with it_, a concern that goes beyond AI services, because you don't necessarily know what the services are doing with your data.
 
 The service might log your data, and if those logs are hacked or exposed, your information could become compromised.
 
-The service might use your contributed data to train future versions of its models, especially if it's operated by a social media conglomerate. This means your private data could become accessible to anyone who formulates the right prompt to extract it.
+The service might use your contributed data to train future versions of its models, especially if it's operated by a social media conglomerate.
+This means your private data could become accessible to anyone who formulates the right prompt to extract it.
 
-The services themselves have a strong interest in preventing these scenarios, of course; it's unlikely that _any_ of the services are particularly interested in private or secured information in and of itself. Most of them, if not all of them, will have documentation around their security and training practices, and this documentation should be read carefully. Ultimately, it's up to users to ensure they understand the risks and take appropriate measures to safeguard their information.
+The services themselves have a strong interest in preventing these scenarios, of course; it's unlikely that _any_ of the services are particularly interested in private or secured information in and of itself.
+Most of them, if not all of them, will have documentation around their security and training practices, and this documentation should be read carefully.
+Ultimately, it's up to users to ensure they understand the risks and take appropriate measures to safeguard their information.
 
-NOTE: Depending on your locale, there may also be laws in place to govern what data you can send to external services, including but not limited to GDPRfootnote:[The text of the General Data Protection Regulation (GPDR) can be found at `https://gdpr-info.eu/`, and addresses the right and ownership of individual data in the European Union.] or HIPAAfootnote:[The Health Insurance Portability and Accountability Act (HIPAA) can be found at `https://www.hhs.gov/hipaa/index.html` and addresses patients' rights to privacy in the United States.]. Please do not violate any laws.
+NOTE: Depending on your locale, there may also be laws in place to govern what data you can send to external services, including but not limited to GDPRfootnote:[The text of the General Data Protection Regulation (GPDR) can be found at `https://gdpr-info.eu/`, and addresses the right and ownership of individual data in the European Union.] or HIPAAfootnote:[The Health Insurance Portability and Accountability Act (HIPAA) can be found at `https://www.hhs.gov/hipaa/index.html` and addresses patients' rights to privacy in the United States.].
+Please do not violate any laws.
 
 The rule of thumb might be: *If someone can use this data to identify the subject of the prompt, it might be too private to send to an AI.* However, this is a _generalized rule_ and shouldn't be taken as legal advice.
 
