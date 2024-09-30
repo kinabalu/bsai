@@ -12,10 +12,10 @@ import java.util.List;
 
 @Primary
 @Service
-public class LightQueryChatService {
+public class RequestChatService {
     protected final ChatClient client;
 
-    LightQueryChatService(ChatClient.Builder builder) {
+    RequestChatService(ChatClient.Builder builder) {
         client = builder.build();
     }
 

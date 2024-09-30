@@ -230,7 +230,7 @@ The test fails if the response doesn't contain the word "off" - which we expect 
 Once we have the other classes required for this test built, we'll be able to see what the query responds with, and validate it *that* way - and there are ways to do it programmatically, but we haven't covered those yet.
 We're getting there.
 
-What we need next is a `LightQueryChatService`.
+What we need next is a `RequestChatService`.
 It's going to look an awful lot like our `ConversationChatService` from Chapter 2, in Listing 2-16, but it's going to introduce a method to build our `OpenAiChatOptions` object that we'll use explicitly in calling the AI, `buildOptions()`.
 
 This `OpenAiChatOptions` object will include a reference to a named service, `RequestLightStatusFunction`, that we'll see next - this is the named function that allows a light's status to be queried.
@@ -314,7 +314,7 @@ However, now we have to build another test - and another service - to show the f
 
 In our previous example, we wrote the test first, then the service the test used, and then the function - here, we've already seen the function, so let's continue inverting the process and take a look at the service that uses the function.
 
-Here, though, we're going to use inheritance, because the only difference between `LightQueryChatService` and `LightUpdateChatService` is the provision of the `UpdateLightStatusFunction` function to the chat options.
+Here, though, we're going to use inheritance, because the only difference between `RequestChatService` and `UpdateChatService` is the provision of the `UpdateLightStatusFunction` function to the chat options.
 
 Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightUpdateService.java`
 [source,java]

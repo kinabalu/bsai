@@ -1,6 +1,6 @@
 package ch03;
 
-import ch03.service.LightUpdateChatService;
+import ch03.service.UpdateChatService;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.util.List;
 public class UpdateLightStatusTest extends BaseLightTests {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    LightUpdateChatService lightConversationService;
+    UpdateChatService lightConversationService;
 
     @Test
     void changeLightStatus() {

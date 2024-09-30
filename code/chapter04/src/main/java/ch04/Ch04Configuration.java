@@ -1,9 +1,9 @@
 package ch04;
 
 import ch03.model.Light;
+import ch03.service.UpdateChatService;
 import ch03.service.UpdateLightStatusFunction;
 import ch03.service.LightService;
-import ch03.service.LightUpdateChatService;
 import ch03.service.RequestLightStatusFunction;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
@@ -56,8 +56,8 @@ public class Ch04Configuration {
     }
 
     @Bean
-    LightUpdateChatService getLightUpdateChatService(ChatClient.Builder builder) {
-        return new LightUpdateChatService(builder);
+    UpdateChatService getLightUpdateChatService(ChatClient.Builder builder) {
+        return new UpdateChatService(builder);
     }
 
     @Bean

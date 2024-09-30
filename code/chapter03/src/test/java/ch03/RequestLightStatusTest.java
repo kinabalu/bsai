@@ -1,6 +1,6 @@
 package ch03;
 
-import ch03.service.LightQueryChatService;
+import ch03.service.RequestChatService;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RequestLightStatusTest extends BaseLightTests {
     Logger logger= LoggerFactory.getLogger(this.getClass());
     @Autowired
-    LightQueryChatService lightQueryService;
+    RequestChatService lightQueryService;
 
     @Test
     void queryLightStatus() {
