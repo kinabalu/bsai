@@ -102,7 +102,7 @@ Please do not violate any laws.
 
 The rule of thumb might be: *If someone can use this data to identify the subject of the prompt, it might be too private to send to an AI.* However, this is a _generalized rule_ and shouldn't be taken as legal advice.
 
-As with legal and ethical concerns, a legal professional should be consulted if there's a question of whether data can be sent to an AI or not.
+As with other legal and ethical concerns, a legal professional should be consulted if there's a question of whether data can be sent to an AI or not.
 
 In summary, being mindful of the data you share with AI services is crucial to maintaining security and compliance with legal and ethical standards.
 
