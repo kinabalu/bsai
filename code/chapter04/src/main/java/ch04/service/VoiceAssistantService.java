@@ -1,18 +1,19 @@
 package ch04.service;
 
+import ch03.service.UpdateChatService;
+import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
-import ch03.service.LightService;
+
+import java.util.List;
 
 @Service
 public class VoiceAssistantService {
+
     @Autowired
-    ApplicationContext context;
-    
-    @Autowired
-    private LightService lightService;
+    private UpdateChatService updateChatService;
 
     @Autowired
     private TranscribeService transcribeService;
@@ -20,4 +21,18 @@ public class VoiceAssistantService {
     @Autowired
     private TextToSpeechService textToSpeechService;
 
+    public byte[] issueCommand(String commandText) {
+        var responseAsBytes = textToSpeechService.processText(commandText, null);
+
+        AudioTranscriptionResponse response = transcribeService.transcribeAudio(new ByteArrayResource(responseAsBytes), null);
+
+        String output = response.getResult().getOutput();
+        var updateResponse = updateChatService.converse(
+                List.of(
+                        new UserMessage(output)
+                )
+        );
+
+        return textToSpeechService.processText(updateResponse.getFirst().getOutput().getContent(), null);
+    }
 }

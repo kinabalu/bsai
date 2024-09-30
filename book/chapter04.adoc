@@ -36,7 +36,7 @@ This is _this chapter's_ project file, and thus it's in a directory _under_ the 
 .Listing {chapter}-{counter:listing}: `chapter04/pom.xml`
 [source,xml]
 ----
-include::../code/chapter04/pom.xml[]
+include::../code/chapter04/pom.xml[lines="1..20,26..-1"]
 ----
 
 The first thing we need to handle as we did in previous chapters is the application configuration.
