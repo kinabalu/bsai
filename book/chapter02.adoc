@@ -519,7 +519,7 @@ include::../code/chapter02/src/test/java/ch02/ConversationTests.java[]
 The first part of the test has some utility methods that we'll want: one is a convenience method to help us extract the `AssistantMessage` returned by the API, and the other is a display method to dump wrapped output to a logger.
 Neither one is _necessary_, but they're handy to have around.
 
-Next we have `simpleConversation()`, a test method that validates that `UpdateChatService` is able to replicate the functionality we expect our services to have: can we ask an LLM a simple question?
+Next we have `simpleConversation()`, a test method that validates that `ConversationChatService` is able to replicate the functionality we expect our services to have: can we ask an LLM a simple question?
 We're pretending to be math-challenged for this test, because that gives us a concrete answer we can look for; if our output doesn't have _the actual answer to our question_, we want to fail the test.
 
 The real test is `interactiveConversation()`.

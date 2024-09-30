@@ -235,14 +235,16 @@ It's going to look an awful lot like our `ConversationChatService` from Chapter 
 
 This `OpenAiChatOptions` object will include a reference to a named service, `RequestLightStatusFunction`, that we'll see next - this is the named function that allows a light's status to be queried.
 
-Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightQueryService.java`
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/RequestChatService.java`
 
 [source,java]
 ----
-include::../code/chapter03/src/main/java/ch03/service/LightQueryService.java[]
+include::../code/chapter03/src/main/java/ch03/service/RequestChatService.java[]
 ----
 
-Now we have _finally_ gotten to the point where we can write our function.
+This is fairly straightforward, but note the use of `@Primary` for the class. This is because we're going to extend this class with an `UpdateChatService` (Listing {chapter}-14), and since Spring will look for any Spring bean that can be assigned to a reference, we need to tell it that if there's a choice, use _this_ class and not any other matching class. Ordinarily, you wouldn't need to worry about this sort of thing.
+
+With that said, we have _finally_ gotten to the point where we can write our function.
 
 It's important to note that this is a Component - declared with `@Component` here, so Spring knows to manage it. It could be a `@Bean` in our configuration, or a `@Service` - it's not really a service, despite the name, but as it operates _on_ data, and uses another service, it seemed appropriate enough as a namefootnote:[Readers should definitely feel free to use their own conventions. The power of conventions is not that _you_ use _ours_ - it's that whatever convention you use works for _you_.].
 
@@ -255,19 +257,19 @@ We need three pieces here: our input structure, our output structure, and the fu
 We can put all three in the same source file, and scope the inputs and outputs to our component, as `record` types; our class is a Spring bean, so it has access to all of the wiring that the Spring context provides.
 In our case, we're having Spring provide a reference to a `LightService`, from Listing 3-4.
 
-Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/RequestLightStatusService.java`
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/RequestLightStatusFunction.java`
 
 [source,java]
 ----
-include::../code/chapter03/src/main/java/ch03/service/RequestLightStatusService.java[]
+include::../code/chapter03/src/main/java/ch03/service/RequestLightStatusFunction.java[]
 ----
 
-Our class has an `@Autowired` field, the `LightService`, that provides access to our lights "live."
+Our class has single attribute, the `LightService`, that provides access to our lights "live." We provide this via constructor injection, although we could just as easily have used autowiring.
 
 Next, we have a `RequestLightStatusService.Request` record - which has a single field, a light's name.
-This is what the AI should provide to our function.
+This is what the AI should provide to our function as an input.
 
-After that, we have a `RequestLightStatusService.Response` - which binds the light's color to its status.
+After that, we have a `RequestLightStatusService.Response` - which binds the light's color to its status. This is what we provide to the AI as output from our function call.
 
 Lastly, we have the actual mapping function, the `apply()` method.
 This looks up the light from the `LightService`, and maps the `Optional<Light>` into either a valid `RequestLightStatusService.Response` object (if it exists) or `null` if not.
@@ -301,11 +303,11 @@ The pattern for writing a mutation operation isn't any different from the patter
 
 So in essence, our `UpdateLightStatusFunction` is going to be _just_ like our `RequestLightStatusFunction`, with a mutation of the light and a `Request` that includes the desired light's state. Let's see what it looks like:
 
-Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/ChangeLightStatusService.java`
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/UpdateLightStatusFunction.java`
 
 [source,java]
 ----
-include::../code/chapter03/src/main/java/ch03/service/ChangeLightStatusService.java[]
+include::../code/chapter03/src/main/java/ch03/service/UpdateLightStatusFunction.java[]
 ----
 
 It's so similar to `RequestLightStatusFunction` that one could conceive of writing a class hierarchy to build the functionality - you'd use a generic type for the `Request`, and have localized functionality to apply the request (i.e., a do-nothing operation for `RequestLightStatusFunction` and a mutation operation for `UpdateLightStatusFunction`). It'd be trivial to write, really, but wouldn't really accomplish anything for our purposes here, besides creating a few more listings. In the end, it'd probably end up with _more_ lines of code, by a few, thanks to Java being slightly verbosefootnote:[If we put the functions in our Spring Configuration as `@Bean` instances rather than in separate source files, we could probably save a few lines here and there, but then it'd get a lot harder to explain in this chapter.].
@@ -314,21 +316,21 @@ However, now we have to build another test - and another service - to show the f
 
 In our previous example, we wrote the test first, then the service the test used, and then the function - here, we've already seen the function, so let's continue inverting the process and take a look at the service that uses the function.
 
-Here, though, we're going to use inheritance, because the only difference between `RequestChatService` and `UpdateChatService` is the provision of the `UpdateLightStatusFunction` function to the chat options.
+Here, though, we're going to use inheritance, because the only difference between `RequestChatService` and `UpdateChatService` is the provision of the `UpdateLightStatusFunction` function to the chat optionsfootnote:[This is why listing {chapter}-11 used `@Primary`, because otherwise any reference to `RequestChatService` would be able to be fulfilled by either `RequestChatService` or `UpdateChatService`, and we wanted to tell Spring to prefer `RequestChatService` where possible; if we need an `UpdateChatService`, we'd use that reference type instead.].
 
-Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightUpdateService.java`
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/UpdateChatService.java`
 [source,java]
 ----
-include::../code/chapter03/src/main/java/ch03/service/LightUpdateService.java[]
+include::../code/chapter03/src/main/java/ch03/service/UpdateChatService.java[]
 ----
 
 And now it's time to take a look at a query that actually changes the lights' status. It's going to look much like the `RequestLightStatusTest`, but will actually verify the lights' status after showing the response from the AI. Here, we actually have a better way of validating that our mutation was performed; this is a better test than `RequestLightStatusTest` was.
 
-Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/ChangeLightStatusTest.java`
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/UpdateLightStatusTest.java`
 
 [source,java]
 ----
-include::../code/chapter03/src/test/java/ch03/ChangeLightStatusTest.java[]
+include::../code/chapter03/src/test/java/ch03/UpdateLightStatusTest.java[]
 ----
 
 Our tests will pass (which means the function worked), but the test _also_ generates the following output as an example:
@@ -362,26 +364,26 @@ You can see the flow: first, it determined that it needed to mutate the `yellow`
 
 === Structured Output
 
-Our last test did a good job of verifying that the lights were actually changed, by using a single service (the `LightService`) to do everything, including apply changes from the AI. It's worth noting, though, that we can get the AI to give us actual data structures, so we can blend information from our data as well as information from the AI.
+Our last test did a good job of verifying that the lights were actually changed, by using a single service (the `LightService`) to do everything, including applying changes from the AI. It's worth noting, though, that we can get the AI to give us actual data structures, so we can blend information from our data as well as information from the AI.
 
 One way to do this is to instruct the AI to literally return formatted data: you might issue a query such as `provide the status of the lights in JSON format, with no commentary and no explanation.,` as a short example. Then we could take the response and pipe it through a JSON parser like Jacksonfootnote:[Jackson is the library that provides the default JSON parser in Spring Boot.] and access the resulting data structures.
 
 That's... one way to do it. We can actually instruct Spring AI to do the work for us, though. Let's build a test that does the same thing as `UpdateLightStatusTest`, except that it returns a list of lights - and adds the CIE 1931 color coordinate of the light, inferred from its state and name.
 
----
+'''
 
 CIE 1931 is a mathematical model that "define the relationship between the visible spectrum and the visual sensation of specific colors by human color vision.footnote:[CIE 1931: `https://en.wikipedia.org/wiki/CIE_1931_color_space`, captured on September 27, 2024.]" It represents the colors we can see with an "x", "y", and "z" coordinate - where "z" is often shown as "Y", but that's confusing in a book where users might not be familiar with the systems in question - and it's very common in APIs that work with smart lights, although it's not very common for users to work with the coordinate system directly. It was formalized in 1931, if you can imagine that from its name.
 
----
+'''
 
 There are multiple ways to map data from Spring AI into an object model, but the easiest way is to simply construct the `OpenAiChatOptions` such that we use the `entity()` method, with a type reference that Jackson can recognize. We can even embed the data structures in our service, although it makes referencing them a little more verbose in calling code (as we'll see in our test).
 
 Let's take a look, though. The service looks quite similar to our other Spring AI services, but it has some important differences.
 
-Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightStructuredUpdateService.java`
+Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/UpdateStructuredChatService.java`
 [source,java]
 ----
-include::../code/chapter03/src/main/java/ch03/service/LightStructuredUpdateService.java[]
+include::../code/chapter03/src/main/java/ch03/service/UpdateStructuredChatService.java[]
 ----
 
 The first differences are the use of the `LightWithXYZ` and `LightWithXYZList` records. The `LightWithXYZ` is basically a copy of our `Light` with added CIE 1931 information. The `LightWithXYZList` is simply a way to specify a list of the lights trivially (to avoid building more complex type references and whatnot.)
@@ -398,16 +400,16 @@ There are other ways to specify mappings, if we have a more complex interaction,
 
 Of course, now that we've talked about it, we should show it working, with a test. Here's `UpdateLightStructuredTest`.
 
-Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/ChangeLightStructuredTest.java`
+Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/UpdateLightStructuredTest.java`
 
 [source,java]
 ----
-include::../code/chapter03/src/test/java/ch03/ChangeLightStructuredTest.java[]
+include::../code/chapter03/src/test/java/ch03/UpdateLightStructuredTest.java[]
 ----
 
 We have much the same structure as our other tests, and our query is the same. We have a method to get a specific light from our data structure (because it's returned as an `ArrayList`), but our test takes the data structure, finds both `yellow` and `purple`, and validates their state *and* that their CIE colors are roughly correct.
 
-You'll note the use of actual data types in the test method, like `LightStructuredUpdateService.LightWithXYZList`. This is entirely intentional, and is purely to make the data types obvious to the reader. There's absolutely no need to use the data type's names if you don't want to; `var yellow` would have worked just as wellfootnote:[When this chapter was being written, `var yellow` was actually the declaration used, for example. With that said, we felt we wanted to make the types more obvious, since they were being pulled from a service _and_ exposed to client code, where our other embedded types were limited to their use in internal communications.].
+You'll note the use of actual data types in the test method, like `UpdateLightStructuredTest.LightWithXYZList`. This is entirely intentional, and is purely to make the data types obvious to the reader. There's absolutely no need to use the data type's names if you don't want to; `var yellow` would have worked just as wellfootnote:[When this chapter was being written, `var yellow` was actually the declaration used, for example. With that said, we felt we wanted to make the types more obvious, since they were being pulled from a service _and_ exposed to client code, where our other embedded types were limited to their use in internal communications.].
 
 == Next Steps
 
