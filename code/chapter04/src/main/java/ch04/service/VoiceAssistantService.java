@@ -10,8 +10,9 @@ import ch03.service.LightService;
 public class VoiceAssistantService {
     @Autowired
     ApplicationContext context;
-    @Bean
-    LightService getLightService() { return new LightService(context); }
+    
+    @Autowired
+    private LightService lightService;
 
     @Autowired
     private TranscribeService transcribeService;

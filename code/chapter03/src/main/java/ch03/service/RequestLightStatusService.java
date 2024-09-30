@@ -13,8 +13,11 @@ import java.util.function.Function;
 public class RequestLightStatusService
         implements Function<RequestLightStatusService.Request, RequestLightStatusService.Response> {
     public final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Autowired
     LightService lightService;
+
+    public RequestLightStatusService(LightService lightService) {
+        this.lightService = lightService;
+    }
 
     public record Request(String color) {
     }

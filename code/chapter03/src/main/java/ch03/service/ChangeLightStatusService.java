@@ -13,7 +13,6 @@ import java.util.function.Function;
 public class ChangeLightStatusService
         implements Function<ChangeLightStatusService.Request, ChangeLightStatusService.Response> {
     public final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Autowired
     LightService lightService;
 
     public ChangeLightStatusService(LightService lightService) {
