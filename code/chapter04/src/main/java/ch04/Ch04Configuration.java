@@ -1,9 +1,11 @@
 package ch04;
 
 import ch03.model.Light;
-import ch03.service.ChangeLightStatusService;
+import ch03.service.UpdateLightStatusFunction;
 import ch03.service.LightService;
-import ch03.service.RequestLightStatusService;
+import ch03.service.LightUpdateChatService;
+import ch03.service.RequestLightStatusFunction;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
@@ -43,14 +45,19 @@ public class Ch04Configuration {
 
     @Bean("RequestLightStatusService")
     @Description("Get light status")
-    RequestLightStatusService getRequestLightStatusService(LightService lightService) {
-        return new RequestLightStatusService(lightService);
+    RequestLightStatusFunction getRequestLightStatusFunction(LightService lightService) {
+        return new RequestLightStatusFunction(lightService);
     }
 
     @Bean("ChangeLightStatusService")
     @Description("Change a light's state")
-    ChangeLightStatusService getChangeLightStatusService(LightService lightService) {
-        return new ChangeLightStatusService(lightService);
+    UpdateLightStatusFunction getChangeLightStatusFunction(LightService lightService) {
+        return new UpdateLightStatusFunction(lightService);
+    }
+
+    @Bean
+    LightUpdateChatService getLightUpdateChatService(ChatClient.Builder builder) {
+        return new LightUpdateChatService(builder);
     }
 
     @Bean

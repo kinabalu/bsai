@@ -5,15 +5,17 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Primary
 @Service
-public class LightQueryService {
+public class LightQueryChatService {
     protected final ChatClient client;
 
-    LightQueryService(ChatClient.Builder builder) {
+    LightQueryChatService(ChatClient.Builder builder) {
         client = builder.build();
     }
 

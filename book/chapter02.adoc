@@ -499,7 +499,7 @@ Therefore, when we ask an LLM "What is the definition of a Chinese junk?", that 
 We can actually build a series of messages as our prompt, assigning the appropriate roles as we like, using `UserMessage` and establishing context with `AssistantMessage` instances from the system.
 
 The first thing we need to do is to create a service that accepts a `List` of messages, because our other services are geared around simple queries with one input only.
-Thankfully, this is entirely supported by `Prompt`, which has a constructor that accepts `List<Message>`; our new `LightUpdateService` will do little more than handle the plumbing of constructing the actual `Prompt` and returning the response.
+Thankfully, this is entirely supported by `Prompt`, which has a constructor that accepts `List<Message>`; our new `LightUpdateChatService` will do little more than handle the plumbing of constructing the actual `Prompt` and returning the response.
 
 .Listing {chapter}-{counter:listing}: `chapter02/src/main/java/ch02/service/ConversationChatService.java`
 [source,java]
@@ -519,13 +519,13 @@ include::../code/chapter02/src/test/java/ch02/ConversationTests.java[]
 The first part of the test has some utility methods that we'll want: one is a convenience method to help us extract the `AssistantMessage` returned by the API, and the other is a display method to dump wrapped output to a logger.
 Neither one is _necessary_, but they're handy to have around.
 
-Next we have `simpleConversation()`, a test method that validates that `LightUpdateService` is able to replicate the functionality we expect our services to have: can we ask an LLM a simple question?
+Next we have `simpleConversation()`, a test method that validates that `LightUpdateChatService` is able to replicate the functionality we expect our services to have: can we ask an LLM a simple question?
 We're pretending to be math-challenged for this test, because that gives us a concrete answer we can look for; if our output doesn't have _the actual answer to our question_, we want to fail the test.
 
 The real test is `interactiveConversation()`.
 This method has a lot of bits in it, so let's deconstruct it.
 
-The first part of `interactiveConversation()` replicates `simpleConversation()`; the main difference is that it constructs a `List<Message>` and uses that with the `LightUpdateService`, instead of constructing an immutable `List` in place.
+The first part of `interactiveConversation()` replicates `simpleConversation()`; the main difference is that it constructs a `List<Message>` and uses that with the `LightUpdateChatService`, instead of constructing an immutable `List` in place.
 We also preserve the `AssistantMessage`.
 
 After we validate (and display) the output, we add the `AssistantMessage` to the `messages`.

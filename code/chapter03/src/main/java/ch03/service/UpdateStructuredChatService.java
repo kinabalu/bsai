@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class LightStructuredUpdateService {
+public class UpdateStructuredChatService {
     private final ChatClient client;
 
     public record LightWithXYZ(String color, boolean on, Double x, Double y, Double z) {
@@ -19,7 +19,7 @@ public class LightStructuredUpdateService {
     public record LightWithXYZList(List<LightWithXYZ> lights) {
     }
 
-    public LightStructuredUpdateService(ChatClient.Builder builder) {
+    public UpdateStructuredChatService(ChatClient.Builder builder) {
         client = builder.build();
     }
 

@@ -5,8 +5,8 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LightUpdateService extends LightQueryService {
-    LightUpdateService(ChatClient.Builder builder) {
+public class LightUpdateChatService extends LightQueryChatService {
+    public LightUpdateChatService(ChatClient.Builder builder) {
         super(builder);
     }
 

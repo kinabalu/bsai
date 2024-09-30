@@ -230,10 +230,10 @@ The test fails if the response doesn't contain the word "off" - which we expect 
 Once we have the other classes required for this test built, we'll be able to see what the query responds with, and validate it *that* way - and there are ways to do it programmatically, but we haven't covered those yet.
 We're getting there.
 
-What we need next is a `LightQueryService`.
+What we need next is a `LightQueryChatService`.
 It's going to look an awful lot like our `ConversationChatService` from Chapter 2, in Listing 2-16, but it's going to introduce a method to build our `OpenAiChatOptions` object that we'll use explicitly in calling the AI, `buildOptions()`.
 
-This `OpenAiChatOptions` object will include a reference to a named service, `RequestLightStatusService`, that we'll see next - this is the named function that allows a light's status to be queried.
+This `OpenAiChatOptions` object will include a reference to a named service, `RequestLightStatusFunction`, that we'll see next - this is the named function that allows a light's status to be queried.
 
 Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightQueryService.java`
 
@@ -281,9 +281,9 @@ Here's example output from our machines for this test:
 
 [source,text]
 ----
-INFO  ch03.service.RequestLightStatusService --
+INFO  ch03.service.RequestLightStatusFunction --
 Requesting status for light: Request[color=yellow]
-INFO  ch03.service.RequestLightStatusService --
+INFO  ch03.service.RequestLightStatusFunction --
 Requesting status for light: Request[color=purple]
 INFO  ch03.RequestLightStatusTest --
 Response: The status of the light named 'yellow' is off.
@@ -299,7 +299,7 @@ It's time to write another function, one that _changes_ a light's status, and th
 
 The pattern for writing a mutation operation isn't any different from the pattern for writing an access. We have an input format - a request - and a response of some sort, and a mapping function to go from one to the other. In this case, we have input that should add the desired light's state in addition to the light's name, and the response... well, the response can be anything, but it probably makes sense to return the new light's information.
 
-So in essence, our `ChangeLightStatusService` is going to be _just_ like our `RequestLightStatusService`, with a mutation of the light and a `Request` that includes the desired light's state. Let's see what it looks like:
+So in essence, our `UpdateLightStatusFunction` is going to be _just_ like our `RequestLightStatusFunction`, with a mutation of the light and a `Request` that includes the desired light's state. Let's see what it looks like:
 
 Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/ChangeLightStatusService.java`
 
@@ -308,13 +308,13 @@ Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/Chang
 include::../code/chapter03/src/main/java/ch03/service/ChangeLightStatusService.java[]
 ----
 
-It's so similar to `RequestLightStatusService` that one could conceive of writing a class hierarchy to build the functionality - you'd use a generic type for the `Request`, and have localized functionality to apply the request (i.e., a do-nothing operation for `RequestLightStatusService` and a mutation operation for `ChangeLightStatusService`). It'd be trivial to write, really, but wouldn't really accomplish anything for our purposes here, besides creating a few more listings. In the end, it'd probably end up with _more_ lines of code, by a few, thanks to Java being slightly verbosefootnote:[If we put the functions in our Spring Configuration as `@Bean` instances rather than in separate source files, we could probably save a few lines here and there, but then it'd get a lot harder to explain in this chapter.].
+It's so similar to `RequestLightStatusFunction` that one could conceive of writing a class hierarchy to build the functionality - you'd use a generic type for the `Request`, and have localized functionality to apply the request (i.e., a do-nothing operation for `RequestLightStatusFunction` and a mutation operation for `UpdateLightStatusFunction`). It'd be trivial to write, really, but wouldn't really accomplish anything for our purposes here, besides creating a few more listings. In the end, it'd probably end up with _more_ lines of code, by a few, thanks to Java being slightly verbosefootnote:[If we put the functions in our Spring Configuration as `@Bean` instances rather than in separate source files, we could probably save a few lines here and there, but then it'd get a lot harder to explain in this chapter.].
 
 However, now we have to build another test - and another service - to show the functionality. It's going to look _very_ similar to our previous example, but that's all right; authors get paid by the wordfootnote:[We actually don't get paid by the word, or by the page. In the days of pulp fiction, in the 1950s, authors _were_ paid by the word, which is why so much pulp fiction used purple prose - authors wrote out everything they could, so they would get paid more by the publisher. Speaking personally, your author here thinks that's a great idea; can we go back to that, Publisher?].
 
 In our previous example, we wrote the test first, then the service the test used, and then the function - here, we've already seen the function, so let's continue inverting the process and take a look at the service that uses the function.
 
-Here, though, we're going to use inheritance, because the only difference between `LightQueryService` and `LightUpdateService` is the provision of the `ChangeLightStatusService` function to the chat options.
+Here, though, we're going to use inheritance, because the only difference between `LightQueryChatService` and `LightUpdateChatService` is the provision of the `UpdateLightStatusFunction` function to the chat options.
 
 Listing {chapter}-{counter:listing}: `chapter03/src/main/java/ch03/service/LightUpdateService.java`
 [source,java]
@@ -335,19 +335,19 @@ Our tests will pass (which means the function worked), but the test _also_ gener
 
 [source,text]
 ----
-INFO  ch03.service.ChangeLightStatusService --
+INFO  ch03.service.UpdateLightStatusFunction --
 Changing status for light: Request[color=yellow, on=true]
-INFO  ch03.service.RequestLightStatusService --
+INFO  ch03.service.RequestLightStatusFunction --
 Requesting status for light: Request[color=red]
-INFO  ch03.service.RequestLightStatusService --
+INFO  ch03.service.RequestLightStatusFunction --
 Requesting status for light: Request[color=green]
-INFO  ch03.service.RequestLightStatusService --
+INFO  ch03.service.RequestLightStatusFunction --
 Requesting status for light: Request[color=blue]
-INFO  ch03.service.RequestLightStatusService --
+INFO  ch03.service.RequestLightStatusFunction --
 Requesting status for light: Request[color=purple]
-INFO  ch03.service.RequestLightStatusService --
+INFO  ch03.service.RequestLightStatusFunction --
 Requesting status for light: Request[color=yellow]
-INFO  ch03.ChangeLightStatusTest --
+INFO  ch03.UpdateLightStatusTest --
 Response from service: The yellow light is now turned on.
 
 Here are the states of the lights:
@@ -358,7 +358,7 @@ Here are the states of the lights:
 - Yellow light: On
 ----
 
-You can see the flow: first, it determined that it needed to mutate the `yellow` light, so called `ChangeLightStatusService` with `yellow` and `true` to turn the light "on" - and then it iterated through the lights we specified ("red", "green", "blue", "purple", and "yellow") to query their state, and it informed us that `purple` wasn't available, as the function to get the light returned `null`.
+You can see the flow: first, it determined that it needed to mutate the `yellow` light, so called `UpdateLightStatusFunction` with `yellow` and `true` to turn the light "on" - and then it iterated through the lights we specified ("red", "green", "blue", "purple", and "yellow") to query their state, and it informed us that `purple` wasn't available, as the function to get the light returned `null`.
 
 === Structured Output
 
@@ -366,7 +366,7 @@ Our last test did a good job of verifying that the lights were actually changed,
 
 One way to do this is to instruct the AI to literally return formatted data: you might issue a query such as `provide the status of the lights in JSON format, with no commentary and no explanation.,` as a short example. Then we could take the response and pipe it through a JSON parser like Jacksonfootnote:[Jackson is the library that provides the default JSON parser in Spring Boot.] and access the resulting data structures.
 
-That's... one way to do it. We can actually instruct Spring AI to do the work for us, though. Let's build a test that does the same thing as `ChangeLightStatusTest`, except that it returns a list of lights - and adds the CIE 1931 color coordinate of the light, inferred from its state and name.
+That's... one way to do it. We can actually instruct Spring AI to do the work for us, though. Let's build a test that does the same thing as `UpdateLightStatusTest`, except that it returns a list of lights - and adds the CIE 1931 color coordinate of the light, inferred from its state and name.
 
 ---
 
@@ -396,7 +396,7 @@ Secondly - and here's where the actual work of specifying structured data comes 
 
 There are other ways to specify mappings, if we have a more complex interaction, but this is the beginning of all of it, and even those other interactions are essentially doing something very similar.
 
-Of course, now that we've talked about it, we should show it working, with a test. Here's `ChangeLightStructuredTest`.
+Of course, now that we've talked about it, we should show it working, with a test. Here's `UpdateLightStructuredTest`.
 
 Listing {chapter}-{counter:listing}: `chapter03/src/test/java/ch03/ChangeLightStructuredTest.java`
 
