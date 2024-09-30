@@ -285,6 +285,24 @@ mvn spring-boot:run
 
 In a separate terminal session we can use the curl commands above and see the API responses sent back similarly as with the tests.
 
+=== A simple voice assistant
+Siri was the first voice-activated assistant available in a consumer device in early 2010. Likely due to it being the first and the compute power required it was mired in problems as it had to process speech using cloud servers and thus required a stable and fast internet connection. Fast forward to today and thanks to the advancements in natural language processing and on-device hardware we've moved to a context aware system that understands your speech and most requests you give it.
+
+We are going to use what we've learned in this chapter and borrow code from the previous to create a simple virtual assistant. This is only a simple example and if you were building an actual voice assistant other choices would be more appropriate from a technology perspective.
+
+==== The voice assistant task
+Here are the steps we're going to go through to have a working voice assistant.
+
+1. Pass the command text we want to the `TextToSpeechService` to generate an audio file with speech that can be later processed.
+2. Take the audio file generated and pass it to the `TranscribeService` for the prompt.
+3. Next we'll pass the text in a `Prompt` and ask the LLM for an answer.
+4. We'll pass the text of the answer received back into the `TextToSpeechService` and save it to disk.
+
+
+
+
+we'll use the transcription to understand what is said, and then pass it to an LLM to have it do a thing, and then pass the text from the LLM back in
+
 == Next Steps
 
 In our next chapter, we're going to look at image generation with Spring AI and object identification in images using the multi-modality API.
