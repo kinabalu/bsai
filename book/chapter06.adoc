@@ -59,10 +59,6 @@ Human expertise and critical thinking remain essential in effectively utilizing 
 
 == Legal and Ethical Issues
 
-////
-Needs address of bias reinforcement should go into prompt engineering and response analysis
-////
-
 AI also creates some interesting legal and ethical concerns.
 Since AI creates content modeled on others' work, there's a danger of it being too similar to the original, potentially infringing on copyright laws.
 This is without even considering the ethical implications of imitating someone else's work product.
@@ -116,6 +112,23 @@ In summary, being mindful of the data you share with AI services is crucial to m
 ** Avoiding Overfitting and Underfitting
 
 == Effective Prompt Engineering
+
+This book doesn't really address how to write prompts well; it's not part of the scope of the book - and it would probably double in length if it were. However, it would be irresponsible not to point out that prompts can create responses that are biased or harmful, and it's our responsibility as users of AI to be aware and address such concerns.
+
+Without going into detail that requires more space than is available, prompt writers should be aware of how prompts can change the responses, by embedding assumptions.
+
+Assumptions in prompts might be entirely benign or innocuous: "Describe a teacher who loves her students," for example, _presumes_ that the teacher is female as part of the question. This _may_ be intentional (perhaps the prompt is trying to describe a teacher who is female, after all), but it might not be; a better query _might_ be "Describe a teacher who loves their students," using gender-neutral language, unless gender is _intended_ to be part of the response.
+
+Even if a neutral question is asked, the response might be biased. A prompt asking for a description of a successful entrepreneur might get a consistent description of a male, for example, even though there are certainly successful female entrepreneurs.
+
+This bias in responses is in part due to the way the models are trained: they're built from prior knowledge, and the response is based on probabilistic likelihoods of what the common pool of knowledge contains. If more successful entrepreneurs are male, then the AI models are more likely to describe successful entrepreneurs as male.
+
+This reinforced reference means that the common pool of knowledge - from which other models might be trained - now contains _even more_ references to male successful entrepreneurs, which creates itself a larger pool of references to more male successful entrepreneurs, and thus the AI models have a magnifying effect on the data, even though there's no malicious intent to create such an effect.
+
+Models being trained on common knowledge also have to wrestle with the possibility that common knowledge is _wrong_.
+
+Prompt engineers should be aware and cautious.
+
 
 * Risks of Underspecified Prompts
 ** Ambiguity in Instructions
