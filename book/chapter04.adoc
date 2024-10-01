@@ -308,7 +308,7 @@ With that, our first task is including chapter 3 in our maven configuration file
 include::../code/chapter04/pom.xml[lines="21..26"]
 ----
 
-Our next task is to modify our `@Configuration` to include the `UpdateChatService` along with it's dependencies and some mocked light status that we can act on with our voice assistant. The block below can be included anywhere within the `Ch04Configuration` file:
+Our next task is to modify our `@Configuration` to include the `UpdateChatService` along with it's dependencies. We are also creating some mocked light status that we can act on with our voice assistant. The block below can be included anywhere within the `Ch04Configuration` file:
 
 .Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
 [source,java]
@@ -316,6 +316,65 @@ Our next task is to modify our `@Configuration` to include the `UpdateChatServic
 include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[lines="22..61"]
 ----
 
+Due to all the work we've done previously, this is all the configuration necessary to make a voice assistant like we've mapped out work. Our next step is to write up a test for what we want to ask. As we promised earlier, we'll show you some code inline that can be used if you want to record your own voice command. For reference the configuration above has the light states as the following:
+
+[cols="1,2"]
+|===
+| Light Name | Status
+
+| yellow
+| off
+
+| red
+| on
+
+| green
+| off
+
+| blue
+| on
+|===
+
+Let's take a look at a test which will send a "voice" command to our LLM asking it to "Turn on yellow light" and gets an spoken word audio file back in response.
+
+.Listing {chapter}-{counter:listing}: `chapter04/src/test/java/ch04/VoiceAssistantTest.java`
+[source,java]
+----
+include::../code/chapter04/src/test/java/ch04/VoiceAssistantTest.java[]
+----
+
+The test we crafted involves calling the `VoiceAssistantService` with text of "Turn on yellow light." and receives a byte array which is the MP3 audio file of the LLM response. After receiving the byte array we assert that its not null and write the MP3 file to disk.
+
+Now it's time to implement our somewhat convoluted `VoiceAssistantService` that our test calls to see this thing working.
+
+.Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/service/VoiceAssistantService.java`
+[source,java]
+----
+include::../code/chapter04/src/main/java/ch04/service/VoiceAssistantService.java[]
+----
+
+We've implemented two methods here for `issueCommand`. The primary method takes a `Resource` which we expect to include the recorded speech command "Turn on yellow light", the other uses the `TextToSpeechService` in case you don't have a way of recording audio and passing it to the service. For our test as written, it uses the method accepting a String to simplify the example. The method transcribes the audio file with spoken words in it, passes it to the `UpdateChatService` for processing using the "real world" and then takes the LLM's text response and returns it as spoken word audio.
+
+Let's re-run our tests for `chapter04`:
+
+[source,shell]
+----
+mvn clean test -am -pl chapter04
+----
+
+If all worked as expected there should be an audio file saved on the filesystem named "voice_assistant_response.mp3" and playing it on your system it will contain a message like "The yellow light has been turned on."
+
+As we indicated earlier, if you want to record your own audio command you can change the test to accommodate loading an MP3 file and sending that through the process. Simply load your MP3 file (here we assume `voice_assistant_command.mp3` as a name) and pass that to the `issueCommand` method wrapped in a `ByteArrayResource`.
+
+Something like the following.
+
+[source,java]
+----
+        byte[] audioCommandAsBytes = Files.readAllBytes(Paths.get("./voice_assistant_command.mp3"));
+        byte[] audioResponseBytes = voiceAssistantService.issueCommand(new ByteArrayResource(audioCommandAsBytes));
+----
+
+There you have it, a voice assistant that understands you.
 
 == Next Steps
 In our next chapter, we're going to look at image generation with Spring AI and object identification in images using the multi-modality API.

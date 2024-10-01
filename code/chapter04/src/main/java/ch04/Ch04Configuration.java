@@ -25,7 +25,7 @@ public class Ch04Configuration {
 
     @Bean
     Light getRedLight() {
-        return new Light("red", false);
+        return new Light("red", true);
     }
 
     @Bean
@@ -35,7 +35,7 @@ public class Ch04Configuration {
 
     @Bean
     Light getBlueLight() {
-        return new Light("blue", false);
+        return new Light("blue", true);
     }
 
     @Bean
