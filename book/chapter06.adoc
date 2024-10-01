@@ -45,7 +45,7 @@ AIs can generate working code relatively easily, and there are many AI models de
 For example, you could ask for the use of a packrat-style parserfootnote:[A "packrat-style parser" is a context-free parser. They tend to be quite fast, often very flexible, and their grammars can be a pain to write. See `https://en.wikipedia.org/wiki/Parsing_expression_grammar` for more details.] in Java, with examples of seven input lines, and show the data you want to extract.
 Many of the AI models will generate full working code, including tests and suggestions of libraries.
 
-The code will probablyfootnote:[Saying code with "probably" work should be offensive to competent programmers. Good programmers _know_ whether their code works. That's part of why this book was written to be test-heavy.] even work.
+The code will probablyfootnote:[Saying code will "probably" work should be offensive to competent programmers. Good programmers _know_ whether their code works. That's part of why this book was written to be test-heavy.] even work.
 The danger here is that the AI will work _to your specification_, flaws and all, which means that the prompt needs to be as precise as possible, and even then, the generated code needs to be parsed carefully to make sure it *actually does what it's supposed to*.
 It might be reliable, but you need to verify that.
 
