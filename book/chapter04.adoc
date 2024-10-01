@@ -308,6 +308,13 @@ With that, our first task is including chapter 3 in our maven configuration file
 include::../code/chapter04/pom.xml[lines="21..26"]
 ----
 
+Our next task is to modify our `@Configuration` to include the `UpdateChatService` along with it's dependencies and some mocked light status that we can act on with our voice assistant. The block below can be included anywhere within the `Ch04Configuration` file:
+
+.Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
+[source,java]
+----
+include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[lines="22..61"]
+----
 
 
 == Next Steps
