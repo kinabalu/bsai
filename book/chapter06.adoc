@@ -7,7 +7,7 @@ In Chapter 1, we brought up a simple high-level overview of the AI landscape as 
 It's a useful chapter, not just because of the content it holds, but because of the way it was written.
 
 It was drafted in Asciidoctorfootnote:[Asciidoctor (`https://asciidoctor.org`) is software for taking simple text content and generating a document model from it.] (as was the rest of the book), with the editor suggesting minor grammar changes as it was written.
-These edits were focused on simple things like matching tenses, or spellingfootnote:[If you're interested, the tool used for grammar and syntax was Grammarly, at `https://app.grammarly.com/`, which is merely one of many such tools, and this is not an endorsement of Grammarly over other similar tools like ProWritingAid (`https://prowritingaid.com/`), and so forth. Most of them do the same sorts of things, although most of them _also_ tend to be more focused on specific types of writing; ProWritingAid, for example, is primarily meant for storytellers. Even Microsoft Word has similar grammar aids, like Copilot.].
+These edits were focused on simple things like matching tenses, or spellingfootnote:[If you're interested, the tool used for grammar and syntax was Grammarly, at `https://app.grammarly.com/`, which is merely one of many such tools, and this is not an endorsement of Grammarly over other similar tools like ProWritingAid (`https://prowritingaid.com/`), and so forth. Most of them do the same sorts of things, although most of them _also_ tend to be more focused on specific types of writing; ProWritingAid, for example, is primarily meant for storytellers. Even Microsoft Word has similar grammar aids, like CoPilot.].
 
 After the initial simple draft was done and revised by the author, the content was submitted as a whole to an LLM (ChatGPT, specifically), with a prompt asking for hints toward readability, ease of use, and appropriate topical coverage.
 ChatGPT then presented a potential rewrite of the chapter, which wasn't quite what was intended.
@@ -108,18 +108,26 @@ While this book does not delve into the intricacies of prompt engineering—doin
 
 To illustrate this point without delving into extensive detail, prompt writers should be aware of how prompts can change the responses, by embedding assumptions.
 
-Assumptions in prompts might be entirely benign or innocuous: "Describe a teacher who loves her students," for example, _presumes_ that the teacher is female as part of the question. While this may be intentional — for instance, if focusing on a female teacher — it might also be an unintentional bias. A better query _might_ be "Describe a teacher who loves their students," using gender-neutral language, unless gender is _intended_ to be part of the response.
+Assumptions in prompts might be entirely benign or innocuous: "Describe a teacher who loves her students," for example, _presumes_ that the teacher is female as part of the question.
+While this may be intentional — for instance, if focusing on a female teacher — it might also be an unintentional bias.
+A better query _might_ be "Describe a teacher who loves their students," using gender-neutral language, unless gender is _intended_ to be part of the response.
 
-Even if a neutral question is asked, the response might be biased. A prompt asking for a description of a successful entrepreneur might get a consistent description of a male, for example, even though there are certainly successful female entrepreneurs.
+Even if a neutral question is asked, the response might be biased.
+A prompt asking for a description of a successful entrepreneur might get a consistent description of a male, for example, even though there are certainly successful female entrepreneurs.
 
-These biases occur because AI models are trained on existing data, which may reflect societal biases. As a result, the AI might be more likely to produce responses that align with those biases.  If the models have more references to male business leaders than female entrepreneurs, then the models will themselves more likely describe entrepreneurs as male.
+These biases occur because AI models are trained on existing data, which may reflect societal biases.
+As a result, the AI might be more likely to produce responses that align with those biases.
+If the models have more references to male business leaders than female entrepreneurs, then the models will themselves more likely describe entrepreneurs as male.
 
-This reinforcement means that the common knowledge pool—which future models may use for training—contains even more references to successful male entrepreneurs. This creates a feedback loop, amplifying the bias without any malicious intent.
+This reinforcement means that the common knowledge pool—which future models may use for training—contains even more references to successful male entrepreneurs.
+This creates a feedback loop, amplifying the bias without any malicious intent.
 
-Models being trained on common knowledge also have to wrestle with the possibility that common knowledge is _wrong_. An engineer on LinkedIn had a rather appropriate observation:
+Models being trained on common knowledge also have to wrestle with the possibility that common knowledge is _wrong_.
+An engineer had a rather appropriate observation on LinkedIn:
 
-[quote,Paul Parks,'https://www.linkedin.com/posts/paulmooreparks_ai-llm-activity-7240264719364673536-GpFJ/']
-I'm going to be very wary of large-language models and AI in general until I find one that can say, "I don't know," when I ask a question about a technical matter. Generally, they behave like really eager interns that would rather make up an answer than admit to not knowing the answer.
+[quote,Paul Parks,'https://www.linkedin.com/posts/paulmooreparks_ai-llm-activity-7240264719364673536-GpFJ']
+I'm going to be very wary of large-language models and AI in general until I find one that can say, "I don't know," when I ask a question about a technical matter.
+Generally, they behave like really eager interns that would rather make up an answer than admit to not knowing the answer.
 
 Therefore, it's crucial for anyone interacting with AI systems to continually remain vigilant about these biases and actively work to mitigate them in pursuit of accuracy, honesty, and integrity.
 
@@ -129,6 +137,7 @@ We've reached the end of the journey for _this_ particular book.
 
 We've tried to focus on those elements from Spring AI that would prove most useful for most programmers, while acknowledging that there are a lot of use cases that go deeper in nearly everything we've touched.
 
-Such is the nature of an introductory book. We'd like to invite you to explore and create using the technology, going as far as your imagination and skills can take you, and we wish you success in all that you do; show us what you've done, and tell us what we can do better!
+Such is the nature of an introductory book.
+We'd like to invite you to explore and create using the technology, going as far as your imagination and skills can take you, and we wish you success in all that you do; show us what you've done, and tell us what we can do better!
 
 Thank you.
