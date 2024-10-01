@@ -94,16 +94,21 @@ It's also important to keep in mind that the reason we have so many models and d
 
 It's an aphorism that "when all you have is a hammer, everything looks like a nail." As of this writing, this feels like an accusation; it's rather common to see "can we throw an AI at it?" as a response to problems that, honestly, don't need all that much computation power.
 
-For example, in medicine, a cardiologist named Lee Goldman came up with three simple questions to try to determine if a patient was having a heart attack. His fellow doctors were sure that they, being experts, had a better set of questions and tests to evaluate a patient's status, but _actual tests_ showed that Goldman's three questions were *70% better* at detecting heart attacks, _plus_ they were far quicker to ask than the alternativesfootnote:[Malcolm Gladwell, _Blink: The Power of Thinking without Thinking_, Back Bay Books, 2007.]. Using an AI to detect heart attacks might work - but as with Dr. Goldman's three questions, the simple approach might be faster, cheaper, and more effective than the shiny technology. This would be a poor application of the resources and power of AI.
+For example, in medicine, a cardiologist named Lee Goldman came up with three simple questions to try to determine if a patient was having a heart attack.
+His fellow doctors were sure that they, being experts, had a better set of questions and tests to evaluate a patient's status, but _actual tests_ showed that Goldman's three questions were *70% better* at detecting heart attacks, _plus_ they were far quicker to ask than the alternativesfootnote:[Malcolm Gladwell, _Blink: The Power of Thinking without Thinking_, Back Bay Books, 2007.].
+Using an AI to detect heart attacks might work - but as with Dr. Goldman's three questions, the simple approach might be faster, cheaper, and more effective than the shiny technology.
+This would be a poor application of the resources and power of AI.
 
 That's not to say that you shouldn't use artificial intelligence, at all: it's more an observation that AI is a tool, and like most tools, it has appropriate uses and can be overused, and given the current enthusiasm around a term that few seem to understand, is *often* overused.
 
 == The Scope of This Book
-// TODO: Fix this! It's not LLMs only.
 
-This book primarily focuses on Large Language Models and how to access them with the Spring Framework.
+This book delves into the integration of advanced AI models — including Large Language Models (LLMs), as well as audio and visual processing models — using the Spring Framework.
 
-Large language models use a number of techniques to reduce textual prompts to mathematical models, and apply *other* mathematical models to generate responses, also generally textual in nature, although chapters 4 and 5 will show you how to feed audio and visual information into an LLM, and get audio and visual information *out*.
+While LLMs transform textual prompts into meaningful textual responses through complex mathematical computations, AI's capabilities are not limited to text.
+In this book, you will also learn how to process and generate audio and visual data using AI models.
+Specifically, Chapters 4 and 5 focus on feeding audio and visual inputs into these models and retrieving corresponding outputs.
+By the end of this book, you'll be prepared to handle a variety of data types — textual, auditory, and visual — within your Spring Framework applications.
 
 == How can AIs be used?
 

@@ -52,7 +52,7 @@ It might be reliable, but you need to verify that.
 You're not getting rid of the need for a competent engineer just because an AI can generate code.
 Most experienced programmers can easily recount examples where a stakeholder described a complex process as "just process the order, it's obvious," only to find a complex problem lurking behind a simple request.
 
-In the end, an AI is going to rely heavily on two things: your skill at specify a problem clearly and precisely, and your ability to evaluate whether the solution is appropriate.
+In the end, an AI is going to rely heavily on two things: your skill at specifying a problem clearly and precisely, and your ability to evaluate whether the solution is appropriate.
 
 There's no shortcut here.
 Human expertise and critical thinking remain essential in effectively utilizing AI tools.
