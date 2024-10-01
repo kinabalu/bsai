@@ -2,11 +2,20 @@
 :chapter: 4
 
 == Generating and Processing Audio
-Since the early 19th century, humans have expressed the idea of a mechanical device capable of speech in fiction, through authors like Jules Verne and later H.G. Wells. By the mid 20th century in fiction we had moved from "Ulla, Ulla" to machines that were capable of talking back (text to speech) and understanding speech (transcription). Today we are surrounded by mechanical devices that have made the vision of Roddenberry and others come to life whether prefaced with "Computer", "Siri" or "Alexa" the result is a device that understands the basics of what you ask it like requests for weather or a piece of music.
 
-Today, we can reasonably speak something as futuristic as "Computer, write me a chapter on using Spring AI to generate and process audio" and what would be returned might just be a good first startfootnote:[As we mentioned in Chapter 1, unless we mention it the text of this book was written by one of the human authors.]. Since we're still actually writing the text here, let's turn our attention toward what we can achieve using AI with the spoken word. One can imagine transcribing video or audio to written text as part of a service offering. Written text can be spoken aloud using this module for the vision-impaired and for those engaged in activities where reading isn't an option or as a response to commands in a system like Siri.
+Since the early 19th century, humans have expressed the idea of a mechanical device capable of speech in fiction, through authors like Jules Verne and later H.G. Wells.
+By the mid 20th century in fiction we had moved from "Ulla, Ulla" to machines that were capable of talking back (text to speech) and understanding speech (transcription).
+Today we are surrounded by mechanical devices that have made the vision of Roddenberry and others come to life whether prefaced with "Computer", "Siri" or "Alexa" the result is a device that understands the basics of what you ask it like requests for weather or a piece of music.
 
-Spring AI has two avenues for working with audio. The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech. In both instances the integration done today with Spring AI uses OpenAI. Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
+Today, we can reasonably speak something as futuristic as "Computer, write me a chapter on using Spring AI to generate and process audio" and what would be returned might just be a good first startfootnote:[As we mentioned in Chapter 1, unless we mention it the text of this book was written by one of the human authors.].
+Since we're still actually writing the text here, let's turn our attention toward what we can achieve using AI with the spoken word.
+One can imagine transcribing video or audio to written text as part of a service offering.
+Written text can be spoken aloud using this module for the vision-impaired and for those engaged in activities where reading isn't an option or as a response to commands in a system like Siri.
+
+Spring AI has two avenues for working with audio.
+The first is transcribing text from a supplied audio file and the second is generating an audio file with natural sounding speech.
+In both instances the integration done today with Spring AI uses OpenAI.
+Hopefully in the near future we'll see integrations with other providers like Elevenlabs or Google's Gemini.
 
 In this chapter we will walk through the two simple APIs for processing audio and text and real world examples of how you can use both.
 
@@ -14,13 +23,14 @@ Let's dive in.
 
 === The AI spoken word
 
-// TODO The following paragraph doesn't flow as well as it should. It feels like it should be multiple paragraphs.
-Creating spoken audio from text using a computer has been around since the early 1960s.
-A physicist at Bell Labs used an IBM 7094 computer to synthesize speech and recreate the song "Daisy Bell;" author Arthur C. Clarke saw a demonstration of this, and incorporated it in his book and the screenplay for "2001: A Space Odyssey" for when HAL9000 is shut down.
+Text-to-speech technology has a long history, dating back to the 1960ls when Bell Labs used an IBM 7094 computer to synthesize speech for 'Daisy Bell,' even influencing Arthur C. Clarke's depiction of HAL9000 in '2001: A Space Odyssey.'
 
-It's an interesting technical challenge that involves understanding of how words are formed from phonemes and how phonemes link together, much as how font ligatures work to create handwriting fonts.
+Text-to-speech synthesis is a fascinating programming challenge because it demands bridging the gap between abstract language and human perception.
+The models must grapple with not just grammar, but also the nuances of pronunciation, intonation, and rhythm that make speech sound natural.
 
-There are plenty of text-to-speech libraries out there, but AI has a much larger repository of information to draw from, and requires less work to install and run, since the heavy lifting's been done by the AI service providers.
+This shift towards AI-powered solutions brings a host of benefits.
+Programmers now have access to a wider range of voices, more natural-sounding speech, and simpler integration processes.
+Service providers handle the heavy lifting, freeing developers to focus on creative applications and pushing the boundaries of flexible models.
 
 The first task we'll take on is to create our directory structure for this chapter.
 This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
@@ -85,7 +95,7 @@ Note the use of `spring.config.import`, which allows us to load our `.env` file'
 include::../code/chapter04/src/test/resources/application.properties[]
 ----
 
-Our first test case is going to be based on the Daisy Bell song footnote:[As mentioned in the rather informative article, "The IBM 7094 is the First Computer to Sing,` at `https://www.historyofinformation.com/detail.php?entryid=4445` - well worth reading.] that we referenced at the beginning of the chapter.
+Our first test case is going to be based on the Daisy Bell songfootnote:[As mentioned in the rather informative article, "The IBM 7094 is the First Computer to Sing,` at `https://www.historyofinformation.com/detail.php?entryid=4445` - well worth reading.] that we referenced at the beginning of the chapter.
 Our test is simple; We're going to pass the lyrics to the song "Daisy Bell" to service `TextToSpeechService` and call the `processText` method.
 We'll take the response and assert that it is non-null as the actual response would be tough to verify in a test.
 (However, as we'll demonstrate, we can save it to local storage, where you can play it yourself and hear whether the AI actually fulfilled our request.)
@@ -145,11 +155,16 @@ If we pass a custom `OpenAiAudioSpeechOptions` to a custom test we can do so lik
 include::../code/chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java[]
 ----
 
-This test generates an MP3 file on disk which, with the given options, aims to sound more like a song. However, it’s safe to say that vocalists like Celine Dion, Adele, and Janis Joplin have nothing to worry about from OpenAI just yet. The Whisper model we are using has been trained on the spoken word in the various supported languages. In order to provide a method of "text-to-sing" we'd need to model the aspects of melody, pitch, rhythm and the various other musical elements involved in realistic sounding singing.
+This test generates an MP3 file on disk which, with the given options, aims to sound more like a song.
+However, it’s safe to say that vocalists like Celine Dion, Adele, and Janis Joplin have nothing to worry about from OpenAI just yet.
+The Whisper model we are using has been trained on the spoken word in the various supported languages.
+In order to provide a method of "text-to-sing" we'd need to model the aspects of melody, pitch, rhythm and the various other musical elements involved in realistic sounding singing.
 
-There are general purpose TTS systems on the market today (Tacotron 2, WaveNet, and FastSpeech) that can be adapted by training the model on singing data including the music and patterns involved. It would also be important to provide the actual melody in the form of perhaps a MIDI file to teach the model the song it's singing.
+There are general purpose TTS systems on the market today (Tacotron 2, WaveNet, and FastSpeech) that can be adapted by training the model on singing data including the music and patterns involved.
+It would also be important to provide the actual melody in the form of perhaps a MIDI file to teach the model the song it's singing.
 
 === Transcription
+
 The other primary method available in these modules is the ability of Spring AI to integrate with a provider like OpenAI to transcribe audio of spoken words to text.
 Our tests previously have been using the lyrics to "Daisy Bell", and we will continue that here.
 A search on Wikipedia gives us a FLAC file of the original recording.
@@ -163,7 +178,9 @@ curl -O 'https://bit.ly/daisy_bell_dectalk'
 
 Our transcription test will be based on this song, after downloading you can place the file in the chapter's `src/test/resources` directory.
 The test is fairly simple, we'll read the file from the classpath and pass the audio content to the `TranscribeService` and call the single method `transcribeAudio`.
-The response we receive back will be verified using an assertion of a phrase from the original lyrics, because transcription is not an exact art. Even when the words match (as they usually will), the punctuation can be different, so an exact match of the output is unlikely. As a result, we're going to search for a phrase we do indeed fully expect to be in the output (the closing line) and leave it at that.
+The response we receive back will be verified using an assertion of a phrase from the original lyrics, because transcription is not an exact art.
+Even when the words match (as they usually will), the punctuation can be different, so an exact match of the output is unlikely.
+As a result, we're going to search for a phrase we do indeed fully expect to be in the output (the closing line) and leave it at that.
 
 Let's take a look at our test.
 
@@ -286,21 +303,29 @@ mvn spring-boot:run
 In a separate terminal session we can use the curl commands above and see the API responses sent back similarly as with the tests.
 
 === A simple voice assistant
-Siri was the first voice-activated assistant available in a consumer device in early 2010. Likely due to it being the first and the compute power required it was mired in problems as it had to process speech using cloud servers and thus required a stable and fast internet connection. Fast forward to today and thanks to the advancements in natural language processing and on-device hardware we've moved to a context aware system that understands your speech and most requests you give it.
 
-We are going to use what we've learned in this chapter and borrow code from the previous to create a simple virtual assistant. This is only a simple example and if you were building an actual voice assistant other choices would be more appropriate from a technology perspective.
+Siri was the first voice-activated assistant available in a consumer device in early 2010. Likely due to it being the first and the compute power required it was mired in problems as it had to process speech using cloud servers and thus required a stable and fast internet connection.
+Fast forward to today and thanks to the advancements in natural language processing and on-device hardware we've moved to a context aware system that understands your speech and most requests you give it.
+
+We are going to use what we've learned in this chapter and borrow code from the previous to create a simple virtual assistant.
+This is only a simple example and if you were building an actual voice assistant other choices would be more appropriate from a technology perspective.
 
 ==== The voice assistant task
-This task will create a new service called `VirtualAssistantService` which will make calls to the other two services we built in this chapter. In addition we will add integration with the `UpdateChatService` from chapter 3 to act on our lights via the chosen LLM.
 
-We're going to take a slight shortcut for the audio command portion in our example and use the `TextToSpeechService` for creating the audio. If you would like to record the audio command yourself we will call out how you can modify the `VoiceAssistantServiceTest` to pick up your file. If we think about this logically using the code we have today we will be doing the following actions:
+This task will create a new service called `VirtualAssistantService` which will make calls to the other two services we built in this chapter.
+In addition we will add integration with the `UpdateChatService` from chapter 3 to act on our lights via the chosen LLM.
+
+We're going to take a slight shortcut for the audio command portion in our example and use the `TextToSpeechService` for creating the audio.
+If you would like to record the audio command yourself we will call out how you can modify the `VoiceAssistantServiceTest` to pick up your file.
+If we think about this logically using the code we have today we will be doing the following actions:
 
 1. Generate the audio file with the command using the `TextToSpeechService`.
 2. Take that audio file (or one you record yourself) and pass it to the `TranscribeService` to include in our prompt to `UpdateChatService`.
 3. We'll pass the text from the `TranscribeService` to the `converse` method of `UpdateChatService` which calls the appropriate function based on the audio command.
 4. Finally we'll pass the text output of the `converse` method to the `TextToSpeechService` and save the resulting spoken word audio to disk.
 
-With that, our first task is including chapter 3 in our maven configuration files, This will let us re-use the services and methods involved in our ability to manage the real world we created in the previous chapter of light management using the LLM. Include the following block anywhere in the `<dependencies>` block.
+With that, our first task is including chapter 3 in our maven configuration files, This will let us re-use the services and methods involved in our ability to manage the real world we created in the previous chapter of light management using the LLM.
+Include the following block anywhere in the `<dependencies>` block.
 
 .Listing {chapter}-{counter:listing}: `chapter04/pom.xml`
 [source,xml]
@@ -308,7 +333,9 @@ With that, our first task is including chapter 3 in our maven configuration file
 include::../code/chapter04/pom.xml[lines="21..26"]
 ----
 
-Our next task is to modify our `@Configuration` to include the `UpdateChatService` along with it's dependencies. We are also creating some mocked light status that we can act on with our voice assistant. The block below can be included anywhere within the `Ch04Configuration` file:
+Our next task is to modify our `@Configuration` to include the `UpdateChatService` along with it's dependencies.
+We are also creating some mocked light status that we can act on with our voice assistant.
+The block below can be included anywhere within the `Ch04Configuration` file:
 
 .Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
 [source,java]
@@ -316,7 +343,10 @@ Our next task is to modify our `@Configuration` to include the `UpdateChatServic
 include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[lines="22..61"]
 ----
 
-Due to all the work we've done previously, this is all the configuration necessary to make a voice assistant like we've mapped out work. Our next step is to write up a test for what we want to ask. As we promised earlier, we'll show you some code inline that can be used if you want to record your own voice command. For reference the configuration above has the light states as the following:
+Due to all the work we've done previously, this is all the configuration necessary to make a voice assistant like we've mapped out work.
+Our next step is to write up a test for what we want to ask.
+As we promised earlier, we'll show you some code inline that can be used if you want to record your own voice command.
+For reference the configuration above has the light states as the following:
 
 [cols="1,2"]
 |===
@@ -343,7 +373,8 @@ Let's take a look at a test which will send a "voice" command to our LLM asking 
 include::../code/chapter04/src/test/java/ch04/VoiceAssistantTest.java[]
 ----
 
-The test we crafted involves calling the `VoiceAssistantService` with text of "Turn on yellow light." and receives a byte array which is the MP3 audio file of the LLM response. After receiving the byte array we assert that its not null and write the MP3 file to disk.
+The test we crafted involves calling the `VoiceAssistantService` with text of "Turn on yellow light." and receives a byte array which is the MP3 audio file of the LLM response.
+After receiving the byte array we assert that its not null and write the MP3 file to disk.
 
 Now it's time to implement our somewhat convoluted `VoiceAssistantService` that our test calls to see this thing working.
 
@@ -353,7 +384,10 @@ Now it's time to implement our somewhat convoluted `VoiceAssistantService` that 
 include::../code/chapter04/src/main/java/ch04/service/VoiceAssistantService.java[]
 ----
 
-We've implemented two methods here for `issueCommand`. The primary method takes a `Resource` which we expect to include the recorded speech command "Turn on yellow light", the other uses the `TextToSpeechService` in case you don't have a way of recording audio and passing it to the service. For our test as written, it uses the method accepting a String to simplify the example. The method transcribes the audio file with spoken words in it, passes it to the `UpdateChatService` for processing using the "real world" and then takes the LLM's text response and returns it as spoken word audio.
+We've implemented two methods here for `issueCommand`.
+The primary method takes a `Resource` which we expect to include the recorded speech command "Turn on yellow light", the other uses the `TextToSpeechService` in case you don't have a way of recording audio and passing it to the service.
+For our test as written, it uses the method accepting a String to simplify the example.
+The method transcribes the audio file with spoken words in it, passes it to the `UpdateChatService` for processing using the "real world" and then takes the LLM's text response and returns it as spoken word audio.
 
 Let's re-run our tests for `chapter04`:
 
@@ -364,7 +398,8 @@ mvn clean test -am -pl chapter04
 
 If all worked as expected there should be an audio file saved on the filesystem named "voice_assistant_response.mp3" and playing it on your system it will contain a message like "The yellow light has been turned on."
 
-As we indicated earlier, if you want to record your own audio command you can change the test to accommodate loading an MP3 file and sending that through the process. Simply load your MP3 file (here we assume `voice_assistant_command.mp3` as a name) and pass that to the `issueCommand` method wrapped in a `ByteArrayResource`.
+As we indicated earlier, if you want to record your own audio command you can change the test to accommodate loading an MP3 file and sending that through the process.
+Simply load your MP3 file (here we assume `voice_assistant_command.mp3` as a name) and pass that to the `issueCommand` method wrapped in a `ByteArrayResource`.
 
 Something like the following.
 
@@ -377,4 +412,5 @@ Something like the following.
 There you have it, a voice assistant that understands you.
 
 == Next Steps
+
 In our next chapter, we're going to look at image generation with Spring AI and object identification in images using the multi-modality API.

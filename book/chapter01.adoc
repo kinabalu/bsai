@@ -152,7 +152,7 @@ Work out your application's purpose, write tests that submit to your AI of choic
 The popular AIs (apart from Ollama, which runs locally, and thus is "free" outside of the cost of the hardware used to run it) have various pricing models.
 They're typically based on the amount of power it requires to process various prompts and types of prompts, so generating images might have a different cost based on image size and the complexity of the prompt, while text prompts only deal with the complexity of the prompt and its answer.
 
-In addition the the prompts, the models used for processing have their own costs, so a high-quality, large model from a provider is likely to cost more than a simple, fast model from the same provider.
+In addition to the prompts, the models used for processing have their own costs, so a high-quality, large model from a provider is likely to cost more than a simple, fast model from the same provider.
 There are lots of providers, each with their own pricing structures, so you should take a little time and look at the requirements you have: the pricing model for OpenAI, the host of ChatGPT and the service used most often in this book, has a pricing model that can be found at `https://openai.com/api/pricing/`.
 
 This book uses a lot of very short AI prompts, generally, so the token counts for the entire book, added together, work out to probably under a thousand tokensfootnote:[This is a guess. We could calculate it, because interactions with an LLM include token counts in the response metadata, but given that the total cost for the book would have been under a dollar if the subscription cost didn't cover the required resources, it's just not worth the effort. Your mileage may vary.].
