@@ -102,35 +102,26 @@ As with other legal and ethical concerns, a legal professional should be consult
 
 In summary, being mindful of the data you share with AI services is crucial to maintaining security and compliance with legal and ethical standards.
 
-== Model Selection and Appropriateness
-
-* Choosing the Right AI Model
-** Model Types and Use Cases
-** Evaluating Model Performance
-* Ensuring Model Relevance
-** Contextual Suitability
-** Avoiding Overfitting and Underfitting
-
 == Effective Prompt Engineering
 
-This book doesn't really address how to write prompts well; it's not part of the scope of the book - and it would probably double in length if it were. However, it would be irresponsible not to point out that prompts can create responses that are biased or harmful, and it's our responsibility as users of AI to be aware and address such concerns.
+While this book does not delve into the intricacies of prompt engineering—doing so would likely double its length—it is important to acknowledge that prompts can create responses that are biased or harmful, and it's our responsibility as users of AI to be aware of potential biases and and address such concerns accordingly.
 
-Without going into detail that requires more space than is available, prompt writers should be aware of how prompts can change the responses, by embedding assumptions.
+To illustrate this point without delving into extensive detail, prompt writers should be aware of how prompts can change the responses, by embedding assumptions.
 
-Assumptions in prompts might be entirely benign or innocuous: "Describe a teacher who loves her students," for example, _presumes_ that the teacher is female as part of the question. This _may_ be intentional (perhaps the prompt is trying to describe a teacher who is female, after all), but it might not be; a better query _might_ be "Describe a teacher who loves their students," using gender-neutral language, unless gender is _intended_ to be part of the response.
+Assumptions in prompts might be entirely benign or innocuous: "Describe a teacher who loves her students," for example, _presumes_ that the teacher is female as part of the question. While this may be intentional — for instance, if focusing on a female teacher — it might also be an unintentional bias. A better query _might_ be "Describe a teacher who loves their students," using gender-neutral language, unless gender is _intended_ to be part of the response.
 
 Even if a neutral question is asked, the response might be biased. A prompt asking for a description of a successful entrepreneur might get a consistent description of a male, for example, even though there are certainly successful female entrepreneurs.
 
-This bias in responses is in part due to the way the models are trained: they're built from prior knowledge, and the response is based on probabilistic likelihoods of what the common pool of knowledge contains. If more successful entrepreneurs are male, then the AI models are more likely to describe successful entrepreneurs as male.
+These biases occur because AI models are trained on existing data, which may reflect societal biases. As a result, the AI might be more likely to produce responses that align with those biases.  If the models have more references to male business leaders than female entrepreneurs, then the models will themselves more likely describe entrepreneurs as male.
 
-This reinforced reference means that the common pool of knowledge - from which other models might be trained - now contains _even more_ references to male successful entrepreneurs, which creates itself a larger pool of references to more male successful entrepreneurs, and thus the AI models have a magnifying effect on the data, even though there's no malicious intent to create such an effect.
+This reinforcement means that the common knowledge pool—which future models may use for training—contains even more references to successful male entrepreneurs. This creates a feedback loop, amplifying the bias without any malicious intent.
 
 Models being trained on common knowledge also have to wrestle with the possibility that common knowledge is _wrong_. An engineer on LinkedIn had a rather appropriate observation:
 
 [quote,Paul Parks,'https://www.linkedin.com/posts/paulmooreparks_ai-llm-activity-7240264719364673536-GpFJ/']
 I'm going to be very wary of large-language models and AI in general until I find one that can say, "I don't know," when I ask a question about a technical matter. Generally, they behave like really eager interns that would rather make up an answer than admit to not knowing the answer.
 
-Prompt engineers should be aware and cautious.
+Therefore, it's crucial for anyone interacting with AI systems to continually remain vigilant about these biases and actively work to mitigate them in pursuit of accuracy, honesty, and integrity.
 
 == Next Steps
 
