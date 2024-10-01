@@ -1,6 +1,31 @@
 = Generating images
 :chapter: 5
 
+== Generating and Processing Images
+Let's go!!!
+
+
+First task we'll do is to create our directory structure for this chapter. This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
+
+.Listing {chapter}-{counter:listing}: Creating the project directory structure in POSIX
+[source,shell]
+----
+mkdir -p src/{main,test}/{java,resources}
+----
+
+This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter05`, and the file is named `pom.xml`.
+
+.Listing {chapter}-{counter:listing}: `chapter05/pom.xml`
+[source,xml]
+----
+include::../../../../code/chapter05/pom.xml[]
+----
+
+The first thing we need to handle as we did in previous chapters is the application configuration. Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to be passed in the constructor, so we create one for each of the models that we can later `@Autowired` into our `@Service` classes.
+
+=== Multimodality
+...
+
 == Next Steps
 
 In our next chapter, ...
