@@ -125,48 +125,19 @@ This bias in responses is in part due to the way the models are trained: they're
 
 This reinforced reference means that the common pool of knowledge - from which other models might be trained - now contains _even more_ references to male successful entrepreneurs, which creates itself a larger pool of references to more male successful entrepreneurs, and thus the AI models have a magnifying effect on the data, even though there's no malicious intent to create such an effect.
 
-Models being trained on common knowledge also have to wrestle with the possibility that common knowledge is _wrong_.
+Models being trained on common knowledge also have to wrestle with the possibility that common knowledge is _wrong_. An engineer on LinkedIn had a rather appropriate observation:
+
+[quote,Paul Parks,'https://www.linkedin.com/posts/paulmooreparks_ai-llm-activity-7240264719364673536-GpFJ/']
+I'm going to be very wary of large-language models and AI in general until I find one that can say, "I don't know," when I ask a question about a technical matter. Generally, they behave like really eager interns that would rather make up an answer than admit to not knowing the answer.
 
 Prompt engineers should be aware and cautious.
 
-
-* Risks of Underspecified Prompts
-** Ambiguity in Instructions
-** Misalignment with Objectives
-* Crafting Clear and Precise Prompts
-** Best Practices
-** Examples and Counterexamples
-
-== Managing Model Updates
-
-* Dangers of Outdated Models
-** Performance Degradation
-** Security Vulnerabilities
-* Strategies for Staying Updated
-** Version Control
-** Continuous Learning Systems
-
-== Case Studies
-
-* Real-World Scenarios of AI Misapplication
-* Lessons Learned from Industry Examples
-
-== Best Practices for Engineers
-
-* Guidelines for Ethical AI Deployment
-* Ensuring Transparency and Accountability
-* Ongoing Education and Awareness
-
-== Conclusion
-
-* Recap of Key Points
-* The Future Landscape of AI in Engineering
-
-== References
-
-* Further Reading
-* Useful Tools and Resources
-
 == Next Steps
 
-In our next chapter, ...
+We've reached the end of the journey for _this_ particular book.
+
+We've tried to focus on those elements from Spring AI that would prove most useful for most programmers, while acknowledging that there are a lot of use cases that go deeper in nearly everything we've touched.
+
+Such is the nature of an introductory book. We'd like to invite you to explore and create using the technology, going as far as your imagination and skills can take you, and we wish you success in all that you do; show us what you've done, and tell us what we can do better!
+
+Thank you.
