@@ -45,7 +45,7 @@ Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to b
 .Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
 [source,java]
 ----
-include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[]
+include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[lines="1..2,8..20,63..76"]
 ----
 
 A `OpenAiAudioApi` has three main request modules that it enables for working with audio.
@@ -291,18 +291,24 @@ Siri was the first voice-activated assistant available in a consumer device in e
 We are going to use what we've learned in this chapter and borrow code from the previous to create a simple virtual assistant. This is only a simple example and if you were building an actual voice assistant other choices would be more appropriate from a technology perspective.
 
 ==== The voice assistant task
-Here are the steps we're going to go through to have a working voice assistant.
+This task will create a new service called `VirtualAssistantService` which will make calls to the other two services we built in this chapter. In addition we will add integration with the `UpdateChatService` from chapter 3 to act on our lights via the chosen LLM.
 
-1. Pass the command text we want to the `TextToSpeechService` to generate an audio file with speech that can be later processed.
-2. Take the audio file generated and pass it to the `TranscribeService` for the prompt.
-3. Next we'll pass the text in a `Prompt` and ask the LLM for an answer.
-4. We'll pass the text of the answer received back into the `TextToSpeechService` and save it to disk.
+We're going to take a slight shortcut for the audio command portion in our example and use the `TextToSpeechService` for creating the audio. If you would like to record the audio command yourself we will call out how you can modify the `VoiceAssistantServiceTest` to pick up your file. If we think about this logically using the code we have today we will be doing the following actions:
+
+1. Generate the audio file with the command using the `TextToSpeechService`.
+2. Take that audio file (or one you record yourself) and pass it to the `TranscribeService` to include in our prompt to `UpdateChatService`.
+3. We'll pass the text from the `TranscribeService` to the `converse` method of `UpdateChatService` which calls the appropriate function based on the audio command.
+4. Finally we'll pass the text output of the `converse` method to the `TextToSpeechService` and save the resulting spoken word audio to disk.
+
+With that, our first task is including chapter 3 in our maven configuration files, This will let us re-use the services and methods involved in our ability to manage the real world we created in the previous chapter of light management using the LLM. Include the following block anywhere in the `<dependencies>` block.
+
+.Listing {chapter}-{counter:listing}: `chapter04/pom.xml`
+[source,xml]
+----
+include::../code/chapter04/pom.xml[lines="21..26"]
+----
 
 
-
-
-we'll use the transcription to understand what is said, and then pass it to an LLM to have it do a thing, and then pass the text from the LLM back in
 
 == Next Steps
-
 In our next chapter, we're going to look at image generation with Spring AI and object identification in images using the multi-modality API.

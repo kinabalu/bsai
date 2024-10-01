@@ -5,6 +5,7 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,10 +22,8 @@ public class VoiceAssistantService {
     @Autowired
     private TextToSpeechService textToSpeechService;
 
-    public byte[] issueCommand(String commandText) {
-        var responseAsBytes = textToSpeechService.processText(commandText, null);
-
-        AudioTranscriptionResponse response = transcribeService.transcribeAudio(new ByteArrayResource(responseAsBytes), null);
+    public byte[] issueCommand(Resource capturedAudio) {
+        AudioTranscriptionResponse response = transcribeService.transcribeAudio(capturedAudio, null);
 
         String output = response.getResult().getOutput();
         var updateResponse = updateChatService.converse(
@@ -34,5 +33,11 @@ public class VoiceAssistantService {
         );
 
         return textToSpeechService.processText(updateResponse.getFirst().getOutput().getContent(), null);
+    }
+
+    public byte[] issueCommand(String commandText) {
+        var responseAsBytes = textToSpeechService.processText(commandText, null);
+
+        return this.issueCommand(new ByteArrayResource(responseAsBytes));
     }
 }
