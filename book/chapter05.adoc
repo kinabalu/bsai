@@ -18,13 +18,23 @@ This is _this chapter's_ project file, and thus it's in a directory _under_ the 
 .Listing {chapter}-{counter:listing}: `chapter05/pom.xml`
 [source,xml]
 ----
-include::../../../../code/chapter05/pom.xml[]
+include::../code/chapter05/pom.xml[]
 ----
 
-The first thing we need to handle as we did in previous chapters is the application configuration. Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to be passed in the constructor, so we create one for each of the models that we can later `@Autowired` into our `@Service` classes.
 
 === Multimodality
-...
+Okay, so what are the other nice things about this? I would say so the multi-modality aspect of some of the large language models out there mean that we can understand what is contained within So a mode could be an image or an audio file and when we understand more about what's there, it means we can take an image that we got off of the web Let's say and ask it for the text of what's in that object and possibly convert that text to a different language, let's say The other thing we can also do is take an image, a photo of something and ask the large language model what's in this photo identify it for me, describe for me what's in this photo or another example could be uploading an audio file that we would like to find out what it is Maybe it's a piece of music and given a substantially large model like ChatGPT 4.0, it's possible that we can upload a piece of music and it could tell you what that music is akin to what Shazam does and not only that, it could tell you similar music to that or it will allow you to upload multiple thousands of these music files and allow you to identify what they are, what type of music it is, which would ordinarily take days of a human's time but the AI can do it fairly quickly So that has some value
+
+
+=== Optical Character Recognition
+One thing that has been made easier and enhanced with large language models is processing images to find the text within.
+
+
+https://upload.wikimedia.org/wikipedia/commons/8/8b/429-460_Police_Interceptor.jpg
+
+
+=== Understanding an image
+
 
 == Next Steps
 

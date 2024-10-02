@@ -55,6 +55,7 @@ Most experienced programmers can easily recount examples where a stakeholder des
 In the end, an AI is going to rely heavily on two things: your skill at specifying a problem clearly and precisely, and your ability to evaluate whether the solution is appropriate.
 
 There's no shortcut here.
+// TODO for now. I think it's a matter of time before some of the tooling gets us more of the way there than we think
 Human expertise and critical thinking remain essential in effectively utilizing AI tools.
 
 == Legal and Ethical Issues
@@ -68,7 +69,9 @@ We could theoretically - but not necessarily legally or ethically - have an AI r
 
 What's more, there are significant concerns that extend beyond copyright law.
 There is a risk that AI could be misused to generate content that falsely represents real people, potentially damaging reputations, or spreading misinformation, or creating something that crosses the line from imitation into forgery.
+// TODO could? or already has. I think we're underexplaining the very dangers that already happen today.
 
+// TODO it's Jackson Pollock.
 Many of the models have been trained to attempt to avoid such violations; asking ChatGPT to create a painting in the style of Jackson Pollack, for example, creates a response that the image cannot be created due to content policy guidelines due to how uniquely identifiable Pollack's style is.
 (Each model has its own policies here; ChatGPT is being used as an example only.)
 
@@ -87,6 +90,7 @@ If your data is meant to be secure, submitting it to an external service can *vi
 The service might log your data, and if those logs are hacked or exposed, your information could become compromised.
 
 The service might use your contributed data to train future versions of its models, especially if it's operated by a social media conglomerate.
+//TODO bite me grok and meta? :)
 This means your private data could become accessible to anyone who formulates the right prompt to extract it.
 
 The services themselves have a strong interest in preventing these scenarios, of course; it's unlikely that _any_ of the services are particularly interested in private or secured information in and of itself.
@@ -96,6 +100,8 @@ Ultimately, it's up to users to ensure they understand the risks and take approp
 NOTE: Depending on your locale, there may also be laws in place to govern what data you can send to external services, including but not limited to GDPRfootnote:[The text of the General Data Protection Regulation (GPDR) can be found at `https://gdpr-info.eu/`, and addresses the right and ownership of individual data in the European Union.] or HIPAAfootnote:[The Health Insurance Portability and Accountability Act (HIPAA) can be found at `https://www.hhs.gov/hipaa/index.html` and addresses patients' rights to privacy in the United States.].
 Please do not violate any laws.
 
+// TODO I would use the California Consumer Privacy Act (CCPA) as the corollary to GDPR -- https://www.oag.ca.gov/privacy/ccpa
+
 The rule of thumb might be: *If someone can use this data to identify the subject of the prompt, it might be too private to send to an AI.* However, this is a _generalized rule_ and shouldn't be taken as legal advice.
 
 As with other legal and ethical concerns, a legal professional should be consulted if there's a question of whether data can be sent to an AI or not.
@@ -104,7 +110,7 @@ In summary, being mindful of the data you share with AI services is crucial to m
 
 == Effective Prompt Engineering
 
-While this book does not delve into the intricacies of prompt engineering—doing so would likely double its length—it is important to acknowledge that prompts can create responses that are biased or harmful, and it's our responsibility as users of AI to be aware of potential biases and and address such concerns accordingly.
+While this book does not delve into the intricacies of prompt engineering—doing so would likely double its length—it is important to acknowledge that prompts can create responses that are biased or harmful, and it's our responsibility as users of AI to be aware of potential biases and address such concerns accordingly.
 
 To illustrate this point without delving into extensive detail, prompt writers should be aware of how prompts can change the responses, by embedding assumptions.
 
