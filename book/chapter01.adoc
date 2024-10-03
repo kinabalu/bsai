@@ -77,8 +77,8 @@ Consider also the history of the region being predicted; if it rains every day i
 A Markov chain reduces the history to a series of tokens (which might combine the day of the year, the region, and the weather for that day) and have a set of outcomes that says "95% of the time, when the prior condition looks like _this_, the next day will look like _that_."
 
 Markov chains are also useful for generating text; the ELIZA programfootnote:[An example of ELIZA can be found at `https://web.njit.edu/~ronkowit/eliza.html` . Try it! It's fun! beware: it might make you think of your mother.] emulates a therapist similar to Carl Rogers, by taking significant parts of what you say to it and repeating those parts back to you, in a few different combinations.
-// TODO using the term Bayesian updating is unclear since we are presupposing that someone knows what that term refers to
-Most Markov chains use some form of Bayesian updating to calculate the probability of transitioning between states; Bayesian algorithms found a lot of use in early attempts to filter email spam, to quite a bit of success, although obviously spammers have found ways to avoid easy detection.
+
+Most Markov chains use some form of probability to calculate the transitions between states; Bayesian algorithms found a lot of use in early attempts to filter email spam, to quite a bit of success, although obviously spammers have found ways to avoid easy detection.
 
 If probabilities don't sound like "artificial intelligence," well, that's fine, but it's generally unfair.
 Probabilities rule much of our lives; when we go for a drive, we look at our fuel and calculate how likely it is that we'll need to purchase more, or when, or whether we'll need to take an umbrella or a coat, after all.
@@ -87,8 +87,7 @@ AI also has a sort of "magic appeal" in how difficult it can be to understand wh
 In the end, it's all math, but ... _what_ math?
 And if it's math, well, do we _need_ AI?
 
-//TODO do we want to explain stemming and tokenization or should we assume knowledge they probably don't have?
-The answer is, as you might suspect, "it depends." "What math?" is answered by another question: "What are you trying to do?" An LLM does a lot of stemming and tokenization to reduce a prompt to a series of numbers, which generates some amusing outcomes sometimesfootnote:[A few weeks ago as of this writing, it was a meme about AI that the LLMs couldn't tell how many occurrences of the letter "R" were in the word "strawberry." To us, it's obviously three; to the LLM, however, it was counting based on the tokenized version of the word, which had two Rs, not three, and it ended up looking hopelessly confused, even when corrected.].
+The answer is, as you might suspect, "it depends." "What math?" is answered by another question: "What are you trying to do?" An LLM does a lot of stemming and tokenizationfootnote:[Stemming and tokenization here refers to the process of reducing words to common, small forms: "machinations," for example, gets stemmed to "machin" as a reduced form, then that gets translated to a token - usually a simple number - for internal representation.] to reduce a prompt to a series of numbers, which generates some amusing outcomes sometimesfootnote:[A few weeks ago as of this writing, it was a meme about AI that the LLMs couldn't tell how many occurrences of the letter "R" were in the word "strawberry." To us, it's obviously three; to the LLM, however, it was counting based on the tokenized version of the word, which had two Rs, not three, and it ended up looking hopelessly confused, even when corrected.].
 A Markov chain gauged towards weather would have _no_ sensible output to an input that asked what `1+1` was - it's simply too sensitive to its problem domain.
 
 It's also important to keep in mind that the reason we have so many models and definitions is because there are so many applications, some appropriate and some not.
@@ -125,8 +124,8 @@ They're taking common elements of storytelling and replacing bits as they go, an
 That doesn't mean the story isn't worth telling - most stories in human history have a similar set of concepts at their hearts, as Joseph Campbellfootnote:[Joseph Campbell wrote a book in 1949 called "The Hero with a Thousand Faces," that described a common set of concepts in human mythology, often summed up as the "Hero's Journey." See `https://www.amazon.com/Thousand-Faces-Collected-Joseph-Campbell/dp/1577315936` for more.] might have told you - but it also isn't the same as coming up with "original content."
 
 But with this observation - that AIs are stirring up knowledge we already had in possibly unexpected ways to come up with content - it's worth saying that this is _useful_.
-//TODO can you check the paragraph below because the last bit says "an AI is able to point out that the emperor's lack of clothing with ease fairly easily" doesn't read right?
-Sometimes things we want to know are "hiding in plain sight," obscured by tradition and expectation, and an AI can abstract over arbitrarily large amounts of information; it can see common patterns that humans can overlook, and without models being specifically limited in what they can observe, an AI is able to point out that the emperor's lack of clothing with easefootnote:[For reference, if you're unfamiliar: "The Emperor's New Clothes" is a story by Hans Christian Andersen, and a workable summary can be found online at `https://en.wikipedia.org/wiki/The_Emperor%27s_New_Clothes` .] fairly easily.
+
+Sometimes things we want to know are "hiding in plain sight," obscured by tradition and expectation, and an AI can abstract over arbitrarily large amounts of information; it can see common patterns that humans can overlook, and without models being specifically limited in what they can observe, an AI is able to point out the emperor's lack of clothing with easefootnote:[For reference, if you're unfamiliar: "The Emperor's New Clothes" is a story by Hans Christian Andersen, and a workable summary can be found online at `https://en.wikipedia.org/wiki/The_Emperor%27s_New_Clothes` .] fairly easily.
 
 For this book, ChatGPT was used as the AI of choice, and it was _also_ used to evaluate content and tone.
 Unless specifically pointed out, the words you are reading were written by an actual human person, and were evaluated by an AI to suggest revisions and additions, some of which were accepted.
@@ -157,14 +156,13 @@ They're typically based on the amount of power it requires to process various pr
 In addition to the prompts, the models used for processing have their own costs, so a high-quality, large model from a provider is likely to cost more than a simple, fast model from the same provider.
 There are lots of providers, each with their own pricing structures, so you should take a little time and look at the requirements you have: the pricing model for OpenAI, the host of ChatGPT and the service used most often in this book, has a pricing model that can be found at `https://openai.com/api/pricing/`.
 
-This book uses a lot of very short AI prompts, generally, so the token counts for the entire book, added together, work out to probably under a thousand tokensfootnote:[This is a guess. We could calculate it, because interactions with an LLM include token counts in the response metadata, but given that the total cost for the book would have been under a dollar if the subscription cost didn't cover the required resources, it's just not worth the effort. Your mileage may vary.].
-//TODO the above footnote might need to be changed as we're talking about OpenAI mostly in this book, and there is no subscription for API calls
+This book uses a lot of very short AI prompts, generally, so the token counts for the entire book, added together, work out to probably under a thousand tokensfootnote:[This is a guess. We could calculate it, because interactions with an LLM include token counts in the response metadata, but for this book, it's just not worth the effort. Your mileage may vary.].
+
 If you run the entire book's tests over and over again, that adds up, but it's still not a lot.
 
 If you're doing a lot of detailed analysis covering a lot of data, your token counts will be higher, and you might run into costs associated with analysis; Chapter 3 covers some ways to mitigate this, but in the end, if you need a certain number of tokens to achieve a task, you... need a certain number of tokens to achieve a task, and your selection of a model and provider will be balanced against your requirements.
 
-// TODO again we should not use the term "subscription" cost here as this isn't how OpenAI is modeled
-The short version of all of that: expect a relatively minor subscription cost, and watch your typical usage to try to predict whether you need additional capacity or not.
+The short version of all of that: expect a relatively minor cost, and watch your typical usage to try to predict whether you need additional capacity or not.
 If you do need more capacity, consider whether you have the resources to run Ollama locally (meaning that you have a decent GPU and RAM, and a fast disk), and _try it_.
 
 // TODO given the talk about external AI providers, does it make sense to mention Groq as an option for faster inference -- https://docs.spring.io/spring-ai/reference/api/chat/groq-chat.html
@@ -190,8 +188,7 @@ Otherwise, there's not a lot to demonstrate, so there aren't a lot of screenshot
 (Given the nature of probabilistic outputs from LLMs, though, there are places where you might be expected to look at a generated string to make sure it fits your expectations, although we're generally trying to avoid this.)
 
 It's also not a book that's exhaustively going to cover every AI technique - or even every possibility of how to work with a given AI model.
-It's focused on the most common applications of AI, and other applications and models are more advanced topics are better covered by other materialsfootnote:[Honest truth: your author considered having an AI rewrite that sentence.].
-//TODO wouldn't it make more sense to say "and other applications and models are more advanced topics THAT are better covered by other materials.
+It's focused on the most common applications of AI, and other applications and models are more advanced topics that are better covered by other materialsfootnote:[Honest truth: your author considered having an AI rewrite that sentence.].
 
 LLMs have different capabilities and settings; part of why we chose ChatGPT was because ChatGPT covers the features that most people want, and other AIs may or may not provide the same set of features, but few other AIs provide features ChatGPT does _not_.
 Readers who wish to use alternatives should be able to fine-tune the example code for their specific AI implementation without too much effort.

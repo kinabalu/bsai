@@ -55,8 +55,8 @@ Most experienced programmers can easily recount examples where a stakeholder des
 In the end, an AI is going to rely heavily on two things: your skill at specifying a problem clearly and precisely, and your ability to evaluate whether the solution is appropriate.
 
 There's no shortcut here.
-// TODO for now. I think it's a matter of time before some of the tooling gets us more of the way there than we think
-Human expertise and critical thinking remain essential in effectively utilizing AI tools.
+
+Human expertise and critical thinking remain essential in effectively utilizing AI tools, although as the tools improve, they can help even when it comes to evaluating themselves.
 
 == Legal and Ethical Issues
 
@@ -68,11 +68,9 @@ For example, actors have filed lawsuits against some AI models' owners, claiming
 We could theoretically - but not necessarily legally or ethically - have an AI replicate a famous actor's voice in a production, with no credit or compensation offered to that actor.
 
 What's more, there are significant concerns that extend beyond copyright law.
-There is a risk that AI could be misused to generate content that falsely represents real people, potentially damaging reputations, or spreading misinformation, or creating something that crosses the line from imitation into forgery.
-// TODO could? or already has. I think we're underexplaining the very dangers that already happen today.
+There is a very real risk that AI could be misused to generate content that falsely represents real people, potentially damaging reputations, or spreading misinformation, or creating something that crosses the line from imitation into forgery.
 
-// TODO it's Jackson Pollock.
-Many of the models have been trained to attempt to avoid such violations; asking ChatGPT to create a painting in the style of Jackson Pollack, for example, creates a response that the image cannot be created due to content policy guidelines due to how uniquely identifiable Pollack's style is.
+Many of the models have been trained to attempt to avoid such violations; asking ChatGPT to create a painting in the style of Jackson Pollock, for example, creates a response that the image cannot be created due to content policy guidelines due to how uniquely identifiable Pollock's style is.
 (Each model has its own policies here; ChatGPT is being used as an example only.)
 
 With that said, developers have trained models without these ethical and legal guardrails: users should exercise caution and ethical consideration when employing these models.
@@ -97,10 +95,8 @@ The services themselves have a strong interest in preventing these scenarios, of
 Most of them, if not all of them, will have documentation around their security and training practices, and this documentation should be read carefully.
 Ultimately, it's up to users to ensure they understand the risks and take appropriate measures to safeguard their information.
 
-NOTE: Depending on your locale, there may also be laws in place to govern what data you can send to external services, including but not limited to GDPRfootnote:[The text of the General Data Protection Regulation (GPDR) can be found at `https://gdpr-info.eu/`, and addresses the right and ownership of individual data in the European Union.] or HIPAAfootnote:[The Health Insurance Portability and Accountability Act (HIPAA) can be found at `https://www.hhs.gov/hipaa/index.html` and addresses patients' rights to privacy in the United States.].
+NOTE: Depending on your locale, there may also be laws in place to govern what data you can send to external services, including but not limited to GDPRfootnote:[The text of the General Data Protection Regulation (GPDR) can be found at `https://gdpr-info.eu/`, and addresses the right and ownership of individual data in the European Union.], CCPAfootnote:[CCPA is the California Consumer Privacy Act, found at `https://www.oag.ca.gov/privacy/ccpa` , and can be considered sort of an analog to the GDPR.], or HIPAAfootnote:[The Health Insurance Portability and Accountability Act (HIPAA) can be found at `https://www.hhs.gov/hipaa/index.html` and addresses patients' rights to privacy in the United States.].
 Please do not violate any laws.
-
-// TODO I would use the California Consumer Privacy Act (CCPA) as the corollary to GDPR -- https://www.oag.ca.gov/privacy/ccpa
 
 The rule of thumb might be: *If someone can use this data to identify the subject of the prompt, it might be too private to send to an AI.* However, this is a _generalized rule_ and shouldn't be taken as legal advice.
 
