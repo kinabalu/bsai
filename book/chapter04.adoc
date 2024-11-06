@@ -23,7 +23,7 @@ Let's dive in.
 
 === The AI spoken word
 
-Text-to-speech technology has a long history, dating back to the 1960ls when Bell Labs used an IBM 7094 computer to synthesize speech for 'Daisy Bell,' even influencing Arthur C. Clarke's depiction of HAL9000 in '2001: A Space Odyssey.'
+Text-to-speech technology has a long history, dating back to the 1960s when Bell Labs used an IBM 7094 computer to synthesize speech for 'Daisy Bell,' even influencing Arthur C. Clarke's depiction of HAL9000 in '2001: A Space Odyssey.'
 
 Text-to-speech synthesis is a fascinating programming challenge because it demands bridging the gap between abstract language and human perception.
 The models must grapple with not just grammar, but also the nuances of pronunciation, intonation, and rhythm that make speech sound natural.
@@ -49,13 +49,12 @@ This is _this chapter's_ project file, and thus it's in a directory _under_ the 
 include::../code/chapter04/pom.xml[lines="1..20,26..-1"]
 ----
 
-The first thing we need to handle as we did in previous chapters is the application configuration.
-Unlike other modules in Spring AI the `OpenAiAudioApi` requires the API key to be passed in the constructorfootnote:[As this is being written, the Spring AI module has not had its first production release, so there are some rough edges in place. Production releases may (or may not!) change some of these details.], so we create one for each of the models that we can later `@Autowired` into our `@Service` classes.
+The first thing we need to handle as we did in previous chapters is the application configuration. Thanks to the magic of the library `spring-ai-spring-boot-autoconfigure` which has the code for auto configuration it will pick up the configuration for working with audio in your application configuration. The most important property to ensure is set is the `spring.ai.openai.api-key`.
 
 .Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
 [source,java]
 ----
-include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[lines="1..2,8..20,63..76"]
+include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[lines="1..2,8..16,58..-1"]
 ----
 
 A `OpenAiAudioApi` has three main request modules that it enables for working with audio.

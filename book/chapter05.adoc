@@ -4,6 +4,10 @@
 == Generating and Processing Images
 Let's go!!!
 
+Can talk about what Optical Character Recognition is, what the process entails and how its been done in the past and possibly how it differs with ChatGPT.
+
+How does the LLM actually understand what an image *is*?
+
 
 First task we'll do is to create our directory structure for this chapter. This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
 
@@ -21,6 +25,67 @@ This is _this chapter's_ project file, and thus it's in a directory _under_ the 
 include::../code/chapter05/pom.xml[]
 ----
 
+Creating an `OpenAiImageApi` is somewhat of a manual process
+
+The `OpenAiImageApi` has three main request modules that it enables for working with audio.
+The first we'll work with is the `OpenAiImageRequest` which may just be the text we want to create an audio file but can also accept several other options which we'll go over below.
+
+As with other modules in Spring AI they can be controlled at the point of the request, in code, or from the application propertiesfootnote:[We consider it a bug that these properties seem to be ignored by the current version of the API.].
+
+[cols="1,2"]
+|===
+| Property name
+| Description
+
+| `spring.ai.openai.api-key`
+| The API key to be used by the application. Again for some reason this isn't utilized by `OpenAiImageApi` but we'll continue with this convention here.
+
+| `spring.ai.openai.organization-id`
+| Optionally specify the organization to use in the API request
+
+| `spring.ai.openai.project-id`
+| Optionally specify the project used for this API request
+|===
+
+The prefix spring.ai.openai.image is the property prefix that lets you configure the ImageModel implementation for OpenAI.
+
+[cols="1,2"]
+|===
+| Property name
+| Description
+
+| `spring.ai.openai.image.enabled`
+| Enable OpenAI image model (we don't know why you would want to disable this but there you go)
+
+| `spring.ai.openai.image.options.n`
+| Images to generate, for `dall-e-3` n=1 but can be up to 10 for `dall-e-2`
+
+| `spring.ai.openai.image.options.model`
+| The model to use for image generation. The `OpenAiImageApi.DEFAULT_IMAGE_MODEL` is `dall-e-3` but you can specify `dall-e-2` as well for speed and cost
+
+| `spring.ai.openai.image.options.quality`
+| Image quality by default will be `standard` but if using the `dall-e-3` model you can specify `hd` and the image will have finer details and greater consistency across the image
+
+| `spring.ai.openai.image.options.response_format`
+| The format in which the generated images are returned. Must be one of `URL` or `b64_json`.
+
+| `spring.ai.openai.image.options.size`
+| Size of generated images. Must be one of `256x256`, `512x512`, or `1024x1024` for `dall-e-2`. Must be one of `1024x1024`, `1792x1024`, or `1024x1792` for `dall-e-3` models.
+
+| `spring.ai.openai.image.options.size_width`
+| Width of the generated images. Must be one of `256`, `512`, or `1024` for `dall-e-2`.
+
+| `spring.ai.openai.image.options.size_height`
+| Height of the generated images. Must be one of `256`, `512`, or `1024` for `dall-e-2`.
+
+| `spring.ai.openai.image.options.style`
+| Style of the generated images. Either `vivid` or `natural`. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for `dall-e-3`.
+
+| `spring.ai.openai.image.options.user`
+| A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
+|===
+
+wha
 
 === Multimodality
 Okay, so what are the other nice things about this? I would say so the multi-modality aspect of some of the large language models out there mean that we can understand what is contained within So a mode could be an image or an audio file and when we understand more about what's there, it means we can take an image that we got off of the web Let's say and ask it for the text of what's in that object and possibly convert that text to a different language, let's say The other thing we can also do is take an image, a photo of something and ask the large language model what's in this photo identify it for me, describe for me what's in this photo or another example could be uploading an audio file that we would like to find out what it is Maybe it's a piece of music and given a substantially large model like ChatGPT 4.0, it's possible that we can upload a piece of music and it could tell you what that music is akin to what Shazam does and not only that, it could tell you similar music to that or it will allow you to upload multiple thousands of these music files and allow you to identify what they are, what type of music it is, which would ordinarily take days of a human's time but the AI can do it fairly quickly So that has some value

@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class Ch05Configuration {
 
-    @Bean
-    OpenAiImageModel imageModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
-        return new OpenAiImageModel(new OpenAiImageApi(apiKey));
-    }
+//    @Bean
+//    OpenAiImageModel imageModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
+//        return new OpenAiImageModel(new OpenAiImageApi(apiKey));
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(Ch05Configuration.class, args);

@@ -6,10 +6,6 @@ import ch03.service.UpdateLightStatusFunction;
 import ch03.service.LightService;
 import ch03.service.RequestLightStatusFunction;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.openai.OpenAiAudioSpeechModel;
-import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
-import org.springframework.ai.openai.api.OpenAiAudioApi;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -58,16 +54,6 @@ public class Ch04Configuration {
     @Bean
     UpdateChatService getLightUpdateChatService(ChatClient.Builder builder) {
         return new UpdateChatService(builder);
-    }
-
-    @Bean
-    OpenAiAudioSpeechModel speechModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
-        return new OpenAiAudioSpeechModel(new OpenAiAudioApi(apiKey));
-    }
-
-    @Bean
-    OpenAiAudioTranscriptionModel transcriptionModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
-        return new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(apiKey));
     }
 
     public static void main(String[] args) {
