@@ -23,6 +23,7 @@ public class ImageGeneratorService {
         var imagePrompt = imageOptions != null ? new ImagePrompt(prompt, imageOptions.build()) : new ImagePrompt(prompt,
                 ImageOptionsBuilder.builder().withWidth(1024).withHeight(1024).build());
         ImageResponse response = openAiImageModel.call(imagePrompt);
+        response.getResult();
         return response.getResult().getOutput();
     }
 }

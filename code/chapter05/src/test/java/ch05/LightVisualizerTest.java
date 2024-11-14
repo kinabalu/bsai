@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.ai.image.Image;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.MimeTypeUtils;
@@ -46,15 +47,11 @@ public class LightVisualizerTest {
         return updateResponse.getFirst().getOutput().getContent();
     }
 
-    void writeBase64PNGToDisk(Image image, String path) throws IOException {
+    Media imageToMedia(Image image) throws IOException {
         byte[] binaryData = Base64.getDecoder().decode(image.getB64Json());
         BufferedImage webpImage = ImageIO.read(new ByteArrayInputStream(binaryData));
-        WebpToPngConverter.convertWebpToPng(webpImage, path);
-    }
-
-    Media readPNGToMedia(String path) throws IOException {
-        Resource imageResource = new FileSystemResource(new File(path));
-        return new Media(MimeTypeUtils.IMAGE_PNG, imageResource);
+        byte[] pngData = WebpToPngConverter.convertWebpToPngByteArray(webpImage);
+        return new Media(MimeTypeUtils.IMAGE_PNG, new ByteArrayResource(pngData));
     }
 
     @Test
@@ -65,9 +62,7 @@ public class LightVisualizerTest {
                     initialLightbulbPrompt,null
             );
 
-            writeBase64PNGToDisk(image, "./first_lightbulb.png");
-
-            Media firstLightbulbMedia = readPNGToMedia("./first_lightbulb.png");
+            Media firstLightbulbMedia = imageToMedia(image);
             String recognition = recognitionService.identify(
                     "In a single sentence explain what is in this picture?",
                     firstLightbulbMedia);
@@ -82,9 +77,7 @@ public class LightVisualizerTest {
                     newLightBulbRenderPrompt,null
             );
 
-            writeBase64PNGToDisk(newLightBulbImage, "./second_lightbulb.png");
-
-            Media secondLightbulbMedia = readPNGToMedia("./second_lightbulb.png");
+            Media secondLightbulbMedia = imageToMedia(newLightBulbImage);
             String newRecognition = recognitionService.identify(
                     "In a single sentence explain what is in this picture?",
                     secondLightbulbMedia);
