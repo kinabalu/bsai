@@ -1,12 +1,32 @@
 = Generating images
 :chapter: 5
 
-== Generating and Processing Images
-Let's go!!!
+== Generating and Recognizing Images
+The 1960s were an important time for the process of image recognition and generation similar to what we explored with audio in the previous chapter. Early image recognition using computer vision systems were focused on simple geometric shapes which evolved into techniques like edge detection and template matching. The complexity inherent in an image meant that these early techniques while impressive for their time were unable to deal with anything more than a very structured environment.
 
-Can talk about what Optical Character Recognition is, what the process entails and how its been done in the past and possibly how it differs with ChatGPT.
+Over the years with advancements in usage of neural networks for learning-based approaches and later Support Vector Machines and other feature-based methods the object detection and classification had reached a well-defined commercial appeal especially with faster available hardware. Fast forward to the last 25 years and the development of Convolutional Neural Networks (CNNs) and advanced GPU processing has exploded the capabilities of image recognition. The techniques utilized in most of the chat models available via Spring AI use some variant of transformers like Vision Transformers to perform their work.
 
-How does the LLM actually understand what an image *is*?
+As of this writing the following offerings can perform image recognition via Spring AI:
+
+* OpenAI (e.g. GPT-4 and GPT-4o models)
+* Ollama (e.g. LlaVa, Baklava, Llama3.2 models)
+* Vertex AI Gemini (e.g. gemini-1.5-pro-001, gemini-1.5-flash-001 models)
+* Anthropic Claude 3
+
+Generation has followed a somewhat similar history and progression over the last 60 years. The basic generations in the 1960s progressed into the 1980s and 1990s with 3D models, textures and realistic lighting using mathematically simulated scenes. In the last 20 years with the invention of Generative Adversarial Networks by Ian Goodfellow which used two neural networks in concert with each other to produce images that can look convincingly real. The real power has surfaced in the last few years with text-to-image generation models beginning with early models like DALL-E 1. Diffusion models were introduced commercially to the world in 2022 with releases by popular names now DALL-E 2, Midjourney and Stable Diffusion and was able to produce images that were more realistic and higher quality than ever before.
+
+As of this writing the following are offered by Spring AI for image generation:
+
+* OpenAI
+* QianFan
+* StabilityAI
+* ZhiPuAI
+
+---
+* first thing is the setup
+* second thing we'll do is set up and do some image generation. bowl of fruit maybe? and pass that to OpenAI and download the image
+* third thing we'll do is take that image and pass it back through image recognition using CLIP
+
 
 
 First task we'll do is to create our directory structure for this chapter. This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
