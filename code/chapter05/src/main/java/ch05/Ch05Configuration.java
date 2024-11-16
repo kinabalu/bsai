@@ -33,10 +33,10 @@ public class Ch05Configuration {
         return new Light("green", false);
     }
 
-//    @Bean
-//    Light getBlueLight() {
-//        return new Light("blue", true);
-//    }
+    @Bean
+    Light getBlueLight() {
+        return new Light("blue", true);
+    }
 
     @Bean
     LightService getLightService(ApplicationContext context) {

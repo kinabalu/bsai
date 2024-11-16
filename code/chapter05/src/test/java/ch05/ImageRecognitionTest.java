@@ -18,11 +18,11 @@ public class ImageRecognitionTest {
 
     @Test
     void runImageRecognitionQuery() {
-        var imageResource = new ClassPathResource("/dall_e_rendering.png");
-        Media dalleRendering = new Media(MimeTypeUtils.IMAGE_PNG, imageResource);
+        var imageResource = new ClassPathResource("/rendered_fruit_bowl.png");
+        Media renderedFruitBowl = new Media(MimeTypeUtils.IMAGE_PNG, imageResource);
         String recognition = imageRecognitionService.identify(
-                "In a single sentence explain what is in this picture?",
-                dalleRendering);
+                "In a single sentence explain what is in this picture.",
+                renderedFruitBowl);
 
         System.out.println(recognition);
         assertTrue(recognition.contains("banana"));

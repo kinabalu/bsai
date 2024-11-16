@@ -12,18 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class ImageGeneratorService {
 
-    private final OpenAiImageModel openAiImageModel;
-
     @Autowired
-    public ImageGeneratorService(OpenAiImageModel openAiImageModel) {
-        this.openAiImageModel = openAiImageModel;
-    }
+    private OpenAiImageModel openAiImageModel;
 
     public Image processPrompt(String prompt, OpenAiImageOptions.Builder imageOptions) {
         var imagePrompt = imageOptions != null ? new ImagePrompt(prompt, imageOptions.build()) : new ImagePrompt(prompt,
                 ImageOptionsBuilder.builder().withWidth(1024).withHeight(1024).build());
         ImageResponse response = openAiImageModel.call(imagePrompt);
-        response.getResult();
         return response.getResult().getOutput();
     }
 }

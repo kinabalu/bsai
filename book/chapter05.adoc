@@ -37,7 +37,7 @@ First task we'll do is to create our directory structure for this chapter. This 
 mkdir -p src/{main,test}/{java,resources}
 ----
 
-This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter05`, and the file is named `pom.xml`.
+This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter05`, and the file is named `pom.xml`. A few items to note here, just as in chapter 4 we are going to include the `chapter03` module for a fun final challenge and a library extension for `ImageIO` which enables dealing with `webp` images which is what OpenAI renders. We have included a simple class which can write these files to disk and convert them to PNG before doing so.
 
 .Listing {chapter}-{counter:listing}: `chapter05/pom.xml`
 [source,xml]
@@ -45,12 +45,18 @@ This is _this chapter's_ project file, and thus it's in a directory _under_ the 
 include::../code/chapter05/pom.xml[]
 ----
 
-Creating an `OpenAiImageApi` is somewhat of a manual process
+Our application configuration will be automatic just like we've shown in previous chapters. Your OpenAI API key will again be fed into the property `spring.ai.openai.api-key`. Our configuration will also include getters for the yellow, red, green and blue light properties, and setting up for the services and functions made available from the `ch03` module to poll lights through ChatGPT and update their state.
 
-The `OpenAiImageApi` has three main request modules that it enables for working with audio.
-The first we'll work with is the `OpenAiImageRequest` which may just be the text we want to create an audio file but can also accept several other options which we'll go over below.
+.Listing {chapter}-{counter:listing}: `chapter05/src/main/java/ch05/Ch05Configuration.java`
+[source,java]
+----
+include::../code/chapter05/src/main/java/ch05/Ch05Configuration.java[]
+----
 
-As with other modules in Spring AI they can be controlled at the point of the request, in code, or from the application propertiesfootnote:[We consider it a bug that these properties seem to be ignored by the current version of the API.].
+
+The `OpenAiImageApi` has a single request module `OpenAiImageRequest` which at a minimum would include
+the prompt we'd use for instructing either the generation which invokes DALL-E or the recognition which
+invokes CLIP. You will get a sense of the available options from the table below which can be included in properties or passed in with the request.
 
 [cols="1,2"]
 |===
@@ -105,22 +111,130 @@ The prefix spring.ai.openai.image is the property prefix that lets you configure
 | A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
 |===
 
-wha
+This chapter similar to chapter 4 will include all tests which will perform executions against the OpenAI API. We will have the opportunity to go a bit deeper and use both the image generation and recognition pieces of the API in concert to create a silly but useful execution path utilizing Spring AI's image and multi-modal modules.
 
-=== Multimodality
-Okay, so what are the other nice things about this? I would say so the multi-modality aspect of some of the large language models out there mean that we can understand what is contained within So a mode could be an image or an audio file and when we understand more about what's there, it means we can take an image that we got off of the web Let's say and ask it for the text of what's in that object and possibly convert that text to a different language, let's say The other thing we can also do is take an image, a photo of something and ask the large language model what's in this photo identify it for me, describe for me what's in this photo or another example could be uploading an audio file that we would like to find out what it is Maybe it's a piece of music and given a substantially large model like ChatGPT 4.0, it's possible that we can upload a piece of music and it could tell you what that music is akin to what Shazam does and not only that, it could tell you similar music to that or it will allow you to upload multiple thousands of these music files and allow you to identify what they are, what type of music it is, which would ordinarily take days of a human's time but the AI can do it fairly quickly So that has some value
+=== Image Generation
 
+Our first test case will be a simple prompt in practice these days but incredibly amazing when you think about the mountain of image data and technological achievement that is involved in taking a random set of text input and creating an image to represent it. At a super high level the text that is entered is tokenized with a transformer and converted into a high-dimensional embedding. That embedding is then mapped to a shared latent space where relationship between text and visual concepts are learned. The latent space is then passed through a generative diffisuion model to create an image using the text embeddings and decoded into an image using CLIP contrastive learning model.
 
-=== Optical Character Recognition
-One thing that has been made easier and enhanced with large language models is processing images to find the text within.
+The text prompt we're using asks DALL-E to imagine a bowl of fruit containing bananas, apples and kiwis. Our code calls the `ImageGeneratorService` which passes back a base64 encoded image included in a JSON object.
 
+.Listing {chapter}-{counter:listing}: `chapter05/src/test/java/ch05/GenerateImageTest.java`
+[source,java]
+----
+include::../code/chapter05/src/test/java/ch05/GenerateImageTest.java[]
+----
 
-https://upload.wikimedia.org/wikipedia/commons/8/8b/429-460_Police_Interceptor.jpg
+In a test first methodology we've now got something that will definitely not pass because it won't compile without an implementation of `ImageGeneratorService`. We'll get to the implementation of that in just a moment.
 
+For now, the image that gets passed back, if you are interested in the output as part of the test the second half of the test writes the file to disk. OpenAI generated images are in `webp` format when they are sent down the wire. The `webp` format is the gold standard for web and mobile applications today due to it's more efficient file size and support in all modern browsers today. For saving and importing into a design tool though we can't help but love `png` for this so we've included a converter from `webp` to `png`.
 
-=== Understanding an image
+.Listing {chapter}-{counter:listing}: `chapter05/src/main/java/ch05/WebpToPngConverter.java`
+[source,java]
+----
+include::../code/chapter05/src/main/java/ch05/WebpToPngConverter.java[]
+----
 
+Now we get to the implementation of the `ImageGeneratorService` which has a singular and very simple method called `processPrompt(String, OpenAiImageOptions.Builder)` which takes a text prompt and an `OpenAiImageOptions` object which if null is passed we'll insert some defaults using the `application.properties` as specified.
+
+With the text prompt given, we issue a call to the API we use `call()` to get the response back from the API which will interface with DALL-E and returns back the output of the `ImageResponse` returned.
+
+Let's take a look at the actual class and what the implementation looks like.
+
+.Listing {chapter}-{counter:listing}: `chapter05/src/main/java/ch05/service/ImageGeneratorService.java`
+[source,java]
+----
+include::../code/chapter05/src/main/java/ch05/service/ImageGeneratorService.java[]
+----
+
+Let's generate an image since our test will pass. We'll call the chapter's test suite using Maven:
+
+[source,shell]
+----
+mvn -am -pl chapter05 clean test
+----
+
+If everything is working properly it should complete with `SUCCESS`.
+After a successful run you can check the root of the projects filesystem and should see a new `png` image named `rendered_fruit_bowl.png` which will contain an image representation of what DALL-E thinks a fruit bowl looks like with bananas, apples and kiwis.
+
+=== Multi-modality recognition
+Now that we have an image that we have generated which we can use this in a test of the multi-modality integration. We'll again lean on using OpenAI as the source for our artificial intelligence needs and we can recyclefootnote:[Given the GPU cost of running a DALL-E generation perhaps reusing this image nets out in the end] the fruit bowl we just generated for our next test.
+
+Our test will consist of two items that we'll be passing to the API: a prompt, and an image. For the image, we'll assume it is a `ClassPathResource` which means we need to copy it to `src/main/resources` which we can do like so:
+
+[source,shell]
+----
+cp rendered_fruit_bowl.png src/main/resources
+----
+
+We'll take the `Resource` and the text prompt `In a single sentence explain what is in this picture.` and at the end do some simple assertions to ensure that the text description contains the words "banana", "apple" and "kiwi".
+
+.Listing {chapter}-{counter:listing}: `chapter05/src/test/java/ch05/ImageRecognitionTest.java`
+[source,java]
+----
+include::../code/chapter05/src/test/java/ch05/ImageRecognitionTest.java[]
+----
+
+One thing you'll notice is we are outputting the contents of the `recognition` object returned to stdout. We've left this in because during the testing of this book the hallucinations sometimes cause a test to fail and it helps to see why the assertions fail.
+
+The other thing you'll see is that we can't quite run this yet since the `ImageRecognitionService` doesn't exist. Let's take a look at the implementation of `ImageRecognitionService` and see how the multi-modality integration of interrogating an image via a prompt is done.
+
+.Listing {chapter}-{counter:listing}: `chapter05/src/main/java/ch05/service/ImageRecognitionService.java`
+[source,java]
+----
+include::../code/chapter05/src/main/java/ch05/service/ImageRecognitionService.java[]
+----
+
+We have a `ChatModel` available in this class which we'll use Spring's dependency injection to reference in our `ImageRecognitionService`.
+
+Our call to OpenAI is building a `UserMessage` which will contain the two items passed ni via the test: a text prompt, and the Media object. Our call to the API will be blocking so we'll use `call()` to get the response specification.
+
+With our response we can pass back the description from OpenAI on what is inside the image.
+For our usage and this test we don't have need for the metadata but just know that it's available if needed for your application.
+
+Now that we have a service our tests should pass. We'll call the chapter's test suite using Maven:
+
+[source,shell]
+----
+mvn -am -pl chapter05 clean test
+----
+
+If mercury isn't in retrograde in the OpenAI cloud, you should see `SUCCESS` in the test. The test itself will print out the returned text from OpenAI and the test itself should also pass.
+
+One fun exercise you can try on your own is to expand your prompt to get more information about the media you upload to the API. We could imagine that uploading a PDF and asking it to summarize the contents could be another test of the multimodal nature of this module in Spring AI.
+
+=== Lights, Camera, AI
+Pur last test we're going to again re-use code from the lights in Chapter 3 and we're going to generate some images based on the lights properties we've defined in `Ch05Configuration` which we're letting OpenAI use as a data source.
+
+Here's the process for what the following test actually does, and the great part about it is we're not doing anything new here so as soon as we explain ourselves here we can run the test right away.
+
+We've got 3 lights that are possible in our system, and in the following test:
+
+1. Ask the AI to create a prompt for DALL-E to generate an image of any lightbulb which is on.
+2. Pass that prompt to the `ImageGeneratorService` and retrieve the `Image`
+3. Pass that `Image` back to the AI and ask it to explain what's in the picture
+4. Assert that at a minimum the explanation contains the word `red` since that's the light that should be turned on
+5. Run a command with OpenAI to turn off the red light, and turn on the green light.
+6. Re-run step 1 - 3 above again
+7. Assert that at a minimum the explanation contains the word `green` now since we turned off the red light and turned on the green in our command.
+
+Let's take a look at how this works in the test below.
+
+.Listing {chapter}-{counter:listing}: `chapter05/src/test/java/ch05/LightVisualizerTest.java`
+[source,java]
+----
+include::../code/chapter05/src/test/java/ch05/LightVisualizerTest.java[]
+----
+
+Now that we have the test and it reuses existing services, we'll again call the chapter's test suite using Maven:
+
+[source,shell]
+----
+mvn -am -pl chapter05 clean test
+----
+
+Whew. We've got a test now performing the functions and it should pass. One could imagine if you hooked up a camera that captured an image at some regular frequency, and uploaded that capture to an AI you could ask it to perform a function based on what it saw in the photo. Pretty neat.
 
 == Next Steps
 
-In our next chapter, ...
+In our next chapter, we'll wrap up with a discussion on navigating AI in engineering, the challenges and share some best practices.

@@ -9,8 +9,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,14 +24,15 @@ public class GenerateImageTest {
         var image = imageGeneratorService.processPrompt(
                 "Can you create an artistic rendering of a bowl full of fruit including only bananas, apples and kiwis",null
         );
+        assertNotNull(image);
 
-        try {
-            byte[] binaryData = Base64.getDecoder().decode(image.getB64Json());
-            BufferedImage webpImage = ImageIO.read(new ByteArrayInputStream(binaryData));
-            WebpToPngConverter.convertWebpToPng(webpImage, "./dall_e_rendering.png");
+        byte[] binaryData = Base64.getDecoder().decode(image.getB64Json());
+        try (ByteArrayInputStream webpStream = new ByteArrayInputStream(binaryData)) {
+            BufferedImage bufferedImage = ImageIO.read(webpStream);
+            assertNotNull(binaryData);
+            WebpToPngConverter.convertWebpToPng(bufferedImage, "./rendered_fruit_bowl.png");
         } catch (IOException e) {
             System.err.println("IO Error while writing file: " + e.getMessage());
         }
-        assertNotNull(image);
     }
 }
