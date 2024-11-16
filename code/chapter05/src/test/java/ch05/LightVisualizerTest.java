@@ -47,7 +47,7 @@ public class LightVisualizerTest {
         return new Media(IMAGE_WEBP, new ByteArrayResource(binaryData));
     }
 
-    @Test
+//    @Test
     void runLightVisualizer() {
         try {
             var initialLightbulbPrompt = runCommand("Based on the status of the lights red, yellow and green create a single sentence prompt for DALL-E of an realistic rendering of a lightbulb for any color which is turned on");

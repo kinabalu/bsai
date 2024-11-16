@@ -4,7 +4,7 @@
 == Generating and Recognizing Images
 The 1960s were an important time for the process of image recognition and generation similar to what we explored with audio in the previous chapter. Early image recognition using computer vision systems were focused on simple geometric shapes which evolved into techniques like edge detection and template matching. The complexity inherent in an image meant that these early techniques while impressive for their time were unable to deal with anything more than a very structured environment.
 
-Over the years with advancements in usage of neural networks for learning-based approaches and later Support Vector Machines and other feature-based methods the object detection and classification had reached a well-defined commercial appeal especially with faster available hardware. Fast forward to the last 25 years and the development of Convolutional Neural Networks (CNNs) and advanced GPU processing has exploded the capabilities of image recognition. The techniques utilized in most of the chat models available via Spring AI use some variant of transformers like Vision Transformers to perform their work.
+Over the years with advancements in usage of neural networks for learning-based approaches and later Support Vector Machines and other feature-based methods the object detection and classification had reached a well-defined commercial appeal especially with faster available hardware. Fast-forward to the last 25 years and the development of Convolutional Neural Networks (CNNs) and advanced GPU processing has exploded the capabilities of image recognition. The techniques utilized in most of the chat models available via Spring AI use some variant of transformers like Vision Transformers to perform their work.
 
 As of this writing the following offerings can perform image recognition via Spring AI:
 
@@ -13,11 +13,7 @@ As of this writing the following offerings can perform image recognition via Spr
 * Vertex AI Gemini (e.g. gemini-1.5-pro-001, gemini-1.5-flash-001 models)
 * Anthropic Claude 3
 
-
-// TODO "basic generations" needs clarification
-// TODO "in the last 20 years with the invention of GANS which used to neural networks to produce images..." this isn't actually a sentence. :)
-// TODO I like this paragraph, but it needs editing
-Generation has followed a somewhat similar history and progression over the last 60 years. The basic generations in the 1960s progressed into the 1980s and 1990s with 3D models, textures and realistic lighting using mathematically simulated scenes. In the last 20 years with the invention of Generative Adversarial Networks by Ian Goodfellow which used two neural networks in concert with each other to produce images that can look convincingly real. The real power has surfaced in the last few years with text-to-image generation models beginning with early models like DALL-E 1. Diffusion models were introduced commercially to the world in 2022 with releases by popular names now DALL-E 2, Midjourney and Stable Diffusion and was able to produce images that were more realistic and higher quality than ever before.
+Image generation has experienced a similar trajectory and progression over the past 60 years. Early efforts in the 1960s laid the foundation, advancing through the 1980s and 1990s with innovations in 3D modeling, texturing and realistic lighting using mathematically simulated scenes. The field took a significant leap forward in the last 20 years with the invention of Generative Adversarial Networks by Ian Goodfellow, which used two neural networks in tandem to create convincingly realistic images. More recently, the advent of text-to-image generation models, starting with early examples like DALL-E 1, marked another transformative phase. In 2022, diffusion models entered the commercial mainstream with notable releases such as DALL-E 2, Midjourney, and Stable Diffusion, delivering unprecedented realism and image quality.
 
 As of this writing the following are offered by Spring AI for image generation:
 
@@ -25,13 +21,6 @@ As of this writing the following are offered by Spring AI for image generation:
 * QianFan
 * StabilityAI
 * ZhiPuAI
-
----
-* first thing is the setup
-* second thing we'll do is set up and do some image generation. bowl of fruit maybe? and pass that to OpenAI and download the image
-* third thing we'll do is take that image and pass it back through image recognition using CLIP
-
-
 
 First task we'll do is to create our directory structure for this chapter. This can be created in the "project directory" as in previous chapters with the following command, if you're running a POSIX shell like `bash` or `zsh`:
 
@@ -41,8 +30,7 @@ First task we'll do is to create our directory structure for this chapter. This 
 mkdir -p src/{main,test}/{java,resources}
 ----
 
-// TODO reference to webp is valuable, but "which is what OpenAI renders" would be a better footnote.
-This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter05`, and the file is named `pom.xml`. A few items to note here, just as in chapter 4 we are going to include the `chapter03` module for a fun final challenge and a library extension for `ImageIO` which enables dealing with `webp` images which is what OpenAI renders. We have included a simple class which can write these files to disk and convert them to PNG before doing so.
+This is _this chapter's_ project file, and thus it's in a directory _under_ the top level directory, called `chapter05`, and the file is named `pom.xml`. A few items to note here, just as in chapter 4 we are going to include the `chapter03` module for a fun final challenge and a library extension for `ImageIO` which enables dealing with `webp` imagesfootnote:[OpenAI renders and sends down `webp` images in their API]. We have included a simple class which can write these files to disk and convert them to PNG before doing so.
 
 .Listing {chapter}-{counter:listing}: `chapter05/pom.xml`
 [source,xml]
@@ -119,9 +107,8 @@ The prefix spring.ai.openai.image is the property prefix that lets you configure
 This chapter similar to chapter 4 will include all tests which will perform executions against the OpenAI API. We will have the opportunity to go a bit deeper and use both the image generation and recognition pieces of the API in concert to create a silly but useful execution path utilizing Spring AI's image and multi-modal modules.
 
 === Image Generation
-
-// TODO this opening sentence is a freaking honker.
-Our first test case will be a simple prompt in practice these days but incredibly amazing when you think about the mountain of image data and technological achievement that is involved in taking a random set of text input and creating an image to represent it. At a super high level the text that is entered is tokenized with a transformer and converted into a high-dimensional embedding. That embedding is then mapped to a shared latent space where relationship between text and visual concepts are learned. The latent space is then passed through a generative diffusion model to create an image using the text embeddings and decoded into an image using CLIP contrastive learning model.
+Our first test case will be a simple prompt for generating an image. It is incredible to think about the mountain of image data and technological achievement that is involved in taking a random set of text input and creating an image to represent it.
+At a super high level the text that is entered is tokenized with a transformer and converted into a high-dimensional embedding. That embedding is then mapped to a shared latent space where relationship between text and visual concepts are learned. The latent space is then passed through a generative diffusion model to create an image using the text embeddings and decoded into an image using CLIP contrastive learning model.
 
 The text prompt we're using asks DALL-E to imagine a bowl of fruit containing bananas, apples and kiwis. Our code calls the `ImageGeneratorService` which passes back a base64 encoded image included in a JSON object.
 
@@ -133,10 +120,7 @@ include::../code/chapter05/src/test/java/ch05/GenerateImageTest.java[]
 
 In a test first methodology we've now got something that will definitely not pass because it won't compile without an implementation of `ImageGeneratorService`. We'll get to the implementation of that in just a moment.
 
-// TODO "today" is gonna feel dated when ".webp2" is what all the cool kids are using.
-// TODO And we overuse "today" as a word.
-// TODO Final sentence made me laugh. Good.
-For now, the image that gets passed back, if you are interested in the output as part of the test the second half of the test writes the file to disk. OpenAI generated images are in `webp` format when they are sent down the wire. The `webp` format is the gold standard for web and mobile applications today due to it's more efficient file size and support in all modern browsers today. For saving and importing into a design tool though we can't help but love `png` for this so we've included a converter from `webp` to `png`.
+For now, the image that gets passed back, if you are interested in the output as part of the test the second half of the test writes the file to disk. OpenAI generated images are in `webp` format when they are sent down the wire. The `webp` format is currently the gold standard for web and mobile applications due to it's more efficient file size and support in all modern browsers today. For saving and importing into a design tool though we can't help but love `png` for this so we've included a converter from `webp` to `png`.
 
 .Listing {chapter}-{counter:listing}: `chapter05/src/main/java/ch05/WebpToPngConverter.java`
 [source,java]
@@ -150,7 +134,6 @@ With the text prompt given, we issue a call to the API we use `call()` to get th
 
 Let's take a look at the actual class and what the implementation looks like.
 
-// TODO I feel like the imageOptions has simpler code than a ternary op here
 .Listing {chapter}-{counter:listing}: `chapter05/src/main/java/ch05/service/ImageGeneratorService.java`
 [source,java]
 ----
@@ -164,26 +147,21 @@ Let's generate an image since our test will pass. We'll call the chapter's test 
 mvn -am -pl chapter05 clean test
 ----
 
-// TODO it did not complete with SUCCESS. I got an error saying "rendered_fruit_bowl.png cannot be opened." It did, however, get created in the top level directory.
-// TODO I would also include a sample image after this, showing what *your* run resulted in for readers. Theirs might not match, but it should communicate the idea. Bonus points if we include something odd in the image via prompt, like "with a praying mantis smiling at the viewer" or something like that.
+The image that gets output will save in the top level directory of our system. After our prompt the following was what DALL-E generated for usfootnote:[Readers might notice that our image has a friend, isn't he cute?].
+
+.Our generative fruit bowl
+image::images/rendered_fruit_bowl.png[]
+
 If everything is working properly it should complete with `SUCCESS`.
 After a successful run you can check the root of the projects filesystem and should see a new `png` image named `rendered_fruit_bowl.png` which will contain an image representation of what DALL-E thinks a fruit bowl looks like with bananas, apples and kiwis.
 
 === Multi-modality recognition
 
-// TODO footnote is... uh... "nets out in the end"?
-Now that we have an image that we have generated which we can use this in a test of the multi-modality integration. We'll again lean on using OpenAI as the source for our artificial intelligence needs and we can recyclefootnote:[Given the GPU cost of running a DALL-E generation perhaps reusing this image nets out in the end] the fruit bowl we just generated for our next test.
+Now that we have an image that we have generated which we can use this in a test of the multi-modality integration. We'll again lean on using OpenAI as the source for our artificial intelligence needs and we can recycle the fruit bowl we just generated for our next test.
 
-Our test will consist of two items that we'll be passing to the API: a prompt, and an image. For the image, we'll assume it is a `ClassPathResource` which means we need to copy it to `src/main/resources` which we can do like so:
+Our test will consist of two items that we'll be passing to the API: a prompt, and an image. For the image, we'll load it using a `FileSystemResource` and pulling from the top level directory.
 
-// TODO AHHHH, this is why I got the error I received. Interesting. Okay, cool. This might want a footnote itself.
-// TODO also, in the source from github, src/main/resources was NOT created. We may want to change this to src/test/resources.
-[source,shell]
-----
-cp rendered_fruit_bowl.png src/main/resources
-----
-
-We'll take the `Resource` and the text prompt `In a single sentence explain what is in this picture.` and at the end do some simple assertions to ensure that the text description contains the words "banana", "apple" and "kiwi".
+We'll take the `Resource` and the text prompt `In a single sentence explain what is in this picture and identify every item.` and at the end do some simple assertions to ensure that the text description contains the words "banana", "apple" and "kiwi".
 
 .Listing {chapter}-{counter:listing}: `chapter05/src/test/java/ch05/ImageRecognitionTest.java`
 [source,java]
@@ -215,8 +193,52 @@ Now that we have a service our tests should pass. We'll call the chapter's test 
 mvn -am -pl chapter05 clean test
 ----
 
-// TODO I'd also like to see some sample output from maven here, for once, showing how OpenAI described the image.
-If mercury isn't in retrograde in the OpenAI cloud, you should see `SUCCESS` in the test. The test itself will print out the returned text from OpenAI and the test itself should also pass.
+If mercury isn't in retrograde in the OpenAI cloud, you should see `SUCCESS` in the test. The test itself will print out the returned text from OpenAI and the test itself should also pass. We have deliberately written a test that depends on the generation from a previously written test `GenerateImageTest` which is not a best practice so in the future best to avoid dependencies.
+
+We've included a test run so you can see it working end to end.
+
+[source,shell]
+----
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running ch05.ImageRecognitionTest
+12:26:03.366 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [ch05.ImageRecognitionTest]: ImageRecognitionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+12:26:03.405 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration ch05.Ch05Configuration for test class ch05.ImageRecognitionTest
+
+Powered by Spring Boot 3.3.0
+2024-11-16T12:26:03.548-08:00  INFO 79859 --- [           main] ch05.ImageRecognitionTest                : Starting ImageRecognitionTest using Java 21.0.3 with PID 79859 (started by kinabalu in /Users/kinabalu/workspace/beginningspring/bsai/code/chapter05)
+2024-11-16T12:26:03.550-08:00  INFO 79859 --- [           main] ch05.ImageRecognitionTest                : No active profile set, falling back to 1 default profile: "default"
+2024-11-16T12:26:04.248-08:00  INFO 79859 --- [           main] ch05.ImageRecognitionTest                : Started ImageRecognitionTest in 0.798 seconds (process running for 1.173)
+WARNING: A Java agent has been loaded dynamically (/Users/kinabalu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.16/byte-buddy-agent-1.14.16.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+The image shows a bowl containing a red apple, a yellow apple, and two bananas, with sliced kiwis and kiwi seeds on a wooden surface.
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.366 s -- in ch05.ImageRecognitionTest
+[INFO] Running ch05.GenerateImageTest
+2024-11-16T12:26:08.665-08:00  INFO 79859 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [ch05.GenerateImageTest]: GenerateImageTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-11-16T12:26:08.665-08:00  INFO 79859 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration ch05.Ch05Configuration for test class ch05.GenerateImageTest
+Conversion complete: ./rendered_fruit_bowl.png
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.88 s -- in ch05.GenerateImageTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for bsai-code 1.0:
+[INFO]
+[INFO] bsai-code .......................................... SUCCESS [  0.140 s]
+[INFO] chapter03 .......................................... SUCCESS [ 12.635 s]
+[INFO] chapter05 .......................................... SUCCESS [ 19.162 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  32.062 s
+[INFO] Finished at: 2024-11-16T12:26:21-08:00
+[INFO] ------------------------------------------------------------------------
+----
 
 One fun exercise you can try on your own is to expand your prompt to get more information about the media you upload to the API. We could imagine that uploading a PDF and asking it to summarize the contents could be another test of the multimodal nature of this module in Spring AI.
 
