@@ -39,7 +39,7 @@ There are several compelling answers to this, and some less convincing ones as w
 Let's start by clarifying what AI is.
 "Artificial intelligence" is a broad term with numerous applications, and we certainly won't cover all—or even most—of them in this book.
 
-Here's how an AI summarized artificial intelligence:
+Here's how an AI (ChatGPT, using the GPT-4o model, specifically) summarized artificial intelligence:
 
 [source,text]
 ----
@@ -135,7 +135,42 @@ Unless specifically pointed out, the words you are reading were written by an ac
 That's a good question!
 As with others, the answer is "it depends on what you want," combined with what you want to spend and the cost of using a given AI service.
 
-There are a lot of choices: ChatGPT (from OpenAI), Meta (from Facebook), Grok (from X), Amazon Bedrock, Claude, and Ollama, and that's just a *few* of the options.
+There are a lot of choices:
+
+
+[cols="1,1,3"]
+|===
+|Name
+|Source
+|Url
+
+|ChatGPT
+|OpenAI
+|`https://chatgpt.com`
+
+|Meta
+|Facebook
+|`https://meta.ai`
+
+| Grok
+|X
+|`https://x.ai/`
+
+|Amazon Bedrock
+|Amazon
+|`https://aws.amazon.com/bedrock/`
+
+|Claude
+|Anthropic
+|`https://claude.ai/`
+
+|Ollama
+|Open Source
+|`https://ollama.com/`
+|===
+
+That's just a *few* of the options.
+
 Most of them use a similar API endpoint (after all, they do have a pretty common usage pattern), but their capabilities aren't quite the same; Ollama, for example, doesn't support audio or image generation as of this writing in and of itself, while ChatGPT certainly does.
 
 This is actually why you'd want to use Spring AI: it abstracts much of the low-level APIs into a common framework.
@@ -178,7 +213,7 @@ It requires you to have Java and Maven installed, although handy links will be p
 This book does *not* require an IDE.
 You'll want one, we think, but ... which one?
 We don't know, and don't care.
-You can use a simple text editor, if that's what you desire, or IDEA, or Eclipse, or NetBeans, or Visual Studio Code; we offer these names as they occurred to us to write, not as an indication of preference in any way.
+You can use a simple text editor, if that's what you desire, or IDEA, or Eclipse (or the Spring Tool Suite, which is based on Eclipse), or NetBeans, or Visual Studio Code; we offer these names as they occurred to us to write, not as an indication of preference in any way.
 
 The book also generally focuses on tests as a way to demonstrate technique.
 There are a few places where there's an application to execute (particularly in Chapter 4, which provides a web-based application to convert text to speech) but the _primary_ demonstration is in setting expectations of output given a specific set of inputs, and validation of that output.
