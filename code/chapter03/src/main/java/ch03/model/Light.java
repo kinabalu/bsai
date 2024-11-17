@@ -3,8 +3,8 @@ package ch03.model;
 import java.util.StringJoiner;
 
 public class Light {
-    String color;
-    Boolean on;
+    private String color;
+    private Boolean on;
 
     public Light(String color, boolean on) {
         this.color = color;

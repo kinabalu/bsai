@@ -3,11 +3,11 @@ package ch03.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Description;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
-@Component("ChangeLightStatusService")
+@Service("ChangeLightStatusService")
 @Description("Change a light's state")
 public class UpdateLightStatusFunction
         implements Function<UpdateLightStatusFunction.Request, UpdateLightStatusFunction.Response> {

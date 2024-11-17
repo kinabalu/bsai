@@ -54,9 +54,14 @@ It's fairly straightforward in and of itself, including the dependencies we need
 include::../code/chapter02/pom.xml[]
 ----
 
+NOTE: The dependency on `spring-boot-starter-web` is due to the way the Spring AI modules are being developed.
+As this book was being written, there was an implicit requirement for classes in the `web` module, as opposed to an _explicit_ transient requirement, so we have to include this on our own.
+By the time _you_ use Spring AI, this requirement may have changed.
+
 We'll want one more file to save ourselves a lot of unnecessary duplication: an `.env` file.
 This file is going to hold our OpenAI access key.
-This is a simple name/value pair, and this file goes into the root of our project structure.
+This is a token provided by OpenAI to keep track of usage and capabilities, and we'll detail how to get it in the next section of this chapter; most of the providers have a similar value, and getting their access keys may differ slightly.
+In each case, however, this is a simple name/value pair, and this file goes into the root of our project structure.
 
 Listing {chapter}-{counter:listing}: `.env`
 
@@ -135,11 +140,11 @@ Selecting this link gives you a chance to create new secrets - the API keys you 
 When you generate these, save them somewhere safe - and use set the value in the `.env` file for use by Spring AI.
 The value you'll want should look like `sk-proj-` followed by a number of other letters.
 
-If you lose this key, all you need to do is create a new one - but OpenAI doesn't show you the keys again.
+If you lose this key, all you need to do is create a new one - but OpenAI doesn't show you the keys again, so keep track of it.
 
 The value in the "Project ID" field is what we'll put in the `.env` file.
 
-.The Project settings on OpenAI.com
+.The API Settings Page
 image::images/ch02-openai-secret-key.png[]
 
 That's a lot of setup!
@@ -165,7 +170,7 @@ With that said, it's time to look at how Spring AI's `ChatClient` actually works
 A `ChatClient` uses a `Prompt` to interact with the language model.
 A `Prompt` might be as simple as a block of text, but can configure what model is being used, the accepted variability of the response, and a host of other options.
 These can be controlled at the point of the request, in code, but we can also control them in our application properties.
-We'll need to set the API key, in any event, so let's take a look at the some of the more useful properties we can set.
+We'll need to set the API key, in any event, so let's take a look at the some of the more useful properties we can set for Spring AI. (Spring has many, _many_ settings available, depending on what modules you choose to use; we're _only_ looking at Spring AI here.)
 
 [cols="1,2"]
 |===
@@ -290,6 +295,13 @@ Let's keep ourselves looking at the model for now.
 [source,java]
 ----
 include::../code/chapter02/src/test/java/ch02/OptionTests.java[]
+----
+
+If you're writing the code yourself as we go through the book, the command to execute all of the tests in this chapter is:
+
+[source,bash]
+----
+mvn -am -pl chapter02 clean test
 ----
 
 The output for this execution is relatively variable (thanks to the default temperature of queries) but one run locally generated this outputfootnote:[We're going to stick on the subject of junks, which are, according to Wikipedia, "a type of Chinese sailing ship characterized by a central rudder, an overhanging flat transom, watertight bulkheads, and a flat-bottomed design." The subject was chosen mostly to avoid referring to African laden swallows, which - let's be real - nobody cares about.]:
@@ -552,7 +564,9 @@ This gives the LLM a chance to examine the context of the question (including ou
 We can also use `SystemMessage` as part of the conversation.
 A _system message_ is an edict for the LLM to factor in; it can be similar to a `UserMessage` in impact, but _in general_ a system message is more likely to have a persistent impact over the entire conversation; a `UserMessage` might, for example, change the conversational mode to Diogenes instead, but a `SystemMessage` is harder for the user to override.
 
-This is an interesting example - but we can take it further, and we will, in the next chapter. Our `ConversationTests` example shows context as part of the conversation, but our test looks for a very simple answer - "does the result contain this bit of text that represents what we expect?" and we can do better. It's one of the more compelling features of Spring AI, and we're going to look at it in our next chapter, where we discuss concrete data extraction.
+This is an interesting example - but we can take it further, and we will, in the next chapter.
+Our `ConversationTests` example shows context as part of the conversation, but our test looks for a very simple answer - "does the result contain this bit of text that represents what we expect?" and we can do better.
+It's one of the more compelling features of Spring AI, and we're going to look at it in our next chapter, where we discuss concrete data extraction.
 
 == Next Steps
 
