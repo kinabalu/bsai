@@ -7,7 +7,7 @@ In Chapter 1, we brought up a simple high-level overview of the AI landscape as 
 It's a useful chapter, not just because of the content it holds, but because of the way it was written.
 
 It was drafted in Asciidoctorfootnote:[Asciidoctor (`https://asciidoctor.org`) is software for taking simple text content and generating a document model from it.] (as was the rest of the book), with the editor suggesting minor grammar changes as it was written.
-These edits were focused on simple things like matching tenses, or spellingfootnote:[If you're interested, the tool used for grammar and syntax was Grammarly, at `https://app.grammarly.com/`, which is merely one of many such tools, and this is not an endorsement of Grammarly over other similar tools like ProWritingAid (`https://prowritingaid.com/`), and so forth. Most of them do the same sorts of things, although most of them _also_ tend to be more focused on specific types of writing; ProWritingAid, for example, is primarily meant for storytellers. Even Microsoft Word has similar grammar aids, like CoPilot.].
+These edits were focused on simple things like matching tenses, or spellingfootnote:[If you're interested, the tool used for grammar and syntax was Grammarly, at `https://grammarly.com/`, which is merely one of many such tools, and this is not an endorsement of Grammarly over other similar tools like ProWritingAid (`https://prowritingaid.com/`), and so forth. Most of them do the same sorts of things, although most of them _also_ tend to be more focused on specific types of writing; ProWritingAid, for example, is primarily meant for storytellers. Even Microsoft Word has similar grammar aids, like CoPilot.].
 
 After the initial simple draft was done and revised by the author, the content was submitted as a whole to an LLM (ChatGPT, specifically), with a prompt asking for hints toward readability, ease of use, and appropriate topical coverage.
 ChatGPT then presented a potential rewrite of the chapter, which wasn't quite what was intended.
@@ -38,7 +38,7 @@ This is not without its dangers.
 If there's a concern around AI, it's not about a possible future in which an AI overthrows humanity: it's in how easy it is to mistake AI-generated content as being accurate.
 Generating content with AI is easy and becoming easier all the time, and the AIs are getting better and better at generating realistic output, no matter what kind of medium is being used.
 
-AI models depend heavily on the quality of their training data and are highly sensitive to data quality issues: "garbage in, garbage out" is very apt, and given the volume of data used to train even the smaller LLMs, it's very difficult to ensure that the data is correct; thus, it's relatively easy for an AI to confidently assert something that is very, very wrong.
+AI models depend heavily on the quality and suitability of their training data and are highly sensitive to data quality issues: "garbage in, garbage out" is very apt, and given the volume of data used to train even the smaller LLMs, it's very difficult to ensure that the data is correct; thus, it's relatively easy for an AI to confidently assert something that is very, very wrong.
 
 AIs can generate working code relatively easily, and there are many AI models designed specifically for this purpose; asking an AI how to write a function to parse a given set of inputs, yielding a specific type of output, is likely to give you working code for whichever language you choose, and you can often even specify the parsing techniques.
 
