@@ -21,7 +21,7 @@ public class TranscribeTest {
     void transcribeQuery() {
         Resource daisyBellResource = new ClassPathResource("Daisy_Bell_sung_by_DECtalk.flac");
         AudioTranscriptionResponse response = transcribeService.transcribeAudio(daisyBellResource, null);
-
+        System.out.println(response.getResult().getOutput());
         assertTrue(response.getResult().getOutput().contains("the seat of a bicycle built for two"));
     }
 }

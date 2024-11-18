@@ -113,8 +113,8 @@ If you are interested in the output as part of the test you could write the mp3 
 Files.write(Paths.get("./daisybell.mp3"), responseAsBytes);
 ----
 
-This test is simple enough, but it obviously won't run because we don't have an implementation of the `TextToSpeechService`.
-The service has two public methods in it, `processText(String)` and `processText(String, OpenAiAudioSpeechOptions.Builder)`, which both return a `byte[]`.
+This test is simple enough, but it obviously won't run because we don't have an implementation of the `TextToSpeechService` yet.
+The service has a single public methods in it, `processText(String, OpenAiAudioSpeechOptions.Builder)`, which returns a `byte[]`.
 
 We have a `SpeechModel` available which we'll use Spring's dependency injection to reference in our `TextToSpeechService`.
 
@@ -141,12 +141,24 @@ We've got something to test now, so we can run this chapter's test suite by usin
 mvn -am -pl chapter04 clean test
 ----
 
-If everything is working properly it should complete with `SUCCESS`.
+If everything is working properly it should complete with `SUCCESS`. We've included what you should see in your output after running this command below.
+
+[source,shell]
+----
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running ch04.SpeechTTSTest
+INFO  org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [ch04.SpeechTTSTest]: SpeechTTSTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+INFO  org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration ch04.Ch04Configuration for test class ch04.SpeechTTSTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.532 s -- in ch04.SpeechTTSTest
+----
+
+
 If you chose to add the line for writing the file output to disk you can open up the resulting MP3 file and have a listen.
 This test will sound more like spoken word than singing as there is no "singing" option within the OpenAI API; the result is a particularly passionless rendering of a silly love song, and might be worth listening to only for humor's sake.
 
-Let's say we wanted to pass some extra options to make it more like a song.
-If we pass a custom `OpenAiAudioSpeechOptions` to a custom test we can do so like this.
+Let's say we wanted to pass some extra options to make it more like a song. Our endless testing with the API brought us to use the voice "Shimmer" and slow down the speed to `0.7` which makes it sound more like singing. We can pass a custom `OpenAiAudioSpeechOptions` with these options using a custom test like so:
 
 .Listing {chapter}-{counter:listing}: `chapter04/src/test/java/ch04/SpeechTTSTestWithOptions.java`
 [source,java]
@@ -217,9 +229,33 @@ We've got something to test now, so we can run this chapter's test suite by usin
 mvn -am -pl chapter04 clean test
 ----
 
-If the stars align and the AI hasn't done any hallucinating during your test you should see `SUCCESS` in the test.
+If the stars align and the AI hasn't done any hallucinating during your test you should see `SUCCESS` in the test. You can see a run for the `TranscribeTest` below.
+
+[source,shell]
+----
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running ch04.TranscribeTest
+INFO  org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [ch04.TranscribeTest]: TranscribeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+INFO  org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration ch04.Ch04Configuration for test class ch04.TranscribeTest
+
+Powered by Spring Boot 3.3.0
+INFO  ch04.TranscribeTest -- Starting TranscribeTest using Java 21.0.3 with PID 12317 (started by kinabalu in /Users/kinabalu/workspace/beginningspring/bsai/code/chapter04)
+INFO  ch04.TranscribeTest -- No active profile set, falling back to 1 default profile: "default"
+INFO  ch04.TranscribeTest -- Started TranscribeTest in 0.816 seconds (process running for 1.303)
+WARNING: A Java agent has been loaded dynamically (/Users/kinabalu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.16/byte-buddy-agent-1.14.16.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+Daisy, Daisy, give me your answer, too. I'm half crazy, all for the love of you. It won't be a stylish marriage. I can't afford a carriage. But you'd look sweet on the seat of a bicycle built for two.
+
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.347 s -- in ch04.TranscribeTest
+----
 
 The neat thing to consider here is that the phrase is actually rendered pretty well; we expect it to render the _number_ two (as in "a bicycle built for two") and not the homonym "too" - the AI model is usually going to infer the proper words based on the phrases in the song, so while the punctuation and capitalization may be slightly variable, _in general_ it's rendering a quite recognizable transcription of the input, _without_ necessarily recognizing the song itself.
+
+The following table shows many of the transcription options available in this module of Spring AI and passed on to OpenAI.
 
 [cols="1,2"]
 |===
@@ -247,7 +283,7 @@ The neat thing to consider here is that the phrase is actually rendered pretty w
 === REST Example
 
 A real world example might be an endpoint using Spring MVC which processes text or audio files.
-Our next step will to be setting up two simple POST endpoints one which accepts a String of text and the other which accepts an audio file.
+Our next step will be setting up two simple POST endpoints one which accepts a String of text and the other which accepts an audio file.
 
 Calling this endpoint might look something like:
 
@@ -262,7 +298,21 @@ curl -X POST http://localhost:8080/api/tts \
 EOF
 ----
 
-The above is passing a JSON object with a key of `text` and the value as the string we're looking to pass in.
+The above is passing a JSON object with a key of `text` and the value as the string we're looking to pass in. Running this command will look like the following depending on what text you pass in. For our case we're passing in the contents of the song.
+
+[source,shell]
+----
+curl -X POST http://localhost:8080/api/tts \
+-H "Content-Type: application/json" \
+--output test.mp3 \
+--data-binary @- << EOF
+{"text": "Daisy, Daisy, \nGive me your answer, do! \nI'm half crazy, \nAll for the love of you! \nIt won't be a stylish marriage, \nI can't afford a carriage, \nBut you'll look sweet upon the seat \nOf a bicycle built for two!"}
+EOF
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  240k  100  240k  100   229  97535     90  0:00:02  0:00:02 --:--:-- 97650
+----
+
 For transcribing an audio file containing spoken words we can imagine the curl command to look like this:
 
 .Listing {chapter}-{counter:listing}: Sending the Daisy Bell audio file to transcribe endpoint
@@ -272,7 +322,14 @@ curl -X POST http://localhost:8080/api/transcribe \
 -F "file=@./src/test/resources/Daisy_Bell_sung_by_DECtalk.flac"
 ----
 
-Running this from the chapter root should pick up the file that was downloaded earlier in the chapter and imagine it would return back the transcribed text.
+Running this from the chapter root should pick up the file that was downloaded earlier in the chapter and imagine it would return back the transcribed text. Output from this file will look something like the following:
+
+[source,shell]
+----
+% curl -X POST http://localhost:8080/api/transcribe \
+-F "file=@./src/test/resources/Daisy_Bell_sung_by_DECtalk.flac"
+Daisy, Daisy, give me your answer, do. I'm half-crazy all for the love of you. It won't be a stylish marriage, I can't afford a carriage. But you'd look sweet on the seat of a bicycle built for two.
+----
 
 We'll start our implementation by creating a simple data class called `TextToSpeechRequest` which we can use for our endpoint `/api/tts`.
 
@@ -296,7 +353,34 @@ We can run this from the chapter root using Maven.
 
 [source,shell]
 ----
-mvn spring-boot:run
+mvn -pl chapter04 -am spring-boot:run
+----
+
+After running `spring-boot:run` you'll see output like below indicating that the server is running.
+
+[source,shell]
+----
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.0)
+
+2024-11-17T19:20:02.448-08:00  INFO 14015 --- [           main] ch04.Ch04Configuration                   : Starting Ch04Configuration using Java 21.0.3 with PID 14015 (/Users/kinabalu/workspace/beginningspring/bsai/code/chapter04/target/classes started by kinabalu in /Users/kinabalu/workspace/beginningspring/bsai/code/chapter04)
+2024-11-17T19:20:02.449-08:00  INFO 14015 --- [           main] ch04.Ch04Configuration                   : No active profile set, falling back to 1 default profile: "default"
+2024-11-17T19:20:02.864-08:00  INFO 14015 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2024-11-17T19:20:02.870-08:00  INFO 14015 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-11-17T19:20:02.870-08:00  INFO 14015 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2024-11-17T19:20:02.895-08:00  INFO 14015 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2024-11-17T19:20:02.895-08:00  INFO 14015 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 365 ms
+2024-11-17T19:20:03.177-08:00  INFO 14015 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2024-11-17T19:20:03.182-08:00  INFO 14015 --- [           main] ch04.Ch04Configuration                   : Started Ch04Configuration in 0.861 seconds (process running for 1.002)
+2024-11-17T19:20:37.051-08:00  INFO 14015 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-11-17T19:20:37.051-08:00  INFO 14015 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-11-17T19:20:37.052-08:00  INFO 14015 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 ----
 
 In a separate terminal session we can use the curl commands above and see the API responses sent back similarly as with the tests.
@@ -324,22 +408,22 @@ If we think about this logically using the code we have today we will be doing t
 4. Finally we'll pass the text output of the `converse` method to the `TextToSpeechService` and save the resulting spoken word audio to disk.
 
 With that, our first task is including chapter 3 in our maven configuration files, This will let us re-use the services and methods involved in our ability to manage the real world we created in the previous chapter of light management using the LLM.
-Include the following block anywhere in the `<dependencies>` block.
+We're including the updated `pom.xml` which includes a reference to `chapter03`:
 
 .Listing {chapter}-{counter:listing}: `chapter04/pom.xml`
 [source,xml]
 ----
-include::../code/chapter04/pom.xml[lines="21..26"]
+include::../code/chapter04/pom.xml[]
 ----
 
 Our next task is to modify our `@Configuration` to include the `UpdateChatService` along with it's dependencies.
 We are also creating some mocked light status that we can act on with our voice assistant.
-The block below can be included anywhere within the `Ch04Configuration` file:
+Here's an updated `Ch04Configuration` file with those new elements defined:
 
 .Listing {chapter}-{counter:listing}: `chapter04/src/main/java/ch04/Ch04Configuration.java`
 [source,java]
 ----
-include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[lines="22..61"]
+include::../code/chapter04/src/main/java/ch04/Ch04Configuration.java[]
 ----
 
 Due to all the work we've done previously, this is all the configuration necessary to make a voice assistant like we've mapped out work.
@@ -395,7 +479,19 @@ Let's re-run our tests for `chapter04`:
 mvn clean test -am -pl chapter04
 ----
 
-If all worked as expected there should be an audio file saved on the filesystem named "voice_assistant_response.mp3" and playing it on your system it will contain a message like "The yellow light has been turned on."
+If all worked as expected there should be an audio file saved on the filesystem named "voice_assistant_response.mp3" and playing it on your system it will contain a message like "The yellow light has been turned on." We have included the maven output from our run for the `VoiceAssistantTest` class below.
+
+[source,shell]
+----
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running ch04.VoiceAssistantTest
+INFO  org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [ch04.VoiceAssistantTest]: VoiceAssistantTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+INFO  org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration ch04.Ch04Configuration for test class ch04.VoiceAssistantTest
+INFO  ch03.service.UpdateLightStatusFunction -- Changing status for light: Request[color=yellow, on=true]
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.998 s -- in ch04.VoiceAssistantTest
+----
 
 As we indicated earlier, if you want to record your own audio command you can change the test to accommodate loading an MP3 file and sending that through the process.
 Simply load your MP3 file (here we assume `voice_assistant_command.mp3` as a name) and pass that to the `issueCommand` method wrapped in a `ByteArrayResource`.
