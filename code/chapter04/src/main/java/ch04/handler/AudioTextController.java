@@ -4,7 +4,6 @@ import ch04.model.TextToSpeechRequest;
 import ch04.service.TextToSpeechService;
 import ch04.service.TranscribeService;
 import ch04.service.VoiceAssistantService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,14 +18,17 @@ import java.io.IOException;
 @RequestMapping("/api")
 public class AudioTextController {
 
-    @Autowired
-    private TextToSpeechService textToSpeechService;
+    private final TextToSpeechService textToSpeechService;
 
-    @Autowired
-    private TranscribeService transcribeService;
+    private final TranscribeService transcribeService;
 
-    @Autowired
-    private VoiceAssistantService voiceAssistantService;
+    private final VoiceAssistantService voiceAssistantService;
+
+    public AudioTextController(TextToSpeechService textToSpeechService, TranscribeService transcribeService, VoiceAssistantService voiceAssistantService) {
+        this.textToSpeechService = textToSpeechService;
+        this.transcribeService = transcribeService;
+        this.voiceAssistantService = voiceAssistantService;
+    }
 
     @PostMapping("/tts")
     public ResponseEntity<byte[]> handleTextToSpeech(@RequestBody TextToSpeechRequest textToSpeechRequest) {
